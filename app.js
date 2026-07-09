@@ -312,15 +312,18 @@ function actualizarNavActivo(ruta) {
     "#/glosario":"nav-glosario",
     "#/progreso":"nav-progreso",
     "#/ranking": "nav-ranking",
+    "#/sugerir": "nav-sugerir",
     "#/admin":   "nav-admin",
   };
   document.querySelectorAll(".topbar nav a").forEach((a) => a.classList.remove("activo"));
   const id = mapa[ruta];
   if (id) document.getElementById(id)?.classList.add("activo");
 
-  // Mostrar/ocultar pestaña admin
   const navAdmin = document.getElementById("nav-admin");
   if (navAdmin) navAdmin.style.display = ROL === "admin" ? "" : "none";
+
+  const navSugerir = document.getElementById("nav-sugerir");
+  if (navSugerir) navSugerir.style.display = (USUARIO && ROL !== "admin") ? "" : "none";
 }
 
 /* ---------- EL EXPEDIENTE DEL ALUMNO ----------
@@ -414,7 +417,14 @@ function volverACursos() {
 function pintarBarraUsuario() {
   const zona = document.getElementById("zona-usuario");
   if (!zona) return;
-  if (!USUARIO) { zona.innerHTML = ""; return; }
+  if (!USUARIO) {
+    zona.innerHTML = "";
+    const navSugerir = document.getElementById("nav-sugerir");
+    if (navSugerir) navSugerir.style.display = "none";
+    return;
+  }
+  const navSugerir = document.getElementById("nav-sugerir");
+  if (navSugerir) navSugerir.style.display = ROL !== "admin" ? "" : "none";
   const cursoLink = CURSO_ACTIVO
     ? ` · <a href="javascript:void(0)" onclick="volverACursos()" style="color:var(--texto-muted)">${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.icono || ""} ${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.titulo || CURSO_ACTIVO}</a>`
     : "";
@@ -474,6 +484,11 @@ function toggleModo() {
   pintarLogin();
 }
 
+function toggleCampoProfe() {
+  const wrap = document.getElementById("campo-profe-wrap");
+  if (wrap) wrap.style.display = wrap.style.display === "none" ? "" : "none";
+}
+
 function mostrarError(msg) {
   const el = document.getElementById("error-login");
   if (el) el.textContent = msg;
@@ -523,6 +538,17 @@ function pintarLogin() {
           ${modoRegistro ? T("yaIengoCuenta") : T("soyCuentaNueva")}
         </a>
       </p>
+      ${!modoRegistro ? `
+      <p style="margin-top:.5rem">
+        <a href="javascript:void(0)" onclick="toggleCampoProfe()" style="font-size:.8rem;color:var(--texto-muted)">
+          🔑 ¿Eres profesor?
+        </a>
+      </p>
+      <div id="campo-profe-wrap" style="display:none;margin-top:6px">
+        <input class="buscador" id="campo-codigo-profe" type="password"
+          placeholder="Código de acceso de profesor..."
+          onkeydown="if(event.key==='Enter') enviarFormulario()">
+      </div>` : ""}
     </div>
   `;
 
@@ -552,11 +578,12 @@ function renderizarBotonGoogle() {
 
 async function handleGoogleLogin(response) {
   mostrarError("");
+  const codigoProfe = (document.getElementById("campo-codigo-profe")?.value || "").trim();
   try {
     const resp = await fetch("/api/google-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential: response.credential }),
+      body: JSON.stringify({ credential: response.credential, codigoProfe }),
     });
     const datos = await resp.json();
     if (datos.ok) {
@@ -597,6 +624,7 @@ async function enviarFormulario() {
 async function confirmarLogin() {
   const nombre = document.getElementById("campo-nombre").value.trim().toLowerCase();
   const contrasena = document.getElementById("campo-contrasena").value;
+  const codigoProfe = (document.getElementById("campo-codigo-profe")?.value || "").trim();
   if (!nombre) { mostrarError(T("errorNombreVacio")); return; }
   if (!contrasena) { mostrarError(T("errorContrasenaVacia")); return; }
 
@@ -604,7 +632,7 @@ async function confirmarLogin() {
     const resp = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, contrasena }),
+      body: JSON.stringify({ nombre, contrasena, codigoProfe }),
     });
     const datos = await resp.json();
     if (datos.ok) {
@@ -689,6 +717,7 @@ function navegar() {
   if (ruta === "#/glosario") return pintarGlosario();
   if (ruta === "#/progreso") return pintarProgreso();
   if (ruta === "#/ranking")  return pintarRanking();
+  if (ruta === "#/sugerir" && ROL !== "admin") return pintarSugerir();
   if (ruta === "#/admin" && ROL === "admin") return pintarAdmin();
 
   const matchModulo = ruta.match(/^#\/modulo\/(\d+)$/);
@@ -721,9 +750,14 @@ function pintarInicio() {
   const completados = modulos.filter((m) => PROGRESO[m.id]).length;
   const porcentaje = Math.round((completados / modulos.length) * 100);
 
+  const cursoActualObj = CURSOS.find((c) => c.id === CURSO_ACTIVO);
   let html = `
     <div class="hero">
-      <p class="hero-meta">Academia de Gemelos Digitales</p>
+      <p class="hero-meta">
+        <a href="javascript:void(0)" onclick="volverACursos()"
+           style="color:var(--texto-muted);text-decoration:none">← Mis cursos</a>
+        &nbsp;·&nbsp; ${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}
+      </p>
       <h1>${T("heroTitulo")}</h1>
       <p>${T("heroSub")}</p>
     </div>
@@ -1093,6 +1127,62 @@ async function cargarRanking() {
   }
 }
 
+/* ---------- PANTALLA: SUGERENCIAS (alumnos) ---------- */
+
+function pintarSugerir() {
+  actualizarNavActivo("#/sugerir");
+  app.innerHTML = `
+    <div class="hero">
+      <p class="hero-meta">Academia · Sugerencias</p>
+      <h1>💡 Sugiere un tema</h1>
+      <p>¿Hay algo que te gustaría aprender y aún no está en la plataforma? Los profesores verán tu propuesta.</p>
+    </div>
+    <div style="max-width:560px;margin:0 auto">
+      <textarea id="texto-sugerencia"
+        style="width:100%;box-sizing:border-box;height:140px;resize:vertical;padding:14px;font-family:inherit;
+               font-size:.95rem;background:var(--superficie);border:1px solid var(--borde);border-radius:10px;
+               color:var(--texto);outline:none;transition:border .2s"
+        placeholder="Escribe aquí tu propuesta de tema nuevo (mínimo 10 caracteres)..."
+        oninput="this.style.borderColor='var(--borde-hover)'"></textarea>
+      <p id="error-sugerencia" style="color:#f87171;min-height:1.4em;margin:8px 0"></p>
+      <button class="btn" onclick="enviarSugerencia()">Enviar sugerencia →</button>
+      <div id="exito-sugerencia"></div>
+    </div>
+  `;
+}
+
+async function enviarSugerencia() {
+  const texto = (document.getElementById("texto-sugerencia")?.value || "").trim();
+  const errorEl = document.getElementById("error-sugerencia");
+  if (texto.length < 10) {
+    if (errorEl) errorEl.textContent = "La sugerencia debe tener al menos 10 caracteres.";
+    return;
+  }
+  if (errorEl) errorEl.textContent = "";
+
+  try {
+    const resp = await fetch("/api/sugerencias", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ alumno: USUARIO, texto }),
+    });
+    const datos = await resp.json();
+    if (datos.ok) {
+      document.getElementById("texto-sugerencia").value = "";
+      const exitoEl = document.getElementById("exito-sugerencia");
+      if (exitoEl) exitoEl.innerHTML = `
+        <div style="margin-top:20px;padding:16px;background:rgba(74,222,128,.1);
+                    border:1px solid rgba(74,222,128,.25);border-radius:8px;color:var(--verde)">
+          ✓ Sugerencia enviada. ¡Gracias por contribuir a la plataforma!
+        </div>`;
+    } else {
+      if (errorEl) errorEl.textContent = datos.error || "Error al enviar.";
+    }
+  } catch {
+    if (errorEl) errorEl.textContent = "Error de conexión.";
+  }
+}
+
 /* ---------- PANTALLA: PANEL DE ADMIN ---------- */
 
 async function pintarAdmin() {
@@ -1100,62 +1190,96 @@ async function pintarAdmin() {
   app.innerHTML = `
     <div class="hero">
       <p class="hero-meta">Panel de administración</p>
-      <h1>Gestión de alumnos</h1>
-      <p>Asigna y retira cursos a cada alumno. Los cambios se aplican inmediatamente.</p>
+      <h1>Panel de administración</h1>
+      <p>Gestiona los accesos de alumnos y revisa sus sugerencias de temas nuevos.</p>
     </div>
     <div id="admin-tabla" style="color:var(--texto-muted);text-align:center;padding:40px 0">Cargando···</div>
+    <div id="admin-sugerencias"></div>
   `;
 
+  // — Sección alumnos —
   try {
     const resp = await fetch("/api/admin/alumnos", { headers: { "x-admin": USUARIO } });
     const { alumnos } = await resp.json();
 
     if (!alumnos || alumnos.length === 0) {
       document.getElementById("admin-tabla").textContent = "No hay alumnos registrados todavía.";
-      return;
-    }
-
-    const cabeceraCursos = CURSOS.map((c) => `<th>${c.icono} ${c.titulo}</th>`).join("");
-
-    const filas = alumnos.map((a) => {
-      const celdas = CURSOS.map((c) => {
-        const inscrito = a.clases === null || a.clases.includes(c.id);
-        return `<td style="text-align:center">
-          <button class="toggle-inscripcion ${inscrito ? "inscrito" : ""}"
-            onclick="toggleInscripcion('${a.nombre}', '${c.id}', ${inscrito}, this)">
-            ${inscrito ? "✓" : "○"}
-          </button>
-        </td>`;
+    } else {
+      const cabeceraCursos = CURSOS.map((c) => `<th>${c.icono} ${c.titulo}</th>`).join("");
+      const filas = alumnos.map((a) => {
+        const celdas = CURSOS.map((c) => {
+          const inscrito = a.clases === null || a.clases.includes(c.id);
+          return `<td style="text-align:center">
+            <button class="toggle-inscripcion ${inscrito ? "inscrito" : ""}"
+              onclick="toggleInscripcion('${a.nombre}', '${c.id}', ${inscrito}, this)">
+              ${inscrito ? "✓" : "○"}
+            </button>
+          </td>`;
+        }).join("");
+        return `
+          <tr class="fila-admin">
+            <td>
+              <div class="rank-avatar" style="display:inline-flex;margin-right:8px">${a.nombre.slice(0,2).toUpperCase()}</div>
+              <strong>${a.nombre}</strong>
+            </td>
+            <td style="color:var(--texto-suave);font-size:.82rem">${a.email || "—"}</td>
+            ${celdas}
+          </tr>`;
       }).join("");
-      return `
-        <tr class="fila-admin">
-          <td>
-            <div class="rank-avatar" style="display:inline-flex;margin-right:8px">${a.nombre.slice(0,2).toUpperCase()}</div>
-            <strong>${a.nombre}</strong>
-          </td>
-          <td style="color:var(--texto-suave);font-size:.82rem">${a.email || "—"}</td>
-          ${celdas}
-        </tr>`;
-    }).join("");
 
-    document.getElementById("admin-tabla").innerHTML = `
-      <div class="stats-row" style="margin-bottom:16px">
-        <div class="stat-pill"><strong>${alumnos.length}</strong><span>alumnos</span></div>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="tabla-admin">
-          <thead><tr>
-            <th>Alumno</th><th>Email</th>${cabeceraCursos}
-          </tr></thead>
-          <tbody>${filas}</tbody>
-        </table>
-      </div>
-      <p style="margin-top:16px;font-size:.8rem;color:var(--texto-muted)">
-        ✓ = inscrito en el curso · ○ = sin acceso · null = acceso a todos (usuarios anteriores)
-      </p>`;
+      document.getElementById("admin-tabla").innerHTML = `
+        <div class="stats-row" style="margin-bottom:16px">
+          <div class="stat-pill"><strong>${alumnos.length}</strong><span>alumnos</span></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tabla-admin">
+            <thead><tr><th>Alumno</th><th>Email</th>${cabeceraCursos}</tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        </div>
+        <p style="margin-top:16px;font-size:.8rem;color:var(--texto-muted)">
+          ✓ = inscrito en el curso · ○ = sin acceso
+        </p>`;
+    }
   } catch (e) {
     document.getElementById("admin-tabla").textContent = "Error al cargar los alumnos.";
     console.error(e);
+  }
+
+  // — Sección sugerencias —
+  try {
+    const respSug = await fetch("/api/sugerencias", { headers: { "x-admin": USUARIO } });
+    const { sugerencias } = await respSug.json();
+    const sugDiv = document.getElementById("admin-sugerencias");
+    if (!sugDiv) return;
+
+    if (!sugerencias || sugerencias.length === 0) {
+      sugDiv.innerHTML = `
+        <h2 class="seccion-titulo" style="margin-top:48px">💡 Sugerencias de alumnos</h2>
+        <p style="color:var(--texto-muted)">Aún no hay sugerencias.</p>`;
+      return;
+    }
+
+    const filasSug = sugerencias.map((s) => {
+      const fecha = new Date(s.fecha).toLocaleDateString("es-ES");
+      return `
+        <div class="fila-sugerencia">
+          <div class="rank-avatar">${s.alumno.slice(0, 2).toUpperCase()}</div>
+          <div class="sug-cuerpo">
+            <p class="sug-meta"><strong>${s.alumno}</strong> · <span>${fecha}</span></p>
+            <p class="sug-texto">${s.texto}</p>
+          </div>
+        </div>`;
+    }).join("");
+
+    sugDiv.innerHTML = `
+      <h2 class="seccion-titulo" style="margin-top:48px">💡 Sugerencias de alumnos</h2>
+      <div class="stats-row" style="margin-bottom:16px">
+        <div class="stat-pill"><strong>${sugerencias.length}</strong><span>sugerencias</span></div>
+      </div>
+      <div class="lista-sugerencias">${filasSug}</div>`;
+  } catch (e) {
+    console.error("Error cargando sugerencias:", e);
   }
 }
 

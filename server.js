@@ -19,6 +19,7 @@ const { Resend } = require("resend");
 const PUERTO = process.env.PORT || 4173;
 const ARCHIVADOR = path.join(__dirname, "progreso.json");
 const FICHERO_USUARIOS = path.join(__dirname, "usuarios.json");
+const FICHERO_SUGERENCIAS = path.join(__dirname, "sugerencias.json");
 
 /* Códigos de verificación en memoria — desaparecen al reiniciar,
    que es lo correcto: un código caducado no debería sobrevivir */
@@ -65,6 +66,18 @@ function leerUsuarios() {
 
 function guardarUsuarios(usuarios) {
   fs.writeFileSync(FICHERO_USUARIOS, JSON.stringify(usuarios, null, 2));
+}
+
+function leerSugerencias() {
+  try {
+    return JSON.parse(fs.readFileSync(FICHERO_SUGERENCIAS, "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+function guardarSugerencias(lista) {
+  fs.writeFileSync(FICHERO_SUGERENCIAS, JSON.stringify(lista, null, 2));
 }
 
 function hashContrasena(contrasena, sal) {
@@ -171,7 +184,7 @@ const servidor = http.createServer((peticion, respuesta) => {
     peticion.on("data", (t) => (cuerpo += t));
     peticion.on("end", async () => {
       try {
-        const { credential } = JSON.parse(cuerpo);
+        const { credential, codigoProfe } = JSON.parse(cuerpo);
         const GOOGLE_CLIENT_ID = "681227298388-s9b2l8khn07bivbfvvqukasfu91cc6rl.apps.googleusercontent.com";
 
         const verRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
@@ -201,6 +214,13 @@ const servidor = http.createServer((peticion, respuesta) => {
           guardarUsuarios(usuarios);
         }
 
+        // Promoción a admin si el código de profesor es correcto
+        if (codigoProfe && process.env.ADMIN_CODE && codigoProfe.trim() === process.env.ADMIN_CODE) {
+          if (usuarios[nombreClave].rol !== "admin") {
+            usuarios[nombreClave].rol = "admin";
+            guardarUsuarios(usuarios);
+          }
+        }
         const uGoogle = usuarios[nombreClave];
         respuesta.writeHead(200, { "Content-Type": "application/json" });
         respuesta.end(JSON.stringify({ ok: true, nombre: nombreClave, rol: uGoogle.rol || "alumno", clases: uGoogle.clases ?? null }));
@@ -250,13 +270,13 @@ const servidor = http.createServer((peticion, respuesta) => {
   }
 
   /* --- LOGIN: verificar credenciales ---
-     POST /api/login  body: { nombre, contrasena } */
+     POST /api/login  body: { nombre, contrasena, codigoProfe? } */
   if (url === "/api/login" && peticion.method === "POST") {
     let cuerpo = "";
     peticion.on("data", (t) => (cuerpo += t));
     peticion.on("end", async () => {
       try {
-        const { nombre, contrasena } = JSON.parse(cuerpo);
+        const { nombre, contrasena, codigoProfe } = JSON.parse(cuerpo);
         const usuarios = leerUsuarios();
         const clave = nombre.trim().toLowerCase();
         const usuario = usuarios[clave];
@@ -269,9 +289,15 @@ const servidor = http.createServer((peticion, respuesta) => {
           respuesta.writeHead(401, { "Content-Type": "application/json" });
           return respuesta.end(JSON.stringify({ error: "Nombre o contraseña incorrectos." }));
         }
-        const uLogin = usuarios[clave];
+        // Promoción a admin si el código de profesor es correcto
+        if (codigoProfe && process.env.ADMIN_CODE && codigoProfe.trim() === process.env.ADMIN_CODE) {
+          if (usuarios[clave].rol !== "admin") {
+            usuarios[clave].rol = "admin";
+            guardarUsuarios(usuarios);
+          }
+        }
         respuesta.writeHead(200, { "Content-Type": "application/json" });
-        respuesta.end(JSON.stringify({ ok: true, rol: uLogin.rol || "alumno", clases: uLogin.clases ?? null }));
+        respuesta.end(JSON.stringify({ ok: true, rol: usuarios[clave].rol || "alumno", clases: usuarios[clave].clases ?? null }));
       } catch {
         respuesta.writeHead(500, { "Content-Type": "application/json" });
         respuesta.end(JSON.stringify({ error: "Error interno del servidor" }));
@@ -360,6 +386,50 @@ const servidor = http.createServer((peticion, respuesta) => {
       }
     });
     return;
+  }
+
+  /* --- SUGERENCIAS: enviar (alumnos) ---
+     POST /api/sugerencias  body: { alumno, texto } */
+  if (url === "/api/sugerencias" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", () => {
+      try {
+        const { alumno, texto } = JSON.parse(cuerpo);
+        if (!alumno || !texto || texto.trim().length < 10) {
+          respuesta.writeHead(400, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "La sugerencia debe tener al menos 10 caracteres." }));
+        }
+        const lista = leerSugerencias();
+        lista.unshift({
+          id: Date.now(),
+          alumno: alumno.trim().toLowerCase(),
+          texto: texto.trim().slice(0, 500),
+          fecha: new Date().toISOString(),
+        });
+        guardarSugerencias(lista);
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true }));
+      } catch (e) {
+        console.error(e);
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error interno" }));
+      }
+    });
+    return;
+  }
+
+  /* --- SUGERENCIAS: leer (solo admins) ---
+     GET /api/sugerencias   Header: x-admin: nombreAdmin */
+  if (url === "/api/sugerencias" && peticion.method === "GET") {
+    const adminNombre = (peticion.headers["x-admin"] || "").trim().toLowerCase();
+    const usuarios = leerUsuarios();
+    if (!usuarios[adminNombre] || usuarios[adminNombre].rol !== "admin") {
+      respuesta.writeHead(403, { "Content-Type": "application/json" });
+      return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+    }
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ sugerencias: leerSugerencias() }));
   }
 
   /* --- RANKING ---

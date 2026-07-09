@@ -633,3 +633,23 @@ body {
   .topbar nav a { padding: 5px 10px; font-size: .8rem; }
   .rank-barra-wrap { display: none; }
 }
+
+/* ---------- Sugerencias ---------- */
+.lista-sugerencias { display: flex; flex-direction: column; gap: 12px; }
+
+.fila-sugerencia {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 16px 18px;
+  transition: border-color .2s;
+}
+.fila-sugerencia:hover { border-color: var(--borde-hover); }
+
+.sug-cuerpo { flex: 1; }
+.sug-meta { margin: 0 0 6px; font-size: .82rem; color: var(--texto-suave); }
+.sug-meta strong { color: var(--texto); }
+.sug-texto { margin: 0; color: var(--texto); font-size: .95rem; line-height: 1.5; }
