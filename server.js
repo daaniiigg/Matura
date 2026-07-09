@@ -283,4 +283,5 @@ const servidor = http.createServer((peticion, respuesta) => {
 servidor.listen(PUERTO, () => {
   console.log(`🏫 Secretaría abierta en http://localhost:${PUERTO}`);
   console.log(`📋 Los expedientes se guardan en: ${ARCHIVADOR}`);
+  console.log(`📧 RESEND_API_KEY cargada: ${process.env.RESEND_API_KEY ? "SÍ ✅" : "NO ❌"}`);
 });
