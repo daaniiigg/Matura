@@ -74,6 +74,16 @@ const TEXTOS = {
     errorCredenciales: "Nombre o contraseña incorrectos.",
     errorUsuarioExiste: "Ese nombre ya está en uso. Elige otro o entra con el tuyo.",
     errorServidor: "Error al conectar con la secretaría. ¿Está el servidor activo?",
+    emailPlaceholder: "Tu correo electrónico...",
+    enviarCodigo: "Enviar código de verificación →",
+    verificacionTitulo: "Revisa tu correo",
+    verificacionSub: "Hemos enviado un código de 6 dígitos a {email}. Tienes 10 minutos para introducirlo.",
+    codigoPlaceholder: "Código de 6 dígitos...",
+    verificar: "Verificar →",
+    reenviarCodigo: "Reenviar código",
+    errorEmailInvalido: "Introduce un correo electrónico válido.",
+    errorEmailEnUso: "Ese correo ya está registrado.",
+    errorCodigoIncorrecto: "Código incorrecto o caducado. Pide uno nuevo.",
   },
   en: {
     navModulos: "Modules",
@@ -134,6 +144,16 @@ const TEXTOS = {
     errorCredenciales: "Wrong name or password.",
     errorUsuarioExiste: "That name is already taken. Choose another or sign in with yours.",
     errorServidor: "Error connecting to the server. Is the server running?",
+    emailPlaceholder: "Your email address...",
+    enviarCodigo: "Send verification code →",
+    verificacionTitulo: "Check your email",
+    verificacionSub: "We sent a 6-digit code to {email}. You have 10 minutes to enter it.",
+    codigoPlaceholder: "6-digit code...",
+    verificar: "Verify →",
+    reenviarCodigo: "Resend code",
+    errorEmailInvalido: "Enter a valid email address.",
+    errorEmailEnUso: "That email is already registered.",
+    errorCodigoIncorrecto: "Incorrect or expired code. Request a new one.",
   },
   de: {
     navModulos: "Module",
@@ -194,6 +214,16 @@ const TEXTOS = {
     errorCredenciales: "Falscher Name oder falsches Passwort.",
     errorUsuarioExiste: "Dieser Name ist bereits vergeben. Wähle einen anderen oder melde dich an.",
     errorServidor: "Verbindungsfehler mit dem Server. Läuft der Server?",
+    emailPlaceholder: "Deine E-Mail-Adresse...",
+    enviarCodigo: "Bestätigungscode senden →",
+    verificacionTitulo: "Überprüfe deine E-Mail",
+    verificacionSub: "Wir haben einen 6-stelligen Code an {email} gesendet. Du hast 10 Minuten, ihn einzugeben.",
+    codigoPlaceholder: "6-stelliger Code...",
+    verificar: "Bestätigen →",
+    reenviarCodigo: "Code erneut senden",
+    errorEmailInvalido: "Gib eine gültige E-Mail-Adresse ein.",
+    errorEmailEnUso: "Diese E-Mail ist bereits registriert.",
+    errorCodigoIncorrecto: "Falscher oder abgelaufener Code. Fordere einen neuen an.",
   },
 };
 
@@ -287,6 +317,8 @@ function pintarBarraUsuario() {
 /* ---------- PANTALLA: ENTRADA (login / registro) ---------- */
 
 let modoRegistro = false;
+let EMAIL_PENDIENTE = null;
+let NOMBRE_PENDIENTE = null;
 
 function toggleModo() {
   modoRegistro = !modoRegistro;
@@ -304,11 +336,18 @@ function validarContrasena(c) {
   return null;
 }
 
+function validarEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
 function pintarLogin() {
-  const confirmarCampo = modoRegistro
-    ? `<input class="buscador" id="campo-confirmar" type="password" placeholder="${T("confirmarPlaceholder")}"
-         onkeydown="if(event.key==='Enter') enviarFormulario()">`
-    : "";
+  const camposRegistro = modoRegistro ? `
+    <input class="buscador" id="campo-email" type="email" placeholder="${T("emailPlaceholder")}">
+    <input class="buscador" id="campo-contrasena" type="password" placeholder="${T("contraPlaceholder")}">
+    <input class="buscador" id="campo-confirmar" type="password" placeholder="${T("confirmarPlaceholder")}"
+      onkeydown="if(event.key==='Enter') enviarFormulario()">` : `
+    <input class="buscador" id="campo-contrasena" type="password" placeholder="${T("contraPlaceholder")}"
+      onkeydown="if(event.key==='Enter') enviarFormulario()">`;
 
   app.innerHTML = `
     <div class="hero">
@@ -317,17 +356,36 @@ function pintarLogin() {
     </div>
     <div style="max-width:420px;margin:0 auto;text-align:center">
       <input class="buscador" id="campo-nombre" type="text" placeholder="${T("loginPlaceholder")}" autofocus>
-      <input class="buscador" id="campo-contrasena" type="password" placeholder="${T("contraPlaceholder")}"
-        onkeydown="if(event.key==='Enter') enviarFormulario()">
-      ${confirmarCampo}
+      ${camposRegistro}
       <p id="error-login" style="color:#e74c3c;min-height:1.4em;margin:8px 0"></p>
       <button class="btn" onclick="enviarFormulario()">
-        ${modoRegistro ? T("registrar") : T("entrar")}
+        ${modoRegistro ? T("enviarCodigo") : T("entrar")}
       </button>
       <p style="margin-top:1rem">
         <a href="javascript:void(0)" onclick="toggleModo()" style="font-size:.9rem">
           ${modoRegistro ? T("yaIengoCuenta") : T("soyCuentaNueva")}
         </a>
+      </p>
+    </div>
+  `;
+}
+
+function pintarVerificacion() {
+  app.innerHTML = `
+    <div class="hero">
+      <h1>${T("verificacionTitulo")}</h1>
+      <p>${T("verificacionSub", { email: EMAIL_PENDIENTE })}</p>
+    </div>
+    <div style="max-width:420px;margin:0 auto;text-align:center">
+      <input class="buscador" id="campo-codigo" type="text" maxlength="6"
+        placeholder="${T("codigoPlaceholder")}" autofocus
+        onkeydown="if(event.key==='Enter') verificarCodigo()">
+      <p id="error-login" style="color:#e74c3c;min-height:1.4em;margin:8px 0"></p>
+      <button class="btn" onclick="verificarCodigo()">${T("verificar")}</button>
+      <p style="margin-top:1rem">
+        <a href="javascript:void(0)" onclick="pintarLogin()" style="font-size:.9rem">← Volver</a>
+        &nbsp;·&nbsp;
+        <a href="javascript:void(0)" onclick="reenviarCodigo()" style="font-size:.9rem">${T("reenviarCodigo")}</a>
       </p>
     </div>
   `;
@@ -362,28 +420,60 @@ async function confirmarLogin() {
 
 async function confirmarRegistro() {
   const nombre = document.getElementById("campo-nombre").value.trim().toLowerCase();
+  const email = document.getElementById("campo-email").value.trim();
   const contrasena = document.getElementById("campo-contrasena").value;
   const confirmar = document.getElementById("campo-confirmar").value;
+
   if (!nombre) { mostrarError(T("errorNombreVacio")); return; }
+  if (!validarEmail(email)) { mostrarError(T("errorEmailInvalido")); return; }
   const errorPass = validarContrasena(contrasena);
   if (errorPass) { mostrarError(errorPass); return; }
   if (contrasena !== confirmar) { mostrarError(T("errorContrasenasNoCoinciden")); return; }
 
   try {
-    const resp = await fetch("/api/registro", {
+    const resp = await fetch("/api/enviar-codigo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, contrasena }),
+      body: JSON.stringify({ nombre, email, contrasena }),
     });
     const datos = await resp.json();
     if (datos.ok) {
-      entrarComoAlumno(nombre);
+      EMAIL_PENDIENTE = email.trim().toLowerCase();
+      NOMBRE_PENDIENTE = nombre;
+      pintarVerificacion();
     } else {
       mostrarError(datos.error || T("errorServidor"));
     }
   } catch {
     mostrarError(T("errorServidor"));
   }
+}
+
+async function verificarCodigo() {
+  const codigo = document.getElementById("campo-codigo").value.trim();
+  if (!codigo) { mostrarError(T("codigoPlaceholder")); return; }
+
+  try {
+    const resp = await fetch("/api/verificar-codigo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: EMAIL_PENDIENTE, codigo }),
+    });
+    const datos = await resp.json();
+    if (datos.ok) {
+      entrarComoAlumno(NOMBRE_PENDIENTE);
+    } else {
+      mostrarError(datos.error || T("errorCodigoIncorrecto"));
+    }
+  } catch {
+    mostrarError(T("errorServidor"));
+  }
+}
+
+async function reenviarCodigo() {
+  pintarLogin();
+  modoRegistro = true;
+  pintarLogin();
 }
 
 /* ---------- NAVEGACIÓN ---------- */
