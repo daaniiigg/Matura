@@ -2,24 +2,24 @@
    ACADEMIA DE GEMELOS DIGITALES — Estilos
    ============================================ */
 
-/* Variables: si quieres cambiar el color de toda la web, cámbialo aquí una sola vez */
 :root {
-  --azul: #1d4ed8;
-  --azul-oscuro: #1e3a8a;
-  --azul-claro: #eff6ff;
-  --verde: #16a34a;
-  --verde-claro: #f0fdf4;
-  --rojo: #dc2626;
-  --rojo-claro: #fef2f2;
-  --ambar: #d97706;
-  --ambar-claro: #fffbeb;
-  --texto: #1f2937;
-  --texto-suave: #6b7280;
-  --fondo: #f8fafc;
-  --blanco: #ffffff;
-  --borde: #e5e7eb;
-  --radio: 12px;
-  --sombra: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+  --fondo:          #0d0d0d;
+  --superficie:     #171717;
+  --superficie-alt: #1f1f1f;
+  --borde:          #272727;
+  --borde-hover:    #404040;
+  --texto:          #f0f0f0;
+  --texto-suave:    #888888;
+  --texto-muted:    #555555;
+  --acento:         #ffffff;
+  --verde:          #4ade80;
+  --verde-suave:    rgba(74,222,128,.12);
+  --rojo:           #f87171;
+  --rojo-suave:     rgba(248,113,113,.12);
+  --ambar:          #fbbf24;
+  --ambar-suave:    rgba(251,191,36,.12);
+  --radio:          10px;
+  --sombra:         0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,9 +33,9 @@ body {
 
 /* ---------- Barra superior ---------- */
 .topbar {
-  background: var(--blanco);
+  background: var(--superficie);
   border-bottom: 1px solid var(--borde);
-  padding: 14px 24px;
+  padding: 14px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -45,176 +45,278 @@ body {
   top: 0;
   z-index: 10;
 }
+
 .logo {
   font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--azul-oscuro);
+  font-size: 1rem;
+  color: var(--texto);
   text-decoration: none;
+  letter-spacing: -.01em;
 }
-.topbar nav { display: flex; gap: 18px; }
+.logo span { color: var(--texto-suave); font-weight: 400; }
+
+.topbar nav {
+  display: flex;
+  gap: 4px;
+  background: var(--fondo);
+  padding: 4px;
+  border-radius: 99px;
+  border: 1px solid var(--borde);
+}
 .topbar nav a {
   color: var(--texto-suave);
   text-decoration: none;
-  font-weight: 600;
-  font-size: .95rem;
+  font-weight: 500;
+  font-size: .88rem;
+  padding: 6px 16px;
+  border-radius: 99px;
+  transition: background .15s, color .15s;
 }
-.topbar nav a:hover { color: var(--azul); }
+.topbar nav a:hover { color: var(--texto); background: var(--superficie-alt); }
+
+#zona-usuario {
+  font-size: .85rem;
+  color: var(--texto-suave);
+}
+#zona-usuario a { color: var(--texto-suave); text-decoration: none; }
+#zona-usuario a:hover { color: var(--texto); }
+
+#selector-idioma {
+  background: var(--superficie-alt);
+  color: var(--texto);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: .85rem;
+  cursor: pointer;
+}
 
 /* ---------- Contenedor principal ---------- */
 #app {
-  max-width: 880px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 32px 20px 60px;
+  padding: 40px 20px 80px;
 }
 
 .footer {
   text-align: center;
-  color: var(--texto-suave);
-  font-size: .85rem;
-  padding: 24px;
+  color: var(--texto-muted);
+  font-size: .8rem;
+  padding: 28px;
   border-top: 1px solid var(--borde);
+  letter-spacing: .02em;
 }
 
-/* ---------- Portada / lista de módulos ---------- */
+/* ---------- Hero / portada ---------- */
 .hero {
-  text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 }
-.hero h1 { font-size: 2rem; color: var(--azul-oscuro); margin-bottom: 8px; }
-.hero p { color: var(--texto-suave); max-width: 560px; margin: 0 auto; }
+.hero h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--acento);
+  margin-bottom: 10px;
+  letter-spacing: -.02em;
+}
+.hero p {
+  color: var(--texto-suave);
+  max-width: 560px;
+  font-size: .95rem;
+}
 
 .barra-progreso-global {
   background: var(--borde);
   border-radius: 99px;
-  height: 12px;
-  margin: 20px auto 6px;
-  max-width: 420px;
+  height: 4px;
+  margin: 22px 0 8px;
+  max-width: 400px;
   overflow: hidden;
 }
 .barra-progreso-global .relleno {
-  background: var(--verde);
+  background: var(--acento);
   height: 100%;
   border-radius: 99px;
-  transition: width .4s ease;
+  transition: width .5s ease;
 }
-.texto-progreso { font-size: .9rem; color: var(--texto-suave); }
+.texto-progreso { font-size: .82rem; color: var(--texto-muted); }
 
+/* ---------- Secciones y módulos ---------- */
 .seccion-titulo {
-  font-size: 1.15rem;
-  color: var(--azul-oscuro);
-  margin: 30px 0 14px;
-  border-bottom: 2px solid var(--borde);
-  padding-bottom: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--texto-muted);
+  margin: 36px 0 12px;
 }
 
 .tarjeta-modulo {
-  background: var(--blanco);
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   padding: 18px 22px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  box-shadow: var(--sombra);
   cursor: pointer;
-  transition: transform .15s ease, border-color .15s ease;
+  transition: background .15s, border-color .15s;
   text-decoration: none;
   color: inherit;
 }
-.tarjeta-modulo:hover { transform: translateY(-2px); border-color: var(--azul); }
-.tarjeta-modulo .info h3 { font-size: 1.02rem; margin-bottom: 3px; }
-.tarjeta-modulo .info p { font-size: .85rem; color: var(--texto-suave); }
+.tarjeta-modulo:hover {
+  background: var(--superficie-alt);
+  border-color: var(--borde-hover);
+}
+.tarjeta-modulo .info h3 {
+  font-size: .97rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--texto);
+}
+.tarjeta-modulo .info p {
+  font-size: .82rem;
+  color: var(--texto-suave);
+}
+
 .estado {
-  font-size: .8rem;
-  font-weight: 700;
-  padding: 5px 12px;
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 4px 12px;
   border-radius: 99px;
   white-space: nowrap;
+  letter-spacing: .02em;
 }
-.estado.pendiente { background: var(--fondo); color: var(--texto-suave); border: 1px solid var(--borde); }
-.estado.completado { background: var(--verde-claro); color: var(--verde); }
+.estado.pendiente {
+  background: transparent;
+  color: var(--texto-muted);
+  border: 1px solid var(--borde);
+}
+.estado.completado {
+  background: var(--verde-suave);
+  color: var(--verde);
+  border: 1px solid rgba(74,222,128,.25);
+}
 
 /* ---------- Vista de lección ---------- */
-.leccion { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 34px 38px; box-shadow: var(--sombra); }
-.leccion .miga { font-size: .85rem; color: var(--texto-suave); margin-bottom: 14px; }
-.leccion h1 { color: var(--azul-oscuro); font-size: 1.6rem; margin-bottom: 4px; }
-.leccion h2 { color: var(--azul-oscuro); font-size: 1.25rem; margin: 28px 0 10px; }
-.leccion h3 { font-size: 1.05rem; margin: 20px 0 8px; }
-.leccion p, .leccion li { margin-bottom: 10px; }
+.leccion {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 36px 42px;
+}
+.leccion .miga {
+  font-size: .78rem;
+  color: var(--texto-muted);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.leccion h1 {
+  color: var(--acento);
+  font-size: 1.55rem;
+  margin-bottom: 6px;
+  letter-spacing: -.02em;
+}
+.leccion h2 {
+  color: var(--texto);
+  font-size: 1.15rem;
+  margin: 28px 0 10px;
+}
+.leccion h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--texto); }
+.leccion p, .leccion li { margin-bottom: 10px; color: var(--texto-suave); }
 .leccion ul, .leccion ol { padding-left: 24px; margin-bottom: 12px; }
 .leccion blockquote {
-  background: var(--azul-claro);
-  border-left: 4px solid var(--azul);
+  background: var(--superficie-alt);
+  border-left: 3px solid var(--borde-hover);
   padding: 12px 18px;
   border-radius: 0 8px 8px 0;
   margin: 14px 0;
+  color: var(--texto-suave);
 }
-.leccion table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .92rem; }
-.leccion th, .leccion td { border: 1px solid var(--borde); padding: 8px 12px; text-align: left; }
-.leccion th { background: var(--azul-claro); color: var(--azul-oscuro); }
+.leccion table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .9rem; }
+.leccion th, .leccion td {
+  border: 1px solid var(--borde);
+  padding: 9px 14px;
+  text-align: left;
+}
+.leccion th {
+  background: var(--superficie-alt);
+  color: var(--texto);
+  font-weight: 600;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
 .leccion pre {
-  background: #0f172a;
+  background: #000;
   color: #e2e8f0;
   padding: 16px;
   border-radius: 8px;
   overflow-x: auto;
   font-size: .82rem;
   margin: 14px 0;
+  border: 1px solid var(--borde);
 }
 
-/* Caja de objetivos */
+/* Objetivos */
 .objetivos {
-  background: var(--ambar-claro);
-  border: 1px solid #fde68a;
+  background: var(--ambar-suave);
+  border: 1px solid rgba(251,191,36,.2);
   border-radius: var(--radio);
   padding: 16px 22px;
   margin: 18px 0;
 }
-.objetivos h2 { margin-top: 0 !important; font-size: 1rem !important; color: var(--ambar) !important; }
+.objetivos h2 { margin-top: 0 !important; font-size: .85rem !important; color: var(--ambar) !important; text-transform: uppercase; letter-spacing: .06em; }
+.objetivos li { color: var(--texto-suave) !important; }
 
-/* ---------- Ficha de vocabulario ---------- */
+/* Vocabulario */
 .vocabulario {
-  background: var(--verde-claro);
-  border: 1px solid #bbf7d0;
+  background: var(--verde-suave);
+  border: 1px solid rgba(74,222,128,.2);
   border-radius: var(--radio);
   padding: 18px 22px;
   margin: 22px 0;
 }
-.vocabulario h2 { margin: 0 0 10px !important; font-size: 1rem !important; color: var(--verde) !important; }
-.vocabulario dl { display: grid; gap: 8px; }
-.vocabulario dt { font-weight: 700; }
-.vocabulario dd { margin-left: 0; color: var(--texto); font-size: .93rem; margin-bottom: 6px; }
+.vocabulario h2 { margin: 0 0 12px !important; font-size: .85rem !important; color: var(--verde) !important; text-transform: uppercase; letter-spacing: .06em; }
+.vocabulario dl { display: grid; gap: 6px; }
+.vocabulario dt { font-weight: 600; color: var(--texto); }
+.vocabulario dd { margin-left: 0; color: var(--texto-suave); font-size: .92rem; margin-bottom: 8px; }
 
 /* ---------- Botones ---------- */
 .btn {
   display: inline-block;
-  background: var(--azul);
-  color: #fff;
+  background: var(--acento);
+  color: #000;
   border: none;
-  padding: 12px 26px;
+  padding: 11px 24px;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: .95rem;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  transition: background .15s ease;
+  transition: opacity .15s;
+  letter-spacing: -.01em;
 }
-.btn:hover { background: var(--azul-oscuro); }
-.btn.secundario { background: var(--blanco); color: var(--azul); border: 2px solid var(--azul); }
-.acciones { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+.btn:hover { opacity: .85; }
+.btn.secundario {
+  background: transparent;
+  color: var(--texto);
+  border: 1px solid var(--borde);
+}
+.btn.secundario:hover { background: var(--superficie-alt); opacity: 1; }
+.acciones { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
 
 /* ---------- Quiz ---------- */
 .pregunta {
-  background: var(--blanco);
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   padding: 20px 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--sombra);
+  margin-bottom: 12px;
 }
-.pregunta h3 { margin-bottom: 12px; font-size: 1rem; }
+.pregunta h3 { margin-bottom: 14px; font-size: .97rem; color: var(--texto); }
 .opcion {
   display: block;
   padding: 10px 14px;
@@ -222,77 +324,89 @@ body {
   border-radius: 8px;
   margin-bottom: 8px;
   cursor: pointer;
-  transition: background .1s ease;
+  transition: background .1s, border-color .1s;
+  color: var(--texto-suave);
+  font-size: .93rem;
 }
-.opcion:hover { background: var(--azul-claro); }
-.opcion input { margin-right: 10px; }
-.opcion.correcta { background: var(--verde-claro); border-color: var(--verde); }
-.opcion.incorrecta { background: var(--rojo-claro); border-color: var(--rojo); }
+.opcion:hover { background: var(--superficie-alt); border-color: var(--borde-hover); color: var(--texto); }
+.opcion input { margin-right: 10px; accent-color: var(--acento); }
+.opcion.correcta { background: var(--verde-suave); border-color: rgba(74,222,128,.4); color: var(--verde); }
+.opcion.incorrecta { background: var(--rojo-suave); border-color: rgba(248,113,113,.4); color: var(--rojo); }
 
 /* ---------- Resultado y repaso ---------- */
 .resultado {
   text-align: center;
-  background: var(--blanco);
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
-  padding: 30px;
-  margin-bottom: 24px;
-  box-shadow: var(--sombra);
+  padding: 32px;
+  margin-bottom: 20px;
 }
-.resultado .nota { font-size: 2.6rem; font-weight: 800; }
+.resultado .nota { font-size: 2.8rem; font-weight: 800; letter-spacing: -.04em; }
 .nota.bien { color: var(--verde); }
-.nota.mal { color: var(--ambar); }
+.nota.mal  { color: var(--ambar); }
 
 .repaso {
-  background: var(--rojo-claro);
-  border: 1px solid #fecaca;
+  background: var(--rojo-suave);
+  border: 1px solid rgba(248,113,113,.2);
   border-radius: var(--radio);
   padding: 20px 24px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
-.repaso h2 { color: var(--rojo); font-size: 1.1rem; margin-bottom: 12px; }
-.repaso-item { background: var(--blanco); border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; }
-.repaso-item .etiqueta { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.repaso h2 { color: var(--rojo); font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+.repaso-item { background: var(--superficie); border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; border: 1px solid var(--borde); }
+.repaso-item .etiqueta { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-muted); }
 .repaso-item .tu-respuesta { color: var(--rojo); }
-.repaso-item .correcta-txt { color: var(--verde); }
-.repaso-item .explicacion { margin-top: 8px; font-size: .92rem; color: var(--texto-suave); }
+.repaso-item .correcta-txt  { color: var(--verde); }
+.repaso-item .explicacion   { margin-top: 8px; font-size: .9rem; color: var(--texto-suave); }
 
 /* ---------- Página de progreso ---------- */
 .fila-progreso {
-  background: var(--blanco);
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   padding: 16px 22px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--sombra);
 }
-.fila-progreso .nombre { font-weight: 600; }
-.fila-progreso .detalle { font-size: .85rem; color: var(--texto-suave); }
+.fila-progreso .nombre { font-weight: 600; font-size: .95rem; }
+.fila-progreso .detalle { font-size: .82rem; color: var(--texto-suave); }
 
 /* ---------- Glosario ---------- */
 .termino {
-  background: var(--blanco);
+  background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   padding: 16px 22px;
-  margin-bottom: 10px;
-  box-shadow: var(--sombra);
+  margin-bottom: 8px;
+  transition: border-color .15s;
 }
-.termino h3 { color: var(--azul-oscuro); margin-bottom: 4px; }
+.termino:hover { border-color: var(--borde-hover); }
+.termino h3 { color: var(--texto); margin-bottom: 4px; font-size: .97rem; }
+.termino p  { color: var(--texto-suave); font-size: .9rem; }
+
 .buscador {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid var(--borde);
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: .95rem;
   margin-bottom: 20px;
+  background: var(--superficie);
+  color: var(--texto);
+  transition: border-color .15s;
 }
+.buscador:focus {
+  outline: none;
+  border-color: var(--borde-hover);
+}
+.buscador::placeholder { color: var(--texto-muted); }
 
 /* ---------- Móvil ---------- */
 @media (max-width: 640px) {
-  .leccion { padding: 22px 18px; }
+  .leccion { padding: 24px 18px; }
   .tarjeta-modulo { flex-direction: column; align-items: flex-start; }
+  .topbar nav a { padding: 6px 10px; font-size: .82rem; }
 }
