@@ -31,7 +31,11 @@ function limpiarCaducados() {
   }
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// El cliente de Resend se crea al enviar el primer email, no al arrancar
+function getResend() {
+  if (!process.env.RESEND_API_KEY) throw new Error("Falta la variable RESEND_API_KEY en el servidor.");
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 /* ---------- El archivador de expedientes ---------- */
 
@@ -127,7 +131,7 @@ const servidor = http.createServer((peticion, respuesta) => {
           expira: Date.now() + 10 * 60 * 1000,
         };
 
-        await resend.emails.send({
+        await getResend().emails.send({
           from: "Academia de Gemelos Digitales <onboarding@resend.dev>",
           to: email,
           subject: "Tu código de verificación",
