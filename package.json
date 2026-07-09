@@ -1,0 +1,9 @@
+{
+  "name": "lms-gemelos-digitales",
+  "version": "1.0.0",
+  "description": "Plataforma LMS sobre Gemelos Digitales — creada por Daniel en Tailor Hub",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
