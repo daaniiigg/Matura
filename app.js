@@ -312,10 +312,15 @@ function actualizarNavActivo(ruta) {
     "#/glosario":"nav-glosario",
     "#/progreso":"nav-progreso",
     "#/ranking": "nav-ranking",
+    "#/admin":   "nav-admin",
   };
   document.querySelectorAll(".topbar nav a").forEach((a) => a.classList.remove("activo"));
   const id = mapa[ruta];
   if (id) document.getElementById(id)?.classList.add("activo");
+
+  // Mostrar/ocultar pestaña admin
+  const navAdmin = document.getElementById("nav-admin");
+  if (navAdmin) navAdmin.style.display = ROL === "admin" ? "" : "none";
 }
 
 /* ---------- EL EXPEDIENTE DEL ALUMNO ----------
@@ -323,10 +328,12 @@ function actualizarNavActivo(ruta) {
    localStorage solo recuerda quién se sentó en este pupitre
    y en qué idioma prefiere estudiar. */
 
-let USUARIO       = null; // quién ha entrado
-let CURSO_ACTIVO  = null; // qué curso está viendo ahora
-let PROGRESO_GLOBAL = {}; // todos los cursos: { gemelos: {...}, celulas: {...} }
-let PROGRESO      = {};   // progreso del curso activo (atajo a PROGRESO_GLOBAL[CURSO_ACTIVO])
+let USUARIO         = null;    // quién ha entrado
+let ROL             = "alumno"; // "alumno" | "admin"
+let CLASES_ALUMNO   = null;    // null = todos los cursos, array = solo esos
+let CURSO_ACTIVO    = null;    // qué curso está viendo ahora
+let PROGRESO_GLOBAL = {};      // todos los cursos: { gemelos: {...}, celulas: {...} }
+let PROGRESO        = {};      // progreso del curso activo
 
 function migrarProgresoAntiguo(datos) {
   // Si las claves son números, es el formato antiguo (solo gemelos) → migrar
@@ -337,8 +344,10 @@ function migrarProgresoAntiguo(datos) {
   return datos;
 }
 
-async function entrarComoAlumno(nombre) {
+async function entrarComoAlumno(nombre, optsRol = {}) {
   USUARIO = nombre.trim().toLowerCase();
+  ROL = optsRol.rol || "alumno";
+  CLASES_ALUMNO = optsRol.clases ?? null;
   localStorage.setItem("lms-usuario", USUARIO);
 
   const resp = await fetch(`/api/progreso/${encodeURIComponent(USUARIO)}`);
@@ -346,12 +355,22 @@ async function entrarComoAlumno(nombre) {
 
   pintarBarraUsuario();
 
+  if (ROL === "admin") {
+    pintarAdmin();
+    return;
+  }
+
   const ultimoCurso = localStorage.getItem("lms-curso");
-  if (ultimoCurso && DATOS[ultimoCurso]) {
+  if (ultimoCurso && DATOS[ultimoCurso] && cursosDisponibles().find(c => c.id === ultimoCurso)) {
     seleccionarCurso(ultimoCurso);
   } else {
     pintarCursos();
   }
+}
+
+function cursosDisponibles() {
+  if (CLASES_ALUMNO === null) return CURSOS;
+  return CURSOS.filter((c) => CLASES_ALUMNO.includes(c.id));
 }
 
 function seleccionarCurso(id) {
@@ -375,6 +394,8 @@ function salir() {
   localStorage.removeItem("lms-usuario");
   localStorage.removeItem("lms-curso");
   USUARIO = null;
+  ROL = "alumno";
+  CLASES_ALUMNO = null;
   CURSO_ACTIVO = null;
   PROGRESO = {};
   PROGRESO_GLOBAL = {};
@@ -404,7 +425,7 @@ function pintarBarraUsuario() {
 
 function pintarCursos() {
   actualizarNavActivo("");
-  const tarjetas = CURSOS.map((curso) => {
+  const tarjetas = cursosDisponibles().map((curso) => {
     const progresoDelCurso = PROGRESO_GLOBAL[curso.id] || {};
     const datosCursoObj = DATOS[curso.id];
     const totalMods = datosCursoObj ? (datosCursoObj.es.MODULOS.length) : 0;
@@ -539,7 +560,7 @@ async function handleGoogleLogin(response) {
     });
     const datos = await resp.json();
     if (datos.ok) {
-      entrarComoAlumno(datos.nombre);
+      entrarComoAlumno(datos.nombre, { rol: datos.rol, clases: datos.clases });
     } else {
       mostrarError(datos.error || T("errorServidor"));
     }
@@ -587,7 +608,7 @@ async function confirmarLogin() {
     });
     const datos = await resp.json();
     if (datos.ok) {
-      entrarComoAlumno(nombre);
+      entrarComoAlumno(nombre, { rol: datos.rol, clases: datos.clases });
     } else {
       mostrarError(datos.error || T("errorCredenciales"));
     }
@@ -668,6 +689,7 @@ function navegar() {
   if (ruta === "#/glosario") return pintarGlosario();
   if (ruta === "#/progreso") return pintarProgreso();
   if (ruta === "#/ranking")  return pintarRanking();
+  if (ruta === "#/admin" && ROL === "admin") return pintarAdmin();
 
   const matchModulo = ruta.match(/^#\/modulo\/(\d+)$/);
   if (matchModulo) return pintarModulo(Number(matchModulo[1]));
@@ -992,57 +1014,169 @@ function filtrarGlosario(texto) {
 
 /* ---------- PANTALLA: RANKING ---------- */
 
+let RANKING_TAB = "global";
+
 async function pintarRanking() {
+  const tabs = [
+    { id: "global", label: "🌍 Global" },
+    ...CURSOS.map((c) => ({ id: c.id, label: `${c.icono} ${c.titulo}` })),
+  ];
+
+  const tabsHtml = tabs.map((t) => `
+    <button class="rank-tab ${RANKING_TAB === t.id ? "activo" : ""}"
+      onclick="cambiarTabRanking('${t.id}')">${t.label}</button>
+  `).join("");
+
   app.innerHTML = `
     <div class="hero">
-      <p class="hero-meta">Academia de Gemelos Digitales</p>
+      <p class="hero-meta">Academia · Ranking</p>
       <h1>${T("rankingTitulo")}</h1>
       <p>${T("rankingSub")}</p>
     </div>
+    <div class="rank-tabs">${tabsHtml}</div>
     <div id="ranking-lista" style="color:var(--texto-muted);text-align:center;padding:40px 0">···</div>
   `;
+  cargarRanking();
+}
 
+async function cambiarTabRanking(tab) {
+  RANKING_TAB = tab;
+  document.querySelectorAll(".rank-tab").forEach((b) => b.classList.toggle("activo", b.textContent.trim().startsWith(tab === "global" ? "🌍" : (CURSOS.find(c=>c.id===tab)?.icono||""))));
+  // Re-render tabs properly
+  pintarRanking();
+}
+
+async function cargarRanking() {
+  const lista = document.getElementById("ranking-lista");
+  if (!lista) return;
   try {
-    const resp = await fetch(`/api/ranking?curso=${encodeURIComponent(CURSO_ACTIVO)}`);
+    const resp = await fetch(`/api/ranking?curso=${encodeURIComponent(RANKING_TAB)}`);
     const { ranking, total } = await resp.json();
 
     if (!ranking || ranking.length === 0) {
-      document.getElementById("ranking-lista").textContent = T("rankingVacio");
+      lista.textContent = T("rankingVacio");
       return;
     }
 
-    const totalModulos = modulosIdioma().length;
+    const totalModulos = RANKING_TAB === "global"
+      ? CURSOS.reduce((s, c) => s + ((DATOS[c.id]?.es?.MODULOS?.length) || 0), 0)
+      : (DATOS[RANKING_TAB]?.es?.MODULOS?.length || 1);
+
     const posClase = (i) => i === 0 ? "top1" : i === 1 ? "top2" : i === 2 ? "top3" : "";
-    const medalon = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
+    const medalon  = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
 
     const filas = ranking.map((r, i) => {
       const esYo = r.nombre === USUARIO;
-      const pct = Math.round((r.completados / totalModulos) * 100);
-      const iniciales = r.nombre.slice(0, 2).toUpperCase();
+      const pct = Math.min(100, Math.round((r.completados / totalModulos) * 100));
       return `
         <div class="fila-ranking ${esYo ? "yo" : ""}">
           <div class="rank-pos ${posClase(i)}">${medalon(i)}</div>
-          <div class="rank-avatar">${iniciales}</div>
+          <div class="rank-avatar">${r.nombre.slice(0,2).toUpperCase()}</div>
           <div class="rank-info">
             <div class="rank-nombre">${r.nombre}${esYo ? ` <span style="color:var(--texto-muted);font-weight:400">${T("rankingTu")}</span>` : ""}</div>
-            <div class="rank-detalle">${r.completados} / ${totalModulos} ${T("rankingModulos").toLowerCase()} · ${r.media}% ${T("rankingMedia").toLowerCase()}</div>
+            <div class="rank-detalle">${r.completados} ${T("rankingModulos").toLowerCase()} · ${r.media}% ${T("rankingMedia").toLowerCase()}</div>
           </div>
           <div class="rank-barra-wrap">
             <div class="rank-barra-track"><div class="rank-barra-fill" style="width:${pct}%"></div></div>
             <span class="rank-pct">${pct}%</span>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join("");
 
-    document.getElementById("ranking-lista").innerHTML = `
+    lista.innerHTML = `
       <div class="stats-row" style="margin-bottom:20px">
-        <div class="stat-pill"><strong>${total}</strong><span>alumnos registrados</span></div>
+        <div class="stat-pill"><strong>${total}</strong><span>alumnos</span></div>
         <div class="stat-pill"><strong>${ranking.length}</strong><span>con progreso</span></div>
-      </div>
-      ${filas}
-    `;
+      </div>${filas}`;
   } catch {
-    document.getElementById("ranking-lista").textContent = T("errorServidor");
+    if (lista) lista.textContent = T("errorServidor");
   }
+}
+
+/* ---------- PANTALLA: PANEL DE ADMIN ---------- */
+
+async function pintarAdmin() {
+  actualizarNavActivo("#/admin");
+  app.innerHTML = `
+    <div class="hero">
+      <p class="hero-meta">Panel de administración</p>
+      <h1>Gestión de alumnos</h1>
+      <p>Asigna y retira cursos a cada alumno. Los cambios se aplican inmediatamente.</p>
+    </div>
+    <div id="admin-tabla" style="color:var(--texto-muted);text-align:center;padding:40px 0">Cargando···</div>
+  `;
+
+  try {
+    const resp = await fetch("/api/admin/alumnos", { headers: { "x-admin": USUARIO } });
+    const { alumnos } = await resp.json();
+
+    if (!alumnos || alumnos.length === 0) {
+      document.getElementById("admin-tabla").textContent = "No hay alumnos registrados todavía.";
+      return;
+    }
+
+    const cabeceraCursos = CURSOS.map((c) => `<th>${c.icono} ${c.titulo}</th>`).join("");
+
+    const filas = alumnos.map((a) => {
+      const celdas = CURSOS.map((c) => {
+        const inscrito = a.clases === null || a.clases.includes(c.id);
+        return `<td style="text-align:center">
+          <button class="toggle-inscripcion ${inscrito ? "inscrito" : ""}"
+            onclick="toggleInscripcion('${a.nombre}', '${c.id}', ${inscrito}, this)">
+            ${inscrito ? "✓" : "○"}
+          </button>
+        </td>`;
+      }).join("");
+      return `
+        <tr class="fila-admin">
+          <td>
+            <div class="rank-avatar" style="display:inline-flex;margin-right:8px">${a.nombre.slice(0,2).toUpperCase()}</div>
+            <strong>${a.nombre}</strong>
+          </td>
+          <td style="color:var(--texto-suave);font-size:.82rem">${a.email || "—"}</td>
+          ${celdas}
+        </tr>`;
+    }).join("");
+
+    document.getElementById("admin-tabla").innerHTML = `
+      <div class="stats-row" style="margin-bottom:16px">
+        <div class="stat-pill"><strong>${alumnos.length}</strong><span>alumnos</span></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tabla-admin">
+          <thead><tr>
+            <th>Alumno</th><th>Email</th>${cabeceraCursos}
+          </tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px;font-size:.8rem;color:var(--texto-muted)">
+        ✓ = inscrito en el curso · ○ = sin acceso · null = acceso a todos (usuarios anteriores)
+      </p>`;
+  } catch (e) {
+    document.getElementById("admin-tabla").textContent = "Error al cargar los alumnos.";
+    console.error(e);
+  }
+}
+
+async function toggleInscripcion(alumno, curso, estaInscrito, btn) {
+  const accion = estaInscrito ? "remove" : "add";
+  btn.disabled = true;
+  try {
+    const resp = await fetch("/api/admin/enrollar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin: USUARIO, alumno, curso, accion }),
+    });
+    const datos = await resp.json();
+    if (datos.ok) {
+      const ahora = datos.clases.includes(curso);
+      btn.textContent = ahora ? "✓" : "○";
+      btn.className = `toggle-inscripcion ${ahora ? "inscrito" : ""}`;
+      btn.onclick = () => toggleInscripcion(alumno, curso, ahora, btn);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  btn.disabled = false;
 }

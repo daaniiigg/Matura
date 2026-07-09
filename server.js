@@ -201,8 +201,9 @@ const servidor = http.createServer((peticion, respuesta) => {
           guardarUsuarios(usuarios);
         }
 
+        const uGoogle = usuarios[nombreClave];
         respuesta.writeHead(200, { "Content-Type": "application/json" });
-        respuesta.end(JSON.stringify({ ok: true, nombre: nombreClave }));
+        respuesta.end(JSON.stringify({ ok: true, nombre: nombreClave, rol: uGoogle.rol || "alumno", clases: uGoogle.clases ?? null }));
       } catch (e) {
         console.error("Error en google-login:", e);
         respuesta.writeHead(500, { "Content-Type": "application/json" });
@@ -268,11 +269,94 @@ const servidor = http.createServer((peticion, respuesta) => {
           respuesta.writeHead(401, { "Content-Type": "application/json" });
           return respuesta.end(JSON.stringify({ error: "Nombre o contraseña incorrectos." }));
         }
+        const uLogin = usuarios[clave];
         respuesta.writeHead(200, { "Content-Type": "application/json" });
-        respuesta.end(JSON.stringify({ ok: true }));
+        respuesta.end(JSON.stringify({ ok: true, rol: uLogin.rol || "alumno", clases: uLogin.clases ?? null }));
       } catch {
         respuesta.writeHead(500, { "Content-Type": "application/json" });
         respuesta.end(JSON.stringify({ error: "Error interno del servidor" }));
+      }
+    });
+    return;
+  }
+
+  /* --- ADMIN: listar alumnos ---
+     GET /api/admin/alumnos   Header: x-admin: nombreAdmin */
+  if (url === "/api/admin/alumnos" && peticion.method === "GET") {
+    const adminNombre = (peticion.headers["x-admin"] || "").trim().toLowerCase();
+    const usuarios = leerUsuarios();
+    if (!usuarios[adminNombre] || usuarios[adminNombre].rol !== "admin") {
+      respuesta.writeHead(403, { "Content-Type": "application/json" });
+      return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+    }
+    const alumnos = Object.entries(usuarios)
+      .filter(([, u]) => u.rol !== "admin")
+      .map(([nombre, u]) => ({ nombre, email: u.email || "", clases: u.clases ?? null }));
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ alumnos }));
+  }
+
+  /* --- ADMIN: cambiar inscripción ---
+     POST /api/admin/enrollar  body: { admin, alumno, curso, accion: "add"|"remove" } */
+  if (url === "/api/admin/enrollar" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", () => {
+      try {
+        const { admin, alumno, curso, accion } = JSON.parse(cuerpo);
+        const usuarios = leerUsuarios();
+        if (!usuarios[admin] || usuarios[admin].rol !== "admin") {
+          respuesta.writeHead(403, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+        }
+        if (!usuarios[alumno]) {
+          respuesta.writeHead(404, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "Alumno no encontrado" }));
+        }
+        let clases = usuarios[alumno].clases ?? null;
+        if (clases === null) clases = []; // null = todos → si admin toca, se vuelve explícito
+        if (accion === "add" && !clases.includes(curso)) clases.push(curso);
+        if (accion === "remove") clases = clases.filter((c) => c !== curso);
+        usuarios[alumno].clases = clases;
+        guardarUsuarios(usuarios);
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true, clases }));
+      } catch (e) {
+        console.error(e);
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error interno" }));
+      }
+    });
+    return;
+  }
+
+  /* --- ADMIN: setup primer admin ---
+     POST /api/admin/setup  body: { nombre }
+     Solo funciona si no existe ningún admin todavía */
+  if (url === "/api/admin/setup" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", () => {
+      try {
+        const { nombre } = JSON.parse(cuerpo);
+        const usuarios = leerUsuarios();
+        const yaHayAdmin = Object.values(usuarios).some((u) => u.rol === "admin");
+        if (yaHayAdmin) {
+          respuesta.writeHead(409, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "Ya existe un administrador." }));
+        }
+        const clave = (nombre || "").trim().toLowerCase();
+        if (!usuarios[clave]) {
+          respuesta.writeHead(404, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "Usuario no encontrado." }));
+        }
+        usuarios[clave].rol = "admin";
+        guardarUsuarios(usuarios);
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true, mensaje: `${clave} es ahora administrador.` }));
+      } catch (e) {
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error interno" }));
       }
     });
     return;
@@ -282,25 +366,37 @@ const servidor = http.createServer((peticion, respuesta) => {
      GET /api/ranking → lista ordenada de alumnos con su progreso */
   if (url.startsWith("/api/ranking") && peticion.method === "GET") {
     try {
-      const curso = new URL("http://x" + peticion.url).searchParams.get("curso") || "gemelos";
+      const params = new URL("http://x" + peticion.url).searchParams;
+      const curso = params.get("curso") || "global";
       const expedientes = leerExpedientes();
       const usuarios = leerUsuarios();
+      const totalUsuarios = Object.values(usuarios).filter((u) => u.rol !== "admin").length;
+
+      function extraerNotas(todosLosCursos, soloUnCurso) {
+        if (soloUnCurso) {
+          const prog = todosLosCursos[soloUnCurso] || {};
+          return Object.values(prog).filter((p) => p && p.nota !== undefined);
+        }
+        // Global: sumar todos los cursos
+        return Object.values(todosLosCursos)
+          .filter((v) => v && typeof v === "object" && !v.nota) // cada valor es un objeto de módulos
+          .flatMap((prog) => Object.values(prog).filter((p) => p && p.nota !== undefined));
+      }
 
       const ranking = Object.entries(expedientes).map(([nombre, todosLosCursos]) => {
-        // Soporte formato nuevo { cursoId: { modId: {...} } } y antiguo { modId: {...} }
-        const progreso = todosLosCursos[curso] || (typeof todosLosCursos === "object" && !todosLosCursos[curso] ? {} : todosLosCursos);
-        const notas = Object.values(progreso).filter((p) => p && p.nota !== undefined);
+        if (usuarios[nombre] && usuarios[nombre].rol === "admin") return null;
+        const notas = extraerNotas(todosLosCursos, curso === "global" ? null : curso);
         const completados = notas.length;
         const media = completados > 0
           ? Math.round(notas.reduce((s, p) => s + (p.nota / p.total), 0) / completados * 100)
           : 0;
         return { nombre, completados, media };
-      }).filter((r) => r.completados > 0);
+      }).filter((r) => r && r.completados > 0);
 
       ranking.sort((a, b) => b.completados - a.completados || b.media - a.media);
 
       respuesta.writeHead(200, { "Content-Type": "application/json" });
-      respuesta.end(JSON.stringify({ ranking, total: Object.keys(usuarios).length }));
+      respuesta.end(JSON.stringify({ ranking, total: totalUsuarios }));
     } catch (e) {
       console.error(e);
       respuesta.writeHead(500, { "Content-Type": "application/json" });

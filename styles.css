@@ -526,6 +526,70 @@ body {
 .buscador:focus { outline: none; border-color: var(--borde-hover); }
 .buscador::placeholder { color: var(--texto-muted); }
 
+/* ---------- Ranking tabs ---------- */
+.rank-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.rank-tab {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  color: var(--texto-suave);
+  border-radius: 99px;
+  padding: 6px 16px;
+  font-size: .83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.rank-tab:hover { background: var(--superficie-alt); color: var(--texto); }
+.rank-tab.activo { background: var(--superficie-alt); color: var(--acento); border-color: var(--borde-hover); }
+
+/* ---------- Panel de admin ---------- */
+.tabla-admin {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.tabla-admin th {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--texto-muted);
+  text-align: left;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--borde);
+}
+.fila-admin td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--borde);
+  color: var(--texto);
+  vertical-align: middle;
+}
+.fila-admin:hover td { background: var(--superficie-alt); }
+
+.toggle-inscripcion {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: transparent;
+  color: var(--texto-muted);
+  cursor: pointer;
+  font-size: .95rem;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.toggle-inscripcion:hover { border-color: var(--borde-hover); color: var(--texto); }
+.toggle-inscripcion.inscrito {
+  background: var(--verde-suave);
+  border-color: rgba(74,222,128,.35);
+  color: var(--verde);
+}
+.toggle-inscripcion:disabled { opacity: .5; cursor: wait; }
+
 /* ---------- Selección de curso ---------- */
 .lista-cursos { display: flex; flex-direction: column; gap: 10px; }
 
