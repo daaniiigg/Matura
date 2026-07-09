@@ -131,7 +131,7 @@ const servidor = http.createServer((peticion, respuesta) => {
           expira: Date.now() + 10 * 60 * 1000,
         };
 
-        await getResend().emails.send({
+        const { data, error: resendError } = await getResend().emails.send({
           from: "Academia de Gemelos Digitales <onboarding@resend.dev>",
           to: email,
           subject: "Tu código de verificación",
@@ -146,12 +146,67 @@ const servidor = http.createServer((peticion, respuesta) => {
             </div>`,
         });
 
+        if (resendError) {
+          console.error("Error de Resend:", JSON.stringify(resendError));
+          respuesta.writeHead(500, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "No se pudo enviar el email: " + (resendError.message || JSON.stringify(resendError)) }));
+        }
+
+        console.log("Email enviado correctamente:", data?.id);
         respuesta.writeHead(200, { "Content-Type": "application/json" });
         respuesta.end(JSON.stringify({ ok: true }));
       } catch (e) {
         console.error(e);
         respuesta.writeHead(500, { "Content-Type": "application/json" });
         respuesta.end(JSON.stringify({ error: "No se pudo enviar el email. Comprueba la dirección e inténtalo de nuevo." }));
+      }
+    });
+    return;
+  }
+
+  /* --- LOGIN CON GOOGLE ---
+     POST /api/google-login  body: { credential } */
+  if (url === "/api/google-login" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", async () => {
+      try {
+        const { credential } = JSON.parse(cuerpo);
+        const GOOGLE_CLIENT_ID = "681227298388-s9b2l8khn07bivbfvvqukasfu91cc6rl.apps.googleusercontent.com";
+
+        const verRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+        const token = await verRes.json();
+
+        if (token.error || token.aud !== GOOGLE_CLIENT_ID) {
+          respuesta.writeHead(401, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "Token de Google no válido." }));
+        }
+
+        const email = token.email.toLowerCase();
+        const usuarios = leerUsuarios();
+
+        // Buscar si este email de Google ya tiene cuenta
+        let nombreClave = Object.keys(usuarios).find(
+          (k) => usuarios[k].email === email && usuarios[k].google
+        );
+
+        if (!nombreClave) {
+          // Crear cuenta nueva con el nombre de Google
+          let base = (token.given_name || email.split("@")[0])
+            .toLowerCase().replace(/[^a-z0-9]/g, "");
+          nombreClave = base;
+          let i = 2;
+          while (usuarios[nombreClave]) nombreClave = base + i++;
+          usuarios[nombreClave] = { google: true, email };
+          guardarUsuarios(usuarios);
+        }
+
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true, nombre: nombreClave }));
+      } catch (e) {
+        console.error("Error en google-login:", e);
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error al verificar con Google." }));
       }
     });
     return;

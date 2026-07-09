@@ -84,6 +84,8 @@ const TEXTOS = {
     errorEmailInvalido: "Introduce un correo electrónico válido.",
     errorEmailEnUso: "Ese correo ya está registrado.",
     errorCodigoIncorrecto: "Código incorrecto o caducado. Pide uno nuevo.",
+    continueGoogle: "Continuar con Google",
+    oSeparador: "o",
   },
   en: {
     navModulos: "Modules",
@@ -154,6 +156,8 @@ const TEXTOS = {
     errorEmailInvalido: "Enter a valid email address.",
     errorEmailEnUso: "That email is already registered.",
     errorCodigoIncorrecto: "Incorrect or expired code. Request a new one.",
+    continueGoogle: "Continue with Google",
+    oSeparador: "or",
   },
   de: {
     navModulos: "Module",
@@ -224,6 +228,8 @@ const TEXTOS = {
     errorEmailInvalido: "Gib eine gültige E-Mail-Adresse ein.",
     errorEmailEnUso: "Diese E-Mail ist bereits registriert.",
     errorCodigoIncorrecto: "Falscher oder abgelaufener Code. Fordere einen neuen an.",
+    continueGoogle: "Mit Google fortfahren",
+    oSeparador: "oder",
   },
 };
 
@@ -340,6 +346,8 @@ function validarEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
+const GOOGLE_CLIENT_ID = "681227298388-s9b2l8khn07bivbfvvqukasfu91cc6rl.apps.googleusercontent.com";
+
 function pintarLogin() {
   const camposRegistro = modoRegistro ? `
     <input class="buscador" id="campo-email" type="email" placeholder="${T("emailPlaceholder")}">
@@ -355,6 +363,12 @@ function pintarLogin() {
       <p>${modoRegistro ? T("loginSubNuevo") : T("loginSubEntrar")}</p>
     </div>
     <div style="max-width:420px;margin:0 auto;text-align:center">
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin-bottom:16px"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--texto-muted)">
+        <div style="flex:1;height:1px;background:var(--borde)"></div>
+        <span style="font-size:.8rem">${T("oSeparador")}</span>
+        <div style="flex:1;height:1px;background:var(--borde)"></div>
+      </div>
       <input class="buscador" id="campo-nombre" type="text" placeholder="${T("loginPlaceholder")}" autofocus>
       ${camposRegistro}
       <p id="error-login" style="color:#e74c3c;min-height:1.4em;margin:8px 0"></p>
@@ -368,6 +382,48 @@ function pintarLogin() {
       </p>
     </div>
   `;
+
+  renderizarBotonGoogle();
+}
+
+function renderizarBotonGoogle() {
+  if (!window.google || !google.accounts) {
+    setTimeout(renderizarBotonGoogle, 300);
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+  });
+  const contenedor = document.getElementById("google-signin-btn");
+  if (contenedor) {
+    google.accounts.id.renderButton(contenedor, {
+      theme: "filled_black",
+      size: "large",
+      text: "continue_with",
+      shape: "rectangular",
+      width: 300,
+    });
+  }
+}
+
+async function handleGoogleLogin(response) {
+  mostrarError("");
+  try {
+    const resp = await fetch("/api/google-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: response.credential }),
+    });
+    const datos = await resp.json();
+    if (datos.ok) {
+      entrarComoAlumno(datos.nombre);
+    } else {
+      mostrarError(datos.error || T("errorServidor"));
+    }
+  } catch {
+    mostrarError(T("errorServidor"));
+  }
 }
 
 function pintarVerificacion() {
