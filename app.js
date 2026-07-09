@@ -707,18 +707,22 @@ async function reenviarCodigo() {
 
 function navegar() {
   if (!USUARIO) return pintarLogin();
-  if (!CURSO_ACTIVO) return pintarCursos();
 
   const ruta = location.hash || "#/";
   window.scrollTo(0, 0);
+
+  // Estas rutas funcionan sin curso seleccionado
+  if (ruta === "#/ranking")                          { actualizarNavActivo(ruta); return pintarRanking(); }
+  if (ruta === "#/sugerir" && ROL !== "admin")       { actualizarNavActivo(ruta); return pintarSugerir(); }
+  if (ruta === "#/admin"   && ROL === "admin")       { return pintarAdmin(); }
+
+  if (!CURSO_ACTIVO) return pintarCursos();
+
   actualizarNavActivo(ruta);
 
   if (ruta === "#/" || ruta === "") return pintarInicio();
-  if (ruta === "#/glosario") return pintarGlosario();
-  if (ruta === "#/progreso") return pintarProgreso();
-  if (ruta === "#/ranking")  return pintarRanking();
-  if (ruta === "#/sugerir" && ROL !== "admin") return pintarSugerir();
-  if (ruta === "#/admin" && ROL === "admin") return pintarAdmin();
+  if (ruta === "#/glosario")        return pintarGlosario();
+  if (ruta === "#/progreso")        return pintarProgreso();
 
   const matchModulo = ruta.match(/^#\/modulo\/(\d+)$/);
   if (matchModulo) return pintarModulo(Number(matchModulo[1]));
@@ -749,33 +753,21 @@ function pintarInicio() {
   const modulos = modulosIdioma();
   const completados = modulos.filter((m) => PROGRESO[m.id]).length;
   const porcentaje = Math.round((completados / modulos.length) * 100);
-
   const cursoActualObj = CURSOS.find((c) => c.id === CURSO_ACTIVO);
-  let html = `
-    <div class="hero">
-      <p class="hero-meta">
-        <a href="javascript:void(0)" onclick="volverACursos()"
-           style="color:var(--texto-muted);text-decoration:none">← Mis cursos</a>
-        &nbsp;·&nbsp; ${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}
-      </p>
-      <h1>${T("heroTitulo")}</h1>
-      <p>${T("heroSub")}</p>
-    </div>
-    <div class="stats-row">
-      <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
-      <div class="stat-pill"><strong>${completados}</strong><span>${T("completado").replace("✔ ","")}</span></div>
-      <div class="stat-pill"><strong>${porcentaje}%</strong><span>${T("texto-progreso") || "completado"}</span></div>
-    </div>
-    <div class="barra-progreso-global"><div class="relleno" style="width:${porcentaje}%"></div></div>
-    <span class="texto-progreso" style="display:block;margin-bottom:28px">${T("progresoGlobal", { n: completados, t: modulos.length, p: porcentaje })}</span>
-  `;
 
+  const notasArr = modulos.filter(m => PROGRESO[m.id])
+    .map(m => Math.round((PROGRESO[m.id].nota / PROGRESO[m.id].total) * 100));
+  const mediaLocal = notasArr.length > 0
+    ? Math.round(notasArr.reduce((a, b) => a + b, 0) / notasArr.length) + "%"
+    : "—";
+
+  let modulosHtml = "";
   for (const seccion of seccionesIdioma()) {
-    html += `<h2 class="seccion-titulo">${seccion.nombre}</h2>`;
+    modulosHtml += `<h2 class="seccion-titulo">${seccion.nombre}</h2>`;
     for (const mod of modulos.filter((m) => m.seccion === seccion.id)) {
       const hecho = PROGRESO[mod.id];
       const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
-      html += `
+      modulosHtml += `
         <a class="tarjeta-modulo" href="#/modulo/${mod.id}">
           <div class="icono-modulo">${ICONOS_MODULO[mod.id] || mod.id}</div>
           <div class="info">
@@ -790,11 +782,73 @@ function pintarInicio() {
               <div class="tarjeta-barra-fill ${hecho ? "" : "vacia"}" style="width:${pct}%"></div>
             </div>
           </div>
-        </a>
-      `;
+        </a>`;
     }
   }
-  app.innerHTML = html;
+
+  app.innerHTML = `
+    <div class="dashboard-hero">
+      <div>
+        <p class="hero-meta">
+          <a href="javascript:void(0)" onclick="volverACursos()"
+             style="color:var(--texto-muted);text-decoration:none;font-weight:500">← Mis cursos</a>
+          &nbsp;·&nbsp; ${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}
+        </p>
+        <h1 style="font-size:1.7rem;font-weight:700;letter-spacing:-.03em;color:var(--acento);margin-top:4px">
+          ${T("heroTitulo")}
+        </h1>
+      </div>
+      <div class="stats-row" style="margin-bottom:0">
+        <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
+        <div class="stat-pill"><strong>${completados}</strong><span>completados</span></div>
+        <div class="stat-pill"><strong>${porcentaje}%</strong><span>progreso</span></div>
+      </div>
+    </div>
+    <div class="barra-progreso-global" style="max-width:100%;margin-bottom:28px">
+      <div class="relleno" style="width:${porcentaje}%"></div>
+    </div>
+    <div class="dashboard-grid">
+      <div>${modulosHtml}</div>
+      <div class="dashboard-sidebar">
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">Mi rendimiento</h2>
+          <div class="mini-stat-grid">
+            <div class="mini-stat">
+              <span class="mini-stat-val">${completados}/${modulos.length}</span>
+              <span class="mini-stat-label">Módulos</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-val">${mediaLocal}</span>
+              <span class="mini-stat-label">Nota media</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">Top del curso</h2>
+          <div id="mini-ranking-contenido" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  cargarMiniRanking();
+}
+
+async function cargarMiniRanking() {
+  const el = document.getElementById("mini-ranking-contenido");
+  if (!el) return;
+  try {
+    const resp = await fetch(`/api/ranking?curso=${encodeURIComponent(CURSO_ACTIVO)}`);
+    const { ranking } = await resp.json();
+    if (!ranking || ranking.length === 0) { el.textContent = "Aún no hay datos."; return; }
+    const medalon = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉";
+    el.innerHTML = ranking.slice(0, 3).map((r, i) => `
+      <div class="mini-ranking-fila">
+        <span class="mini-ranking-pos">${medalon(i)}</span>
+        <span class="mini-ranking-nombre ${r.nombre === USUARIO ? "yo" : ""}">${r.nombre}</span>
+        <span class="mini-ranking-stat">${r.media}%</span>
+      </div>`).join("");
+  } catch { el.textContent = ""; }
 }
 
 /* ---------- PANTALLA: LECCIÓN ---------- */
