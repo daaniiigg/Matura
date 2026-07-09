@@ -14,7 +14,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
 const PUERTO = process.env.PORT || 4173;
 const ARCHIVADOR = path.join(__dirname, "progreso.json");
@@ -31,13 +31,7 @@ function limpiarCaducados() {
   }
 }
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /* ---------- El archivador de expedientes ---------- */
 
@@ -133,18 +127,18 @@ const servidor = http.createServer((peticion, respuesta) => {
           expira: Date.now() + 10 * 60 * 1000,
         };
 
-        await transporter.sendMail({
-          from: `"Academia de Gemelos Digitales" <${process.env.GMAIL_USER}>`,
+        await resend.emails.send({
+          from: "Academia de Gemelos Digitales <onboarding@resend.dev>",
           to: email,
           subject: "Tu código de verificación",
           html: `
-            <div style="font-family:sans-serif;max-width:500px;margin:0 auto">
-              <h2>Hola, ${nombre} 👋</h2>
-              <p>Tu código de verificación para la Academia de Gemelos Digitales es:</p>
+            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;background:#0d0d0d;color:#f0f0f0;padding:32px;border-radius:12px">
+              <h2 style="margin-bottom:8px">Hola, ${nombre} 👋</h2>
+              <p style="color:#888">Tu código de verificación para la Academia de Gemelos Digitales es:</p>
               <div style="font-size:2.5rem;font-weight:bold;letter-spacing:12px;text-align:center;
-                          padding:24px;background:#f0f4ff;border-radius:8px;margin:24px 0">${codigo}</div>
-              <p>Este código caduca en <strong>10 minutos</strong>.</p>
-              <p style="color:#888;font-size:.85rem">Si no has solicitado este código, ignora este mensaje.</p>
+                          padding:24px;background:#1a1a1a;border-radius:8px;margin:24px 0;border:1px solid #272727">${codigo}</div>
+              <p style="color:#888">Este código caduca en <strong style="color:#f0f0f0">10 minutos</strong>.</p>
+              <p style="color:#555;font-size:.82rem">Si no has solicitado este código, ignora este mensaje.</p>
             </div>`,
         });
 
