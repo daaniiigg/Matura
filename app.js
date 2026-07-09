@@ -319,11 +319,8 @@ function actualizarNavActivo(ruta) {
   const id = mapa[ruta];
   if (id) document.getElementById(id)?.classList.add("activo");
 
-  const navAdmin = document.getElementById("nav-admin");
-  if (navAdmin) navAdmin.style.display = ROL === "admin" ? "" : "none";
-
-  const navSugerir = document.getElementById("nav-sugerir");
-  if (navSugerir) navSugerir.style.display = (USUARIO && ROL !== "admin") ? "" : "none";
+  document.body.classList.toggle("es-admin", ROL === "admin");
+  document.body.classList.toggle("hay-usuario", !!USUARIO);
 }
 
 /* ---------- EL EXPEDIENTE DEL ALUMNO ----------
@@ -419,12 +416,12 @@ function pintarBarraUsuario() {
   if (!zona) return;
   if (!USUARIO) {
     zona.innerHTML = "";
-    const navSugerir = document.getElementById("nav-sugerir");
-    if (navSugerir) navSugerir.style.display = "none";
+    document.body.classList.toggle("es-admin", false);
+    document.body.classList.toggle("hay-usuario", false);
     return;
   }
-  const navSugerir = document.getElementById("nav-sugerir");
-  if (navSugerir) navSugerir.style.display = ROL !== "admin" ? "" : "none";
+  document.body.classList.toggle("es-admin", ROL === "admin");
+  document.body.classList.toggle("hay-usuario", !!USUARIO);
   const cursoLink = CURSO_ACTIVO
     ? ` · <a href="javascript:void(0)" onclick="volverACursos()" style="color:var(--texto-muted)">${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.icono || ""} ${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.titulo || CURSO_ACTIVO}</a>`
     : "";
@@ -1242,19 +1239,60 @@ async function enviarSugerencia() {
 async function pintarAdmin() {
   actualizarNavActivo("#/admin");
   app.innerHTML = `
-    <div class="hero">
-      <p class="hero-meta">Panel de administración</p>
-      <h1>Panel de administración</h1>
-      <p>Gestiona los accesos de alumnos y revisa sus sugerencias de temas nuevos.</p>
+    <div class="dashboard-hero">
+      <div>
+        <p class="hero-meta">Panel de administración</p>
+        <h1 style="font-size:1.7rem;font-weight:700;letter-spacing:-.03em;color:var(--acento);margin-top:4px">
+          Gestión de alumnos
+        </h1>
+      </div>
+      <div class="stats-row" style="margin-bottom:0">
+        <div class="stat-pill" id="pill-alumnos"><strong>···</strong><span>alumnos</span></div>
+        <div class="stat-pill" id="pill-cursos"><strong>${CURSOS.length}</strong><span>cursos</span></div>
+      </div>
     </div>
-    <div id="admin-tabla" style="color:var(--texto-muted);text-align:center;padding:40px 0">Cargando···</div>
-    <div id="admin-sugerencias"></div>
+
+    <div class="dashboard-grid">
+      <div>
+        <h2 class="seccion-titulo">Inscripciones</h2>
+        <div id="admin-tabla" style="color:var(--texto-muted);text-align:center;padding:40px 0">Cargando···</div>
+      </div>
+      <div class="dashboard-sidebar">
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">Alumnos registrados</h2>
+          <div id="admin-lista-sidebar" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+        </div>
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">💡 Sugerencias</h2>
+          <div id="admin-sugerencias-sidebar" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+        </div>
+      </div>
+    </div>
   `;
 
-  // — Sección alumnos —
+  // Load students
   try {
     const resp = await fetch("/api/admin/alumnos", { headers: { "x-admin": USUARIO } });
     const { alumnos } = await resp.json();
+
+    // Update pill
+    const pill = document.getElementById("pill-alumnos");
+    if (pill) pill.innerHTML = `<strong>${alumnos?.length || 0}</strong><span>alumnos</span>`;
+
+    // Sidebar: simple student list
+    const sidebarEl = document.getElementById("admin-lista-sidebar");
+    if (sidebarEl && alumnos && alumnos.length > 0) {
+      sidebarEl.innerHTML = alumnos.slice(0, 8).map(a => `
+        <div class="mini-ranking-fila">
+          <div class="rank-avatar" style="width:28px;height:28px;font-size:.7rem;flex-shrink:0">${a.nombre.slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.83rem;color:var(--texto);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.nombre}</div>
+            <div style="font-size:.72rem;color:var(--texto-muted)">${a.clases === null ? "todos los cursos" : (a.clases.join(", ") || "sin cursos")}</div>
+          </div>
+        </div>`).join("") + (alumnos.length > 8 ? `<p style="color:var(--texto-muted);font-size:.75rem;margin-top:8px">+${alumnos.length - 8} más</p>` : "");
+    } else if (sidebarEl) {
+      sidebarEl.textContent = "No hay alumnos todavía.";
+    }
 
     if (!alumnos || alumnos.length === 0) {
       document.getElementById("admin-tabla").textContent = "No hay alumnos registrados todavía.";
@@ -1282,17 +1320,14 @@ async function pintarAdmin() {
       }).join("");
 
       document.getElementById("admin-tabla").innerHTML = `
-        <div class="stats-row" style="margin-bottom:16px">
-          <div class="stat-pill"><strong>${alumnos.length}</strong><span>alumnos</span></div>
-        </div>
         <div style="overflow-x:auto">
           <table class="tabla-admin">
             <thead><tr><th>Alumno</th><th>Email</th>${cabeceraCursos}</tr></thead>
             <tbody>${filas}</tbody>
           </table>
         </div>
-        <p style="margin-top:16px;font-size:.8rem;color:var(--texto-muted)">
-          ✓ = inscrito en el curso · ○ = sin acceso
+        <p style="margin-top:12px;font-size:.75rem;color:var(--texto-muted)">
+          ✓ inscrito · ○ sin acceso
         </p>`;
     }
   } catch (e) {
@@ -1300,40 +1335,32 @@ async function pintarAdmin() {
     console.error(e);
   }
 
-  // — Sección sugerencias —
+  // Load suggestions in sidebar
   try {
     const respSug = await fetch("/api/sugerencias", { headers: { "x-admin": USUARIO } });
     const { sugerencias } = await respSug.json();
-    const sugDiv = document.getElementById("admin-sugerencias");
-    if (!sugDiv) return;
-
+    const sugEl = document.getElementById("admin-sugerencias-sidebar");
+    if (!sugEl) return;
     if (!sugerencias || sugerencias.length === 0) {
-      sugDiv.innerHTML = `
-        <h2 class="seccion-titulo" style="margin-top:48px">💡 Sugerencias de alumnos</h2>
-        <p style="color:var(--texto-muted)">Aún no hay sugerencias.</p>`;
+      sugEl.textContent = "Aún no hay sugerencias.";
       return;
     }
-
-    const filasSug = sugerencias.map((s) => {
+    sugEl.innerHTML = sugerencias.slice(0, 5).map(s => {
       const fecha = new Date(s.fecha).toLocaleDateString("es-ES");
       return `
-        <div class="fila-sugerencia">
-          <div class="rank-avatar">${s.alumno.slice(0, 2).toUpperCase()}</div>
-          <div class="sug-cuerpo">
-            <p class="sug-meta"><strong>${s.alumno}</strong> · <span>${fecha}</span></p>
-            <p class="sug-texto">${s.texto}</p>
-          </div>
+        <div style="padding:10px 0;border-bottom:1px solid var(--borde)">
+          <p style="margin:0 0 3px;font-size:.75rem;color:var(--texto-muted)">${s.alumno} · ${fecha}</p>
+          <p style="margin:0;font-size:.83rem;color:var(--texto);line-height:1.4">${s.texto.slice(0, 120)}${s.texto.length > 120 ? "…" : ""}</p>
         </div>`;
-    }).join("");
+    }).join("") + (sugerencias.length > 5 ? `<p style="color:var(--texto-muted);font-size:.75rem;margin-top:8px">+${sugerencias.length - 5} más en el panel completo</p>` : "");
 
-    sugDiv.innerHTML = `
-      <h2 class="seccion-titulo" style="margin-top:48px">💡 Sugerencias de alumnos</h2>
-      <div class="stats-row" style="margin-bottom:16px">
-        <div class="stat-pill"><strong>${sugerencias.length}</strong><span>sugerencias</span></div>
-      </div>
-      <div class="lista-sugerencias">${filasSug}</div>`;
+    // Also update the main admin-sugerencias div if it exists (from old layout)
+    const oldSugDiv = document.getElementById("admin-sugerencias");
+    if (oldSugDiv) oldSugDiv.innerHTML = "";
   } catch (e) {
-    console.error("Error cargando sugerencias:", e);
+    const sugEl = document.getElementById("admin-sugerencias-sidebar");
+    if (sugEl) sugEl.textContent = "";
+    console.error(e);
   }
 }
 

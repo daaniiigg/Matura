@@ -80,6 +80,12 @@ body {
   color: var(--acento);
 }
 
+/* Nav visibility via body classes */
+#nav-admin  { display: none; }
+#nav-sugerir { display: none; }
+body.es-admin #nav-admin { display: block; }
+body.hay-usuario:not(.es-admin) #nav-sugerir { display: block; }
+
 #zona-usuario {
   font-size: .82rem;
   color: var(--texto-suave);
@@ -237,25 +243,25 @@ body {
 
 /* ---------- Secciones y módulos ---------- */
 .seccion-titulo {
-  font-size: .7rem;
+  font-size: .65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .12em;
+  letter-spacing: .14em;
   color: var(--texto-muted);
-  margin: 32px 0 10px;
+  margin: 28px 0 10px;
 }
 
 .tarjeta-modulo {
   background: var(--superficie);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
-  padding: 16px 20px;
-  margin-bottom: 6px;
+  padding: 20px 22px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   cursor: pointer;
-  transition: background .15s, border-color .15s;
+  transition: background .15s, border-color .15s, transform .1s;
   text-decoration: none;
   color: inherit;
 }

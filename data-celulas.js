@@ -1,5 +1,5 @@
 /* ============================================================
-   TEMARIO — Biología Celular: La célula como unidad de vida.
+   TEMARIO — Biología Celular: La célula como unidad de vida. v2
    Cada módulo tiene: contenido, ficha de vocabulario y quiz.
    Fuente: Biología Celular y Molecular — contenido de nivel bachillerato/universitario.
    ============================================================ */
