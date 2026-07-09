@@ -86,6 +86,14 @@ const TEXTOS = {
     errorCodigoIncorrecto: "Código incorrecto o caducado. Pide uno nuevo.",
     continueGoogle: "Continuar con Google",
     oSeparador: "o",
+    navRanking: "Ranking",
+    rankingTitulo: "Ranking de alumnos",
+    rankingSub: "Clasificación por módulos completados y nota media.",
+    rankingAlumno: "Alumno",
+    rankingModulos: "Módulos",
+    rankingMedia: "Media",
+    rankingVacio: "Aún no hay datos de progreso.",
+    rankingTu: "(tú)",
   },
   en: {
     navModulos: "Modules",
@@ -158,6 +166,14 @@ const TEXTOS = {
     errorCodigoIncorrecto: "Incorrect or expired code. Request a new one.",
     continueGoogle: "Continue with Google",
     oSeparador: "or",
+    navRanking: "Ranking",
+    rankingTitulo: "Student Ranking",
+    rankingSub: "Sorted by modules completed and average score.",
+    rankingAlumno: "Student",
+    rankingModulos: "Modules",
+    rankingMedia: "Average",
+    rankingVacio: "No progress data yet.",
+    rankingTu: "(you)",
   },
   de: {
     navModulos: "Module",
@@ -230,6 +246,14 @@ const TEXTOS = {
     errorCodigoIncorrecto: "Falscher oder abgelaufener Code. Fordere einen neuen an.",
     continueGoogle: "Mit Google fortfahren",
     oSeparador: "oder",
+    navRanking: "Ranking",
+    rankingTitulo: "Schüler-Ranking",
+    rankingSub: "Sortiert nach abgeschlossenen Modulen und Durchschnittsnote.",
+    rankingAlumno: "Schüler",
+    rankingModulos: "Module",
+    rankingMedia: "Durchschnitt",
+    rankingVacio: "Noch keine Fortschrittsdaten.",
+    rankingTu: "(du)",
   },
 };
 
@@ -268,10 +292,23 @@ function pintarTextosFijos() {
   document.getElementById("nav-modulos").textContent = T("navModulos");
   document.getElementById("nav-glosario").textContent = T("navGlosario");
   document.getElementById("nav-progreso").textContent = T("navProgreso");
+  document.getElementById("nav-ranking").textContent = T("navRanking");
   document.getElementById("texto-footer").textContent = T("footer");
   const selector = document.getElementById("selector-idioma");
   if (selector) selector.value = IDIOMA;
   pintarBarraUsuario();
+}
+
+function actualizarNavActivo(ruta) {
+  const mapa = {
+    "#/":        "nav-modulos",
+    "#/glosario":"nav-glosario",
+    "#/progreso":"nav-progreso",
+    "#/ranking": "nav-ranking",
+  };
+  document.querySelectorAll(".topbar nav a").forEach((a) => a.classList.remove("activo"));
+  const id = mapa[ruta];
+  if (id) document.getElementById(id)?.classList.add("activo");
 }
 
 /* ---------- EL EXPEDIENTE DEL ALUMNO ----------
@@ -535,15 +572,16 @@ async function reenviarCodigo() {
 /* ---------- NAVEGACIÓN ---------- */
 
 function navegar() {
-  // Si nadie ha entrado todavía, lo primero es identificarse
   if (!USUARIO) return pintarLogin();
 
   const ruta = location.hash || "#/";
   window.scrollTo(0, 0);
+  actualizarNavActivo(ruta);
 
   if (ruta === "#/" || ruta === "") return pintarInicio();
   if (ruta === "#/glosario") return pintarGlosario();
   if (ruta === "#/progreso") return pintarProgreso();
+  if (ruta === "#/ranking")  return pintarRanking();
 
   const matchModulo = ruta.match(/^#\/modulo\/(\d+)$/);
   if (matchModulo) return pintarModulo(Number(matchModulo[1]));
@@ -551,7 +589,7 @@ function navegar() {
   const matchQuiz = ruta.match(/^#\/quiz\/(\d+)$/);
   if (matchQuiz) return pintarQuiz(Number(matchQuiz[1]));
 
-  pintarInicio(); // ruta desconocida → al inicio
+  pintarInicio();
 }
 
 window.addEventListener("hashchange", navegar);
@@ -568,6 +606,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /* ---------- PANTALLA: INICIO (lista de módulos) ---------- */
 
+const ICONOS_MODULO = { 1:"◈", 2:"◎", 3:"⟡", 4:"⊞", 5:"◉", 6:"⬡", 7:"△", 8:"◇" };
+
 function pintarInicio() {
   const modulos = modulosIdioma();
   const completados = modulos.filter((m) => PROGRESO[m.id]).length;
@@ -575,26 +615,39 @@ function pintarInicio() {
 
   let html = `
     <div class="hero">
+      <p class="hero-meta">Academia de Gemelos Digitales</p>
       <h1>${T("heroTitulo")}</h1>
       <p>${T("heroSub")}</p>
-      <div class="barra-progreso-global"><div class="relleno" style="width:${porcentaje}%"></div></div>
-      <span class="texto-progreso">${T("progresoGlobal", { n: completados, t: modulos.length, p: porcentaje })}</span>
     </div>
+    <div class="stats-row">
+      <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
+      <div class="stat-pill"><strong>${completados}</strong><span>${T("completado").replace("✔ ","")}</span></div>
+      <div class="stat-pill"><strong>${porcentaje}%</strong><span>${T("texto-progreso") || "completado"}</span></div>
+    </div>
+    <div class="barra-progreso-global"><div class="relleno" style="width:${porcentaje}%"></div></div>
+    <span class="texto-progreso" style="display:block;margin-bottom:28px">${T("progresoGlobal", { n: completados, t: modulos.length, p: porcentaje })}</span>
   `;
 
   for (const seccion of seccionesIdioma()) {
     html += `<h2 class="seccion-titulo">${seccion.nombre}</h2>`;
     for (const mod of modulos.filter((m) => m.seccion === seccion.id)) {
       const hecho = PROGRESO[mod.id];
+      const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
       html += `
         <a class="tarjeta-modulo" href="#/modulo/${mod.id}">
+          <div class="icono-modulo">${ICONOS_MODULO[mod.id] || mod.id}</div>
           <div class="info">
             <h3>${T("modulo")} ${mod.id} · ${mod.titulo}</h3>
-            <p>⏱ ${mod.minutos} ${T("minLectura")} · ${mod.quiz.length} ${T("preguntasQuiz")}</p>
+            <p>${mod.minutos} ${T("minLectura")} · ${mod.quiz.length} ${T("preguntasQuiz")}</p>
           </div>
-          <span class="estado ${hecho ? "completado" : "pendiente"}">
-            ${hecho ? `${T("completado")} · ${hecho.nota}/${hecho.total}` : T("pendiente")}
-          </span>
+          <div class="tarjeta-barra">
+            <span class="estado ${hecho ? "completado" : "pendiente"}">
+              ${hecho ? `${hecho.nota}/${hecho.total}` : T("pendiente")}
+            </span>
+            <div class="tarjeta-barra-track">
+              <div class="tarjeta-barra-fill ${hecho ? "" : "vacia"}" style="width:${pct}%"></div>
+            </div>
+          </div>
         </a>
       `;
     }
@@ -846,6 +899,63 @@ function filtrarGlosario(texto) {
   );
   document.getElementById("lista-glosario").innerHTML =
     visibles.length === 0
-      ? `<p style="text-align:center;color:#6b7280">${T("noCoincide", { q: texto })}</p>`
+      ? `<p style="text-align:center;color:var(--texto-muted)">${T("noCoincide", { q: texto })}</p>`
       : visibles.map((g) => `<div class="termino"><h3>${g.termino}</h3><p>${g.definicion}</p></div>`).join("");
+}
+
+/* ---------- PANTALLA: RANKING ---------- */
+
+async function pintarRanking() {
+  app.innerHTML = `
+    <div class="hero">
+      <p class="hero-meta">Academia de Gemelos Digitales</p>
+      <h1>${T("rankingTitulo")}</h1>
+      <p>${T("rankingSub")}</p>
+    </div>
+    <div id="ranking-lista" style="color:var(--texto-muted);text-align:center;padding:40px 0">···</div>
+  `;
+
+  try {
+    const resp = await fetch("/api/ranking");
+    const { ranking, total } = await resp.json();
+
+    if (!ranking || ranking.length === 0) {
+      document.getElementById("ranking-lista").textContent = T("rankingVacio");
+      return;
+    }
+
+    const totalModulos = modulosIdioma().length;
+    const posClase = (i) => i === 0 ? "top1" : i === 1 ? "top2" : i === 2 ? "top3" : "";
+    const medalon = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
+
+    const filas = ranking.map((r, i) => {
+      const esYo = r.nombre === USUARIO;
+      const pct = Math.round((r.completados / totalModulos) * 100);
+      const iniciales = r.nombre.slice(0, 2).toUpperCase();
+      return `
+        <div class="fila-ranking ${esYo ? "yo" : ""}">
+          <div class="rank-pos ${posClase(i)}">${medalon(i)}</div>
+          <div class="rank-avatar">${iniciales}</div>
+          <div class="rank-info">
+            <div class="rank-nombre">${r.nombre}${esYo ? ` <span style="color:var(--texto-muted);font-weight:400">${T("rankingTu")}</span>` : ""}</div>
+            <div class="rank-detalle">${r.completados} / ${totalModulos} ${T("rankingModulos").toLowerCase()} · ${r.media}% ${T("rankingMedia").toLowerCase()}</div>
+          </div>
+          <div class="rank-barra-wrap">
+            <div class="rank-barra-track"><div class="rank-barra-fill" style="width:${pct}%"></div></div>
+            <span class="rank-pct">${pct}%</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    document.getElementById("ranking-lista").innerHTML = `
+      <div class="stats-row" style="margin-bottom:20px">
+        <div class="stat-pill"><strong>${total}</strong><span>alumnos registrados</span></div>
+        <div class="stat-pill"><strong>${ranking.length}</strong><span>con progreso</span></div>
+      </div>
+      ${filas}
+    `;
+  } catch {
+    document.getElementById("ranking-lista").textContent = T("errorServidor");
+  }
 }

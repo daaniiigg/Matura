@@ -278,6 +278,34 @@ const servidor = http.createServer((peticion, respuesta) => {
     return;
   }
 
+  /* --- RANKING ---
+     GET /api/ranking → lista ordenada de alumnos con su progreso */
+  if (url === "/api/ranking" && peticion.method === "GET") {
+    try {
+      const expedientes = leerExpedientes();
+      const usuarios = leerUsuarios();
+
+      const ranking = Object.entries(expedientes).map(([nombre, progreso]) => {
+        const notas = Object.values(progreso).filter((p) => p.nota !== undefined);
+        const completados = notas.length;
+        const media = completados > 0
+          ? Math.round(notas.reduce((s, p) => s + (p.nota / p.total), 0) / completados * 100)
+          : 0;
+        return { nombre, completados, media };
+      });
+
+      ranking.sort((a, b) => b.completados - a.completados || b.media - a.media);
+
+      respuesta.writeHead(200, { "Content-Type": "application/json" });
+      respuesta.end(JSON.stringify({ ranking, total: Object.keys(usuarios).length }));
+    } catch (e) {
+      console.error(e);
+      respuesta.writeHead(500, { "Content-Type": "application/json" });
+      respuesta.end(JSON.stringify({ error: "Error al cargar el ranking" }));
+    }
+    return;
+  }
+
   if (url.startsWith("/api/progreso/")) {
     const alumno = decodeURIComponent(url.split("/")[3] || "").trim().toLowerCase();
 
