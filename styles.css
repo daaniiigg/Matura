@@ -526,6 +526,41 @@ body {
 .buscador:focus { outline: none; border-color: var(--borde-hover); }
 .buscador::placeholder { color: var(--texto-muted); }
 
+/* ---------- Selección de curso ---------- */
+.lista-cursos { display: flex; flex-direction: column; gap: 10px; }
+
+.tarjeta-curso {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.tarjeta-curso:hover { background: var(--superficie-alt); border-color: var(--borde-hover); }
+.tarjeta-curso.proximamente { cursor: default; opacity: .7; }
+.tarjeta-curso.proximamente:hover { background: var(--superficie); border-color: var(--borde); }
+
+.curso-icono {
+  font-size: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--superficie-alt);
+  border: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.curso-info { flex: 1; }
+.curso-info h2 { font-size: 1.1rem; font-weight: 700; color: var(--texto); margin-bottom: 4px; }
+.curso-info p  { font-size: .88rem; color: var(--texto-suave); }
+.curso-flecha  { font-size: 1.2rem; color: var(--texto-muted); }
+
 /* ---------- Móvil ---------- */
 @media (max-width: 640px) {
   .leccion { padding: 22px 16px; }

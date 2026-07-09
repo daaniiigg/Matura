@@ -3,7 +3,7 @@
    Noch nicht übersetzte Module fallen auf Spanisch zurück.
    ============================================================ */
 
-DATOS.de = {
+DATOS.gemelos.de = {
   SECCIONES: [
     { id: "fundamentos", nombre: "📘 Grundlagen" },
     { id: "tecnologia", nombre: "⚙️ Technologie" },
@@ -824,5 +824,5 @@ DIGITALER ZWILLING  →  Anweisungen und Warnungen  →  PHYSISCHE WELT</pre>
 };
 
 /* Fallback: si el glosario aún no está traducido, usar el español */
-if (DATOS.de.GLOSARIO.length === 0) DATOS.de.GLOSARIO = null;
-if (!DATOS.de.GLOSARIO) delete DATOS.de.GLOSARIO;
+if (DATOS.gemelos.de.GLOSARIO.length === 0) DATOS.gemelos.de.GLOSARIO = null;
+if (!DATOS.gemelos.de.GLOSARIO) delete DATOS.gemelos.de.GLOSARIO;

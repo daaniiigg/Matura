@@ -266,18 +266,25 @@ function T(clave, datos = {}) {
   return texto;
 }
 
-/* Contenido (módulos/secciones/glosario) en el idioma elegido.
-   Si un módulo aún no está traducido, se muestra en español. */
+/* Contenido (módulos/secciones/glosario) en el idioma elegido,
+   para el curso activo. Si un módulo no está traducido, usa el español. */
+function datosCurso() {
+  return DATOS[CURSO_ACTIVO] || {};
+}
 function seccionesIdioma() {
-  return (DATOS[IDIOMA] && DATOS[IDIOMA].SECCIONES) || DATOS.es.SECCIONES;
+  const d = datosCurso();
+  return (d[IDIOMA] && d[IDIOMA].SECCIONES) || (d.es && d.es.SECCIONES) || [];
 }
 function modulosIdioma() {
-  if (IDIOMA === "es") return DATOS.es.MODULOS;
-  const traducidos = (DATOS[IDIOMA] && DATOS[IDIOMA].MODULOS) || [];
-  return DATOS.es.MODULOS.map((m) => traducidos.find((t) => t.id === m.id) || m);
+  const d = datosCurso();
+  const es = (d.es && d.es.MODULOS) || [];
+  if (IDIOMA === "es") return es;
+  const traducidos = (d[IDIOMA] && d[IDIOMA].MODULOS) || [];
+  return es.map((m) => traducidos.find((t) => t.id === m.id) || m);
 }
 function glosarioIdioma() {
-  return (DATOS[IDIOMA] && DATOS[IDIOMA].GLOSARIO) || DATOS.es.GLOSARIO;
+  const d = datosCurso();
+  return (d[IDIOMA] && d[IDIOMA].GLOSARIO) || (d.es && d.es.GLOSARIO) || [];
 }
 
 function cambiarIdioma(idioma) {
@@ -316,45 +323,123 @@ function actualizarNavActivo(ruta) {
    localStorage solo recuerda quién se sentó en este pupitre
    y en qué idioma prefiere estudiar. */
 
-let USUARIO = null; // quién ha entrado
-let PROGRESO = {};  // copia local de su expediente (la de verdad está en la secretaría)
+let USUARIO       = null; // quién ha entrado
+let CURSO_ACTIVO  = null; // qué curso está viendo ahora
+let PROGRESO_GLOBAL = {}; // todos los cursos: { gemelos: {...}, celulas: {...} }
+let PROGRESO      = {};   // progreso del curso activo (atajo a PROGRESO_GLOBAL[CURSO_ACTIVO])
+
+function migrarProgresoAntiguo(datos) {
+  // Si las claves son números, es el formato antiguo (solo gemelos) → migrar
+  const claves = Object.keys(datos);
+  if (claves.length > 0 && claves.every((k) => !isNaN(k))) {
+    return { gemelos: datos };
+  }
+  return datos;
+}
 
 async function entrarComoAlumno(nombre) {
   USUARIO = nombre.trim().toLowerCase();
-  localStorage.setItem("lms-usuario", USUARIO); // este pupitre recuerda quién eres
+  localStorage.setItem("lms-usuario", USUARIO);
 
-  // Pedimos a la secretaría el expediente de este alumno
-  const respuesta = await fetch(`/api/progreso/${encodeURIComponent(USUARIO)}`);
-  PROGRESO = await respuesta.json();
+  const resp = await fetch(`/api/progreso/${encodeURIComponent(USUARIO)}`);
+  PROGRESO_GLOBAL = migrarProgresoAntiguo(await resp.json());
 
   pintarBarraUsuario();
+
+  const ultimoCurso = localStorage.getItem("lms-curso");
+  if (ultimoCurso && DATOS[ultimoCurso]) {
+    seleccionarCurso(ultimoCurso);
+  } else {
+    pintarCursos();
+  }
+}
+
+function seleccionarCurso(id) {
+  CURSO_ACTIVO = id;
+  localStorage.setItem("lms-curso", id);
+  PROGRESO = PROGRESO_GLOBAL[id] || {};
+  location.hash = "#/";
   navegar();
 }
 
 function guardarProgreso() {
-  // Enviamos el expediente actualizado a la ventanilla de la secretaría
+  PROGRESO_GLOBAL[CURSO_ACTIVO] = PROGRESO;
   fetch(`/api/progreso/${encodeURIComponent(USUARIO)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(PROGRESO),
+    body: JSON.stringify(PROGRESO_GLOBAL),
   });
 }
 
 function salir() {
   localStorage.removeItem("lms-usuario");
+  localStorage.removeItem("lms-curso");
   USUARIO = null;
+  CURSO_ACTIVO = null;
   PROGRESO = {};
+  PROGRESO_GLOBAL = {};
   pintarBarraUsuario();
   pintarLogin();
+}
+
+function volverACursos() {
+  CURSO_ACTIVO = null;
+  localStorage.removeItem("lms-curso");
+  PROGRESO = {};
+  pintarCursos();
 }
 
 /* Muestra en la barra superior quién ha entrado */
 function pintarBarraUsuario() {
   const zona = document.getElementById("zona-usuario");
   if (!zona) return;
-  zona.innerHTML = USUARIO
-    ? `👤 ${USUARIO} · <a href="#" onclick="salir(); return false;">${T("salir")}</a>`
+  if (!USUARIO) { zona.innerHTML = ""; return; }
+  const cursoLink = CURSO_ACTIVO
+    ? ` · <a href="javascript:void(0)" onclick="volverACursos()" style="color:var(--texto-muted)">${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.icono || ""} ${CURSOS.find(c=>c.id===CURSO_ACTIVO)?.titulo || CURSO_ACTIVO}</a>`
     : "";
+  zona.innerHTML = `👤 ${USUARIO}${cursoLink} · <a href="javascript:void(0)" onclick="salir()">${T("salir")}</a>`;
+}
+
+/* ---------- PANTALLA: SELECCIÓN DE CURSO ---------- */
+
+function pintarCursos() {
+  actualizarNavActivo("");
+  const tarjetas = CURSOS.map((curso) => {
+    const progresoDelCurso = PROGRESO_GLOBAL[curso.id] || {};
+    const datosCursoObj = DATOS[curso.id];
+    const totalMods = datosCursoObj ? (datosCursoObj.es.MODULOS.length) : 0;
+    const completados = Object.values(progresoDelCurso).filter(p => p.nota !== undefined).length;
+    const pct = totalMods > 0 ? Math.round((completados / totalMods) * 100) : 0;
+    const tieneContenido = totalMods > 0;
+
+    return `
+      <div class="tarjeta-curso ${tieneContenido ? "" : "proximamente"}" onclick="${tieneContenido ? `seleccionarCurso('${curso.id}')` : ""}">
+        <div class="curso-icono">${curso.icono}</div>
+        <div class="curso-info">
+          <h2>${curso.titulo}</h2>
+          <p>${curso.descripcion}</p>
+          ${tieneContenido ? `
+            <div style="margin-top:10px">
+              <div class="barra-progreso-global" style="max-width:100%;margin:6px 0 4px">
+                <div class="relleno" style="width:${pct}%"></div>
+              </div>
+              <span class="texto-progreso">${completados} / ${totalMods} módulos completados</span>
+            </div>
+          ` : `<span style="color:var(--texto-muted);font-size:.82rem">Añade módulos en data-celulas.js para activar este curso</span>`}
+        </div>
+        <div class="curso-flecha">${tieneContenido ? "→" : ""}</div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="hero">
+      <p class="hero-meta">Academia · Selección de curso</p>
+      <h1>¿Qué quieres estudiar hoy?</h1>
+      <p>Elige un curso para continuar. Tu progreso se guarda de forma independiente en cada uno.</p>
+    </div>
+    <div class="lista-cursos">${tarjetas}</div>
+  `;
 }
 
 /* ---------- PANTALLA: ENTRADA (login / registro) ---------- */
@@ -573,6 +658,7 @@ async function reenviarCodigo() {
 
 function navegar() {
   if (!USUARIO) return pintarLogin();
+  if (!CURSO_ACTIVO) return pintarCursos();
 
   const ruta = location.hash || "#/";
   window.scrollTo(0, 0);
@@ -872,7 +958,8 @@ function pintarProgreso() {
 function borrarProgreso() {
   if (confirm(T("confirmarBorrar"))) {
     PROGRESO = {};
-    guardarProgreso(); // avisamos a la secretaría de que el expediente queda vacío
+    PROGRESO_GLOBAL[CURSO_ACTIVO] = {};
+    guardarProgreso();
     navegar();
   }
 }
@@ -916,7 +1003,7 @@ async function pintarRanking() {
   `;
 
   try {
-    const resp = await fetch("/api/ranking");
+    const resp = await fetch(`/api/ranking?curso=${encodeURIComponent(CURSO_ACTIVO)}`);
     const { ranking, total } = await resp.json();
 
     if (!ranking || ranking.length === 0) {

@@ -843,6 +843,6 @@ const GLOSARIO = [
   { termino: "Zero Trust", definicion: "Arquitectura de ciberseguridad: nunca confiar automáticamente en ningún usuario o dispositivo, aunque esté dentro de la red corporativa." },
 ];
 
-/* ---- Empaquetamos el temario por idioma ----
-   data-en.js y data-de.js añaden DATOS.en y DATOS.de */
-const DATOS = { es: { SECCIONES, MODULOS, GLOSARIO } };
+/* ---- Empaquetamos el temario por idioma y por curso ---- */
+const DATOS = {};
+DATOS.gemelos = { es: { SECCIONES, MODULOS, GLOSARIO } };

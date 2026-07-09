@@ -3,7 +3,7 @@
    Any module not yet translated here falls back to Spanish.
    ============================================================ */
 
-DATOS.en = {
+DATOS.gemelos.en = {
   SECCIONES: [
     { id: "fundamentos", nombre: "📘 Fundamentals" },
     { id: "tecnologia", nombre: "⚙️ Technology" },
@@ -824,5 +824,5 @@ DIGITAL TWIN  →  instructions and alerts  →  PHYSICAL WORLD</pre>
 };
 
 /* Fallback: si el glosario aún no está traducido, usar el español */
-if (DATOS.en.GLOSARIO.length === 0) DATOS.en.GLOSARIO = null;
-if (!DATOS.en.GLOSARIO) delete DATOS.en.GLOSARIO;
+if (DATOS.gemelos.en.GLOSARIO.length === 0) DATOS.gemelos.en.GLOSARIO = null;
+if (!DATOS.gemelos.en.GLOSARIO) delete DATOS.gemelos.en.GLOSARIO;

@@ -280,19 +280,22 @@ const servidor = http.createServer((peticion, respuesta) => {
 
   /* --- RANKING ---
      GET /api/ranking → lista ordenada de alumnos con su progreso */
-  if (url === "/api/ranking" && peticion.method === "GET") {
+  if (url.startsWith("/api/ranking") && peticion.method === "GET") {
     try {
+      const curso = new URL("http://x" + peticion.url).searchParams.get("curso") || "gemelos";
       const expedientes = leerExpedientes();
       const usuarios = leerUsuarios();
 
-      const ranking = Object.entries(expedientes).map(([nombre, progreso]) => {
-        const notas = Object.values(progreso).filter((p) => p.nota !== undefined);
+      const ranking = Object.entries(expedientes).map(([nombre, todosLosCursos]) => {
+        // Soporte formato nuevo { cursoId: { modId: {...} } } y antiguo { modId: {...} }
+        const progreso = todosLosCursos[curso] || (typeof todosLosCursos === "object" && !todosLosCursos[curso] ? {} : todosLosCursos);
+        const notas = Object.values(progreso).filter((p) => p && p.nota !== undefined);
         const completados = notas.length;
         const media = completados > 0
           ? Math.round(notas.reduce((s, p) => s + (p.nota / p.total), 0) / completados * 100)
           : 0;
         return { nombre, completados, media };
-      });
+      }).filter((r) => r.completados > 0);
 
       ranking.sort((a, b) => b.completados - a.completados || b.media - a.media);
 
