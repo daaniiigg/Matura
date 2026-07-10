@@ -1,257 +1,235 @@
-/* ============================================================
-   MATURA DESIGN SYSTEM
-   Archivo base de tokens y componentes reutilizables.
-   Cargar después de theme.css, antes de styles.css.
-   ============================================================ */
-
-/* ────────────────────────────────────────────────────────────
-   1. VARIABLES GLOBALES
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   MATURA DESIGN SYSTEM v1
+========================================================== */
 
 :root {
 
-  /* Backgrounds */
-  --bg-primary:    #0b0c11;
-  --bg-secondary:  #131420;
-  --bg-card:       rgba(255, 255, 255, 0.03);
-  --bg-hover:      rgba(255, 255, 255, 0.055);
+  /* COLORS */
 
-  /* Borders */
-  --border-color:  rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.12);
+  --bg: #0E1016;
+  --surface: #171A23;
+  --surface-2: #1D2130;
+  --surface-hover: #23283A;
 
-  /* Brand */
-  --primary:       #6C63FF;
-  --primary-hover: #5b52f0;
-  --primary-light: rgba(108, 99, 255, 0.14);
+  --border: rgba(255,255,255,.06);
 
-  /* Text */
-  --text-primary:   #eef0f8;
-  --text-secondary: #a8adc4;
-  --text-muted:     #636880;
+  --primary: #7B6DFF;
+  --primary-light: #A195FF;
 
-  /* Status */
-  --success:        #4ade80;
-  --success-light:  rgba(74, 222, 128, 0.1);
-  --warning:        #fbbf24;
-  --warning-light:  rgba(251, 191, 36, 0.1);
-  --danger:         #f87171;
-  --danger-light:   rgba(248, 113, 113, 0.1);
+  --success: #42D392;
+  --warning: #F7B955;
+  --danger: #FF6B6B;
 
-  /* Radius scale */
-  --radius-sm:  8px;
-  --radius-md:  12px;
-  --radius-lg:  18px;
-  --radius-xl:  24px;
+  --text: #F7F8FB;
+  --text-secondary: #A8AFBF;
+  --text-muted: #6F7688;
+
+  /* Radius */
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
 
   /* Shadows */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.4);
-  --shadow-md:  0 4px 16px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3);
-  --shadow-lg:  0 20px 48px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.35);
 
-  /* Transitions */
-  --transition:      0.2s ease;
-  --transition-slow: 0.35s ease;
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.20);
+  --shadow-md: 0 12px 35px rgba(0,0,0,.35);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.45);
+
+  /* Animation */
+
+  --transition: 250ms cubic-bezier(.4,0,.2,1);
+
+  /* Aliases para compatibilidad con código existente */
+  --bg-primary:    #0E1016;
+  --bg-secondary:  #171A23;
+  --bg-card:       rgba(25,28,39,.82);
+  --bg-hover:      #23283A;
+
+  --border-color:  rgba(255,255,255,.06);
+  --border-strong: rgba(255,255,255,.12);
+
+  --primary-hover: #A195FF;
+  --primary-light-rgba: rgba(123,109,255,.14);
+
+  --text-primary:   #F7F8FB;
+
+  --radius-xl: 28px;
+
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.45);
+
+  --transition-slow: 350ms cubic-bezier(.4,0,.2,1);
 
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   2. M-CARD  — Tarjeta estándar de la aplicación
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   CARDS
+========================================================== */
 
 .m-card {
-  background:    var(--bg-card);
-  border:        1px solid var(--border-color);
+  background: rgba(25,28,39,.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow:    var(--shadow-sm);
-  padding:       24px;
-  transition:    transform var(--transition), background var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
 }
 
 .m-card:hover {
-  transform:  translateY(-4px);
-  background: var(--bg-hover);
+  transform: translateY(-4px);
+  background: rgba(31,35,48,.92);
   box-shadow: var(--shadow-md);
 }
 
-/* Variante sin hover (para contenido estático) */
+/* Variante sin hover */
 .m-card-static {
-  background:    var(--bg-card);
-  border:        1px solid var(--border-color);
+  background: rgba(25,28,39,.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow:    var(--shadow-sm);
-  padding:       24px;
+  box-shadow: var(--shadow-sm);
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   3. M-BUTTON  — Botón principal y variantes
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   BUTTON
+========================================================== */
 
 .m-button,
 .m-button-secondary,
 .m-button-ghost {
-  display:         inline-flex;
-  align-items:     center;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  gap:             8px;
-  height:          42px;
-  padding:         0 20px;
-  border-radius:   var(--radius-md);
-  font-family:     inherit;
-  font-size:       14px;
-  font-weight:     600;
-  letter-spacing:  0.1px;
-  cursor:          pointer;
-  transition:      background var(--transition), transform var(--transition),
-                   box-shadow var(--transition), border-color var(--transition),
-                   color var(--transition);
-  white-space:     nowrap;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
   text-decoration: none;
+  transition: all var(--transition);
 }
 
-/* Primary */
 .m-button {
   background: var(--primary);
-  color:      #fff;
-  border:     1px solid transparent;
-  box-shadow: 0 0 0 0 rgba(108,99,255,0);
+  color: white;
 }
 
 .m-button:hover {
-  background:  var(--primary-hover);
-  transform:   translateY(-1px);
-  box-shadow:  0 4px 16px rgba(108,99,255,.3);
+  background: var(--primary-light);
+  transform: translateY(-2px);
 }
 
 .m-button:active {
   transform: scale(0.98);
 }
 
-/* Secondary */
 .m-button-secondary {
   background: transparent;
-  color:      var(--text-primary);
-  border:     1px solid var(--border-strong);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
 }
 
 .m-button-secondary:hover {
-  background:   var(--bg-hover);
-  border-color: rgba(255,255,255,.2);
-  transform:    translateY(-1px);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
 }
 
-.m-button-secondary:active {
-  transform: scale(0.98);
-}
-
-/* Ghost */
 .m-button-ghost {
   background: transparent;
-  color:      var(--text-secondary);
-  border:     1px solid transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
 }
 
 .m-button-ghost:hover {
-  background: var(--bg-hover);
-  color:      var(--text-primary);
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
-.m-button-ghost:active {
-  transform: scale(0.98);
-}
-
-/* Size modifier */
 .m-button-sm,
 .m-button-secondary.m-button-sm,
 .m-button-ghost.m-button-sm {
-  height:      32px;
-  padding:     0 14px;
-  font-size:   12px;
+  padding: 8px 14px;
+  font-size: 12px;
   border-radius: var(--radius-sm);
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   4. M-BADGE  — Cápsulas tipo Linear
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   BADGES
+========================================================== */
 
 .m-badge {
-  display:       inline-flex;
-  align-items:   center;
-  gap:           5px;
-  padding:       3px 10px;
-  border-radius: 100px;
-  font-size:     11px;
-  font-weight:   600;
-  letter-spacing: 0.3px;
-  background:    rgba(255,255,255,.07);
-  color:         var(--text-secondary);
-  border:        1px solid rgba(255,255,255,.08);
-  white-space:   nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #1A1E2A;
+  border: 1px solid rgba(255,255,255,.05);
+  color: var(--text-secondary);
+  font-size: .72rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-/* Color variants */
 .m-badge-primary {
-  background:   var(--primary-light);
-  color:        #a89cff;
-  border-color: rgba(108,99,255,.2);
+  background: rgba(123,109,255,.12);
+  color: #A195FF;
+  border-color: rgba(123,109,255,.2);
 }
 
 .m-badge-success {
-  background:   var(--success-light);
-  color:        var(--success);
-  border-color: rgba(74,222,128,.15);
+  background: rgba(66,211,146,.1);
+  color: var(--success);
+  border-color: rgba(66,211,146,.15);
 }
 
 .m-badge-warning {
-  background:   var(--warning-light);
-  color:        var(--warning);
-  border-color: rgba(251,191,36,.15);
+  background: rgba(247,185,85,.1);
+  color: var(--warning);
+  border-color: rgba(247,185,85,.15);
 }
 
 .m-badge-danger {
-  background:   var(--danger-light);
-  color:        var(--danger);
-  border-color: rgba(248,113,113,.15);
-}
-
-/* Dot inside badge */
-.m-badge::before {
-  content: '';
-  display: none;
+  background: rgba(255,107,107,.1);
+  color: var(--danger);
+  border-color: rgba(255,107,107,.15);
 }
 
 .m-badge-dot::before {
-  content:       '';
-  display:       block;
-  width:         6px;
-  height:        6px;
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background:    currentColor;
-  opacity:       .8;
+  background: currentColor;
+  opacity: .8;
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   5. M-INPUT  — Campo de texto moderno
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   INPUT
+========================================================== */
 
 .m-input {
-  display:       block;
-  width:         100%;
-  height:        44px;
-  padding:       0 16px;
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
   border-radius: var(--radius-md);
-  border:        1px solid var(--border-color);
-  background:    rgba(255,255,255,.03);
-  color:         var(--text-primary);
-  font-family:   inherit;
-  font-size:     14px;
-  line-height:   1;
-  outline:       none;
-  transition:    border-color var(--transition), box-shadow var(--transition);
+  background: #171A24;
+  border: 1px solid transparent;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all var(--transition);
   -webkit-appearance: none;
 }
 
@@ -265,147 +243,130 @@
 
 .m-input:focus {
   border-color: var(--primary);
-  box-shadow:   0 0 0 3px rgba(108,99,255,.16);
+  box-shadow: 0 0 0 4px rgba(123,109,255,.15);
 }
 
-/* Textarea variant */
 .m-input-area {
-  height:      auto;
-  padding:     12px 16px;
-  resize:      vertical;
+  height: auto;
+  padding: 12px 18px;
+  resize: vertical;
   line-height: 1.6;
-  min-height:  96px;
+  min-height: 96px;
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   6. M-SECTION-TITLE  — Encabezado de sección
-──────────────────────────────────────────────────────────── */
-
-.m-section-title {
-  font-size:      11px;
-  font-weight:    600;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  color:          var(--text-muted);
-  line-height:    1;
-  margin-bottom:  16px;
-  user-select:    none;
-}
-
-/* Variante con línea divisora */
-.m-section-title-hr {
-  font-size:      11px;
-  font-weight:    600;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  color:          var(--text-muted);
-  display:        flex;
-  align-items:    center;
-  gap:            14px;
-  margin-bottom:  20px;
-}
-
-.m-section-title-hr::after {
-  content:    '';
-  flex:       1;
-  height:     1px;
-  background: var(--border-color);
-}
-
-
-/* ────────────────────────────────────────────────────────────
-   7. M-PANEL  — Panel lateral reutilizable
-   Usado en: IA, Ranking, Calendario, Progreso, Actividad
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   PANEL
+========================================================== */
 
 .m-panel {
-  background:    rgba(255,255,255,.03);
-  border:        1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding:       20px 22px;
-  display:       flex;
+  display: flex;
   flex-direction: column;
-  gap:           14px;
+  gap: 18px;
 }
 
-/* Header de panel estandarizado */
 .m-panel-header {
-  display:     flex;
+  display: flex;
   align-items: center;
-  gap:         8px;
+  gap: 8px;
 }
 
 .m-panel-icon {
-  font-size:   15px;
+  font-size: 15px;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .m-panel-label {
-  font-size:      11px;
-  font-weight:    600;
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color:          var(--text-muted);
-  flex:           1;
+  color: var(--text-muted);
+  flex: 1;
 }
 
 .m-panel-action {
-  font-size:   12px;
+  font-size: 12px;
   font-weight: 500;
-  color:       var(--primary);
-  cursor:      pointer;
-  transition:  opacity var(--transition);
+  color: var(--primary);
+  cursor: pointer;
+  transition: opacity var(--transition);
 }
 
 .m-panel-action:hover {
   opacity: .75;
 }
 
-/* Divider within panel */
 .m-panel-divider {
-  height:     1px;
-  background: var(--border-color);
-  margin:     2px 0;
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
 }
 
-/* Empty state */
 .m-panel-empty {
-  font-size:   13px;
-  color:       var(--text-muted);
+  font-size: 13px;
+  color: var(--text-muted);
   line-height: 1.6;
-  text-align:  center;
-  padding:     8px 0;
+  text-align: center;
+  padding: 8px 0;
 }
 
 
-/* ────────────────────────────────────────────────────────────
-   UTILIDADES
-──────────────────────────────────────────────────────────── */
+/* ==========================================================
+   TITLES
+========================================================== */
 
-/* Separador fino */
+.m-section-title {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: .72rem;
+  margin-bottom: 16px;
+}
+
+.m-section-title-hr {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.m-section-title-hr::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+
 .m-divider {
-  height:     1px;
-  background: var(--border-color);
-  border:     none;
-  margin:     0;
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: 0;
 }
 
-/* Flex helpers */
 .m-row   { display: flex; align-items: center; gap: 10px; }
 .m-col   { display: flex; flex-direction: column; gap: 8px; }
 .m-spacer { flex: 1; }
 
-/* Texto */
-.m-text-primary   { color: var(--text-primary);   }
+.m-text-primary   { color: var(--text);           }
 .m-text-secondary { color: var(--text-secondary);  }
 .m-text-muted     { color: var(--text-muted);      }
 .m-text-accent    { color: var(--primary);          }
 
-/* Truncar en una línea */
 .m-truncate {
-  overflow:      hidden;
-  white-space:   nowrap;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
