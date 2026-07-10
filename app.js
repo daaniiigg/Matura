@@ -842,6 +842,8 @@ function pintarInicio() {
     ? Math.round(notasArr.reduce((a, b) => a + b, 0) / notasArr.length) + "%"
     : "—";
 
+  const proxMod = modulos.find(m => !PROGRESO[m.id]);
+
   let modulosHtml = "";
   for (const seccion of seccionesIdioma()) {
     modulosHtml += `<h2 class="seccion-titulo">${seccion.nombre}</h2>`;
@@ -884,27 +886,80 @@ function pintarInicio() {
       <div class="modules-grid">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
-          <div class="panel-widget">
-            <h2 class="seccion-titulo" style="margin-top:0">Estadísticas</h2>
-            <div class="mini-stat-grid">
-              <div class="mini-stat">
-                <span class="mini-stat-val">${completados}/${modulos.length}</span>
-                <span class="mini-stat-label">Módulos</span>
+
+          <!-- WIDGET: Tu progreso -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <span class="widget-icon">📊</span>
+              <span class="widget-label">Tu progreso</span>
+            </div>
+            <div class="widget-ring-wrap">
+              <svg width="96" height="96" viewBox="0 0 96 96" style="display:block;margin:0 auto">
+                <circle cx="48" cy="48" r="36" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#6C63FF" stroke-width="7"
+                  stroke-dasharray="226.19"
+                  stroke-dashoffset="${226.19 * (1 - porcentaje / 100)}"
+                  stroke-linecap="round" transform="rotate(-90 48 48)"
+                  style="transition:stroke-dashoffset .6s ease"/>
+              </svg>
+              <div class="ring-center"><span class="ring-pct">${porcentaje}%</span></div>
+            </div>
+            <div class="widget-stat-row">
+              <div class="widget-stat">
+                <span class="widget-stat-val">${completados}/${modulos.length}</span>
+                <span class="widget-stat-key">módulos</span>
               </div>
-              <div class="mini-stat">
-                <span class="mini-stat-val">${mediaLocal}</span>
-                <span class="mini-stat-label">Nota media</span>
+              <div class="widget-stat">
+                <span class="widget-stat-val">${mediaLocal}</span>
+                <span class="widget-stat-key">nota media</span>
               </div>
             </div>
           </div>
-          <div class="panel-widget">
-            <h2 class="seccion-titulo" style="margin-top:0">Actividad reciente</h2>
-            <div id="mini-ranking-contenido" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+
+          <!-- WIDGET: Próxima tarea -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <span class="widget-icon">🎯</span>
+              <span class="widget-label">Próxima tarea</span>
+            </div>
+            ${proxMod
+              ? `<a href="#/modulo/${proxMod.id}" class="next-module-link">
+                  <span class="next-mod-num">${String(proxMod.id).padStart(2, '0')}</span>
+                  <div class="next-mod-info">
+                    <span class="next-mod-title">${proxMod.titulo}</span>
+                    <span class="next-mod-meta">${proxMod.minutos} min · ${proxMod.quiz.length} preguntas</span>
+                  </div>
+                  <span class="next-mod-arrow">→</span>
+                </a>`
+              : `<p class="widget-muted">¡Todo completado! 🎉</p>`}
           </div>
-          <div class="panel-widget">
-            <h2 class="seccion-titulo" style="margin-top:0">Próxima tarea</h2>
-            <p style="color:var(--texto-muted);font-size:.85rem;line-height:1.6">Sin módulos pendientes programados.</p>
+
+          <!-- WIDGET: Matura AI -->
+          <div class="widget-card widget-ai">
+            <div class="widget-header">
+              <span class="widget-icon">✦</span>
+              <span class="widget-label">Matura AI</span>
+              <span class="widget-badge">Próximamente</span>
+            </div>
+            <p class="widget-muted">Tu asistente de estudio. Pregunta sobre cualquier módulo del curso.</p>
+            <div class="widget-ai-prompt">¿En qué puedo ayudarte?</div>
           </div>
+
+          <!-- WIDGET: Racha de estudio -->
+          <div class="widget-card">
+            <div class="widget-header">
+              <span class="widget-icon">🔥</span>
+              <span class="widget-label">Racha de estudio</span>
+            </div>
+            <div class="streak-count"><span>0</span> días seguidos</div>
+            <div class="streak-week">
+              ${['L','M','X','J','V','S','D'].map(d =>
+                `<div class="streak-day"><span>${d}</span><div class="streak-dot"></div></div>`
+              ).join('')}
+            </div>
+            <p class="widget-muted">Completa un módulo hoy para empezar tu racha</p>
+          </div>
+
         </div>
       </div>
     </div>
