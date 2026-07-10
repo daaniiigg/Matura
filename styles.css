@@ -3053,3 +3053,131 @@ textarea.buscador { height: auto; }
   color: var(--text-secondary);
   margin: 0;
 }
+
+/* ==========================================================
+   COMMAND PALETTE
+========================================================== */
+
+.command-palette {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,10,18,.65);
+  backdrop-filter: blur(14px);
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 90px;
+  z-index: 9999;
+}
+
+.command-palette.is-open {
+  display: flex;
+}
+
+.command-palette__window {
+  width: min(760px, 92vw);
+  background: #181d28;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
+}
+
+.command-search {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 26px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.command-search svg {
+  width: 20px;
+  height: 20px;
+  color: #7ba4ff;
+  flex-shrink: 0;
+}
+
+.command-search input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.command-search input::placeholder {
+  color: rgba(255,255,255,.35);
+}
+
+.command-search kbd {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #232836;
+  font-size: .8rem;
+  color: rgba(255,255,255,.65);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.command-section {
+  padding: 18px;
+}
+
+.command-section__title {
+  display: block;
+  margin-bottom: 14px;
+  font-size: .82rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+}
+
+.command-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s;
+  font-family: inherit;
+}
+
+.command-item:hover,
+.command-item:focus-visible {
+  background: rgba(91,140,255,.08);
+  outline: none;
+}
+
+.command-item svg {
+  width: 20px;
+  height: 20px;
+  color: #7ba4ff;
+  flex-shrink: 0;
+}
+
+.command-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.command-item strong {
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+.command-item small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.55);
+  font-size: .82rem;
+}
