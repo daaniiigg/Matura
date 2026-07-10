@@ -941,33 +941,82 @@ function pintarInicio() {
         </aside>
       </section>
 
+      <!-- QUICK SEARCH -->
+      <section class="quick-search">
+        <div class="quick-search__icon"><i data-lucide="search"></i></div>
+        <input type="text" placeholder="Buscar módulos, apuntes, ejercicios o preguntar a Matura AI...">
+        <button class="btn">Buscar</button>
+      </section>
+
       <!-- QUICK ACTIONS -->
       <section class="quick-actions">
         <button class="quick-action" onclick="document.querySelector('.matura-ai')?.scrollIntoView({behavior:'smooth'})">
-          <div class="quick-action__icon">🧠</div>
-          <div><strong>Matura AI</strong><span>Haz una pregunta</span></div>
+          <div class="quick-action__icon"><i data-lucide="brain"></i></div>
+          <div><strong>Matura AI</strong><span>Resolver dudas</span></div>
         </button>
         ${proxMod
           ? `<a class="quick-action" href="#/modulo/${proxMod.id}">
-              <div class="quick-action__icon">📖</div>
+              <div class="quick-action__icon"><i data-lucide="play-circle"></i></div>
               <div><strong>Continuar</strong><span>${proxMod.titulo}</span></div>
             </a>`
           : `<button class="quick-action" disabled style="opacity:.5;cursor:default">
-              <div class="quick-action__icon">📖</div>
+              <div class="quick-action__icon"><i data-lucide="play-circle"></i></div>
               <div><strong>Continuar</strong><span>Todo completado ✓</span></div>
             </button>`}
         <a class="quick-action" href="#/progreso">
-          <div class="quick-action__icon">📝</div>
+          <div class="quick-action__icon"><i data-lucide="graduation-cap"></i></div>
           <div><strong>Mi progreso</strong><span>Ver estadísticas</span></div>
         </a>
         <a class="quick-action" href="#/glosario">
-          <div class="quick-action__icon">🗂️</div>
+          <div class="quick-action__icon"><i data-lucide="layers"></i></div>
           <div><strong>Glosario</strong><span>Repasar conceptos</span></div>
         </a>
         <a class="quick-action" href="#/ranking">
-          <div class="quick-action__icon">⭐</div>
+          <div class="quick-action__icon"><i data-lucide="star"></i></div>
           <div><strong>Ranking</strong><span>Ver clasificación</span></div>
         </a>
+      </section>
+
+      <!-- FAVORITES -->
+      <section class="favorites">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Acceso rápido</span>
+            <h2>Tus favoritos</h2>
+          </div>
+        </div>
+        <div class="favorites-grid">
+          ${modulos.slice(0, 3).map(mod => `
+          <article class="favorite-card">
+            <i data-lucide="book-open"></i>
+            <h3>${mod.titulo}</h3>
+            <p>${PROGRESO[mod.id] ? "Completado ✓" : "Pendiente"} · ${mod.minutos} min</p>
+          </article>`).join("")}
+        </div>
+      </section>
+
+      <!-- RECENT DOCUMENTS -->
+      <section class="recent-documents">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Documentos</span>
+            <h2>Abiertos recientemente</h2>
+          </div>
+        </div>
+        <div class="documents-list">
+          ${modulos.filter(m => PROGRESO[m.id]).slice(-3).reverse().map(mod => `
+          <a class="document-item" href="#/modulo/${mod.id}">
+            <i data-lucide="file-text"></i>
+            <div>
+              <strong>${mod.titulo}</strong>
+              <span>Nota: ${PROGRESO[mod.id].nota}/${PROGRESO[mod.id].total}</span>
+            </div>
+          </a>`).join("") || `
+          <div class="document-item" style="opacity:.55">
+            <i data-lucide="file-text"></i>
+            <div><strong>Sin documentos recientes</strong><span>Completa un módulo para empezar</span></div>
+          </div>`}
+        </div>
       </section>
 
       <!-- DAILY FOCUS -->
