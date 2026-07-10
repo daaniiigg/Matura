@@ -843,9 +843,97 @@ textarea.buscador { height: auto; }
 }
 @media (max-width: 640px) {
   .leccion { padding: 24px 20px; }
-  .topbar { padding: 10px 16px; }
-  .topbar nav a { padding: 5px 10px; font-size: .75rem; }
   .rank-barra-wrap { display: none; }
+}
+
+/* ===== HAMBURGER BUTTON (hidden on desktop) ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.1);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #9CA3AF;
+  border-radius: 2px;
+  transition: all .25s;
+}
+.hamburger.abierto span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.abierto span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.abierto span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ===== MOBILE TOPBAR ===== */
+@media (max-width: 768px) {
+  .topbar {
+    height: 64px;
+    padding: 0 20px;
+  }
+
+  /* Hide desktop nav and search */
+  .topbar nav { display: none; }
+  .search { display: none; }
+  #selector-idioma { display: none; }
+
+  /* Show hamburger */
+  .hamburger { display: flex; }
+
+  /* Compact brand */
+  .brand-text p { display: none; }
+  .brand-logo { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+  .brand-text h1 { font-size: 17px; }
+  .brand { gap: 10px; }
+
+  /* Smaller avatar */
+  .avatar { width: 36px; height: 36px; font-size: 13px; }
+  .header-right { gap: 10px; }
+
+  /* Mobile nav dropdown */
+  .topbar nav.nav-abierta {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: rgba(11,12,18,.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding: 8px 0 12px;
+    z-index: 999;
+  }
+
+  .topbar nav.nav-abierta a {
+    padding: 13px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #9CA3AF;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    gap: 0;
+  }
+
+  .topbar nav.nav-abierta a:last-child { border-bottom: none; }
+  .topbar nav.nav-abierta a:hover,
+  .topbar nav.nav-abierta a.activo { color: white; background: rgba(255,255,255,.04); }
+}
+
+/* ===== MODULES WRAPPER MOBILE ===== */
+@media (max-width: 768px) {
+  .modules-wrapper { padding: 32px 0 60px; }
+  .modules-wrapper .dashboard-hero { padding-bottom: 20px; }
 }
 
 /* ===== CALENDARIO ===== */

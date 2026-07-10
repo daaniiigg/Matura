@@ -788,9 +788,35 @@ function navegar() {
   pintarInicio();
 }
 
-window.addEventListener("hashchange", navegar);
+window.addEventListener("hashchange", () => {
+  // Close mobile nav on route change
+  document.querySelector('.topbar nav')?.classList.remove('nav-abierta');
+  document.getElementById('hamburger-btn')?.classList.remove('abierto');
+  navegar();
+});
+
 window.addEventListener("DOMContentLoaded", () => {
   pintarTextosFijos();
+
+  // Hamburger menu toggle
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const topbarNav = document.querySelector('.topbar nav');
+  if (hamburgerBtn && topbarNav) {
+    hamburgerBtn.addEventListener('click', () => {
+      const isOpen = topbarNav.classList.toggle('nav-abierta');
+      hamburgerBtn.classList.toggle('abierto', isOpen);
+      hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    });
+    // Close on any nav link click
+    topbarNav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        topbarNav.classList.remove('nav-abierta');
+        hamburgerBtn.classList.remove('abierto');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
   // ¿Este pupitre recuerda quién se sentó la última vez?
   const recordado = localStorage.getItem("lms-usuario");
   if (recordado) {
