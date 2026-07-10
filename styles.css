@@ -1351,3 +1351,147 @@ textarea.buscador { height: auto; }
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.modules-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-card {
+  padding: 26px;
+  border-radius: 22px;
+  background: #181d28;
+  border: 1px solid rgba(255,255,255,.07);
+  transition: .25s;
+}
+
+.sidebar-card:hover {
+  border-color: rgba(91,140,255,.25);
+}
+
+.sidebar-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: .72rem;
+  letter-spacing: .14em;
+  color: rgba(255,255,255,.45);
+}
+
+.sidebar-card h3 {
+  margin: 0 0 22px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.continue-module {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.continue-module__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,.05);
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.continue-module__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.continue-module__content strong {
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.continue-module__content span {
+  color: rgba(255,255,255,.6);
+  font-size: .9rem;
+}
+
+.continue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.continue-footer span {
+  color: rgba(255,255,255,.65);
+  font-size: .9rem;
+}
+
+.weekly-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.goal-item span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.18);
+  flex-shrink: 0;
+}
+
+.goal-item--done span {
+  display: grid;
+  place-items: center;
+  background: #22c55e;
+  border: none;
+  color: white;
+  font-size: .75rem;
+}
+
+.goal-item p {
+  margin: 0;
+  color: rgba(255,255,255,.72);
+  font-size: .95rem;
+}
+
+.sidebar-stats {
+  display: grid;
+  gap: 18px;
+}
+
+.sidebar-stat {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+}
+
+.sidebar-stat strong {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.sidebar-stat span {
+  color: rgba(255,255,255,.6);
+  font-size: .9rem;
+}

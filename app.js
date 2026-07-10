@@ -943,80 +943,81 @@ function pintarInicio() {
       <div class="modules-grid">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
+          <aside class="modules-sidebar">
 
-          <!-- WIDGET: Tu progreso -->
-          <div class="widget-card">
-            <div class="widget-header">
-              <span class="widget-icon">📊</span>
-              <span class="widget-label">Tu progreso</span>
-            </div>
-            <div class="widget-ring-wrap">
-              <svg width="96" height="96" viewBox="0 0 96 96" style="display:block;margin:0 auto">
-                <circle cx="48" cy="48" r="36" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
-                <circle cx="48" cy="48" r="36" fill="none" stroke="#6C63FF" stroke-width="7"
-                  stroke-dasharray="226.19"
-                  stroke-dashoffset="${226.19 * (1 - porcentaje / 100)}"
-                  stroke-linecap="round" transform="rotate(-90 48 48)"
-                  style="transition:stroke-dashoffset .6s ease"/>
-              </svg>
-              <div class="ring-center"><span class="ring-pct">${porcentaje}%</span></div>
-            </div>
-            <div class="widget-stat-row">
-              <div class="widget-stat">
-                <span class="widget-stat-val">${completados}/${modulos.length}</span>
-                <span class="widget-stat-key">módulos</span>
+            <!-- Card: Continuar -->
+            <section class="sidebar-card sidebar-card--continue">
+              <div class="sidebar-card__header">
+                <span class="sidebar-label">CONTINUAR</span>
+                <h3>Sigue donde lo dejaste</h3>
               </div>
-              <div class="widget-stat">
-                <span class="widget-stat-val">${mediaLocal}</span>
-                <span class="widget-stat-key">nota media</span>
+              ${proxMod ? `
+              <div class="continue-module">
+                <div class="continue-module__icon">${ICONOS_MODULO[proxMod.id] || "📘"}</div>
+                <div class="continue-module__content">
+                  <strong>${proxMod.titulo}</strong>
+                  <span>${proxMod.minutos} min · ${proxMod.quiz.length} preguntas</span>
+                </div>
               </div>
-            </div>
-          </div>
+              <div class="progress-bar">
+                <div class="progress-bar__fill" style="width:${porcentaje}%"></div>
+              </div>
+              <div class="continue-footer">
+                <span>${porcentaje}% completado</span>
+                <a href="#/modulo/${proxMod.id}" class="btn">Reanudar</a>
+              </div>
+              ` : `<p class="widget-muted">¡Todo completado! 🎉</p>`}
+            </section>
 
-          <!-- WIDGET: Próxima tarea -->
-          <div class="widget-card">
-            <div class="widget-header">
-              <span class="widget-icon">🎯</span>
-              <span class="widget-label">Próxima tarea</span>
-            </div>
-            ${proxMod
-              ? `<a href="#/modulo/${proxMod.id}" class="next-module-link">
-                  <span class="next-mod-num">${String(proxMod.id).padStart(2, '0')}</span>
-                  <div class="next-mod-info">
-                    <span class="next-mod-title">${proxMod.titulo}</span>
-                    <span class="next-mod-meta">${proxMod.minutos} min · ${proxMod.quiz.length} preguntas</span>
-                  </div>
-                  <span class="next-mod-arrow">→</span>
-                </a>`
-              : `<p class="widget-muted">¡Todo completado! 🎉</p>`}
-          </div>
+            <!-- Card: Objetivos -->
+            <section class="sidebar-card">
+              <div class="sidebar-card__header">
+                <span class="sidebar-label">OBJETIVOS</span>
+                <h3>Esta semana</h3>
+              </div>
+              <div class="weekly-goals">
+                <div class="goal-item${completados >= 1 ? ' goal-item--done' : ''}">
+                  <span>${completados >= 1 ? '✓' : ''}</span>
+                  <p>Completar 1 módulo</p>
+                </div>
+                <div class="goal-item${completados >= 3 ? ' goal-item--done' : ''}">
+                  <span>${completados >= 3 ? '✓' : ''}</span>
+                  <p>Completar 3 módulos</p>
+                </div>
+                <div class="goal-item${porcentaje >= 50 ? ' goal-item--done' : ''}">
+                  <span>${porcentaje >= 50 ? '✓' : ''}</span>
+                  <p>Llegar al 50% del curso</p>
+                </div>
+                <div class="goal-item${porcentaje >= 100 ? ' goal-item--done' : ''}">
+                  <span>${porcentaje >= 100 ? '✓' : ''}</span>
+                  <p>Completar el curso</p>
+                </div>
+              </div>
+            </section>
 
-          <!-- WIDGET: Matura AI -->
-          <div class="widget-card widget-ai">
-            <div class="widget-header">
-              <span class="widget-icon">✦</span>
-              <span class="widget-label">Matura AI</span>
-              <span class="widget-badge">Próximamente</span>
-            </div>
-            <p class="widget-muted">Tu asistente de estudio. Pregunta sobre cualquier módulo del curso.</p>
-            <div class="widget-ai-prompt">¿En qué puedo ayudarte?</div>
-          </div>
+            <!-- Card: Estadísticas -->
+            <section class="sidebar-card">
+              <div class="sidebar-card__header">
+                <span class="sidebar-label">ESTADÍSTICAS</span>
+                <h3>Tu actividad</h3>
+              </div>
+              <div class="sidebar-stats">
+                <div class="sidebar-stat">
+                  <strong>${completados}/${modulos.length}</strong>
+                  <span>Módulos completados</span>
+                </div>
+                <div class="sidebar-stat">
+                  <strong>${porcentaje}%</strong>
+                  <span>Progreso total</span>
+                </div>
+                <div class="sidebar-stat">
+                  <strong>${mediaLocal}</strong>
+                  <span>Nota media</span>
+                </div>
+              </div>
+            </section>
 
-          <!-- WIDGET: Racha de estudio -->
-          <div class="widget-card">
-            <div class="widget-header">
-              <span class="widget-icon">🔥</span>
-              <span class="widget-label">Racha de estudio</span>
-            </div>
-            <div class="streak-count"><span>0</span> días seguidos</div>
-            <div class="streak-week">
-              ${['L','M','X','J','V','S','D'].map(d =>
-                `<div class="streak-day"><span>${d}</span><div class="streak-dot"></div></div>`
-              ).join('')}
-            </div>
-            <p class="widget-muted">Completa un módulo hoy para empezar tu racha</p>
-          </div>
-
+          </aside>
         </div>
       </div>
     </div>
