@@ -999,6 +999,54 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- EXAM CENTER -->
+      <section class="exam-center">
+        <div class="exam-center__header">
+          <div>
+            <span class="section-badge">Exámenes</span>
+            <h2>Centro de preparación</h2>
+            <p>Todo lo relacionado con tus próximos exámenes en un único lugar. Consulta el tiempo restante, tu nivel de preparación y comienza un simulacro en un clic.</p>
+          </div>
+          <a href="#/calendario" class="btn secundario">Ver calendario</a>
+        </div>
+
+        <div class="exam-grid">
+          <article class="next-exam">
+            <div class="next-exam__badge">Próximo examen</div>
+            <h3>${cursoActualObj?.titulo || CURSO_ACTIVO}</h3>
+            <p>${modulos.slice(0,3).map(m => m.titulo).join(" • ")}</p>
+            <div class="countdown">
+              <div class="countdown-item"><strong>—</strong><span>Días</span></div>
+              <div class="countdown-item"><strong>—</strong><span>Horas</span></div>
+              <div class="countdown-item"><strong>—</strong><span>Min</span></div>
+            </div>
+            ${proxMod
+              ? `<a href="#/modulo/${proxMod.id}" class="btn">Empezar simulacro</a>`
+              : `<span class="btn" style="opacity:.55;cursor:default">Curso completado ✓</span>`}
+          </article>
+
+          <div class="exam-list">
+            ${modulos.slice(0, 4).map(mod => {
+              const hecho = PROGRESO[mod.id];
+              const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
+              const scoreClass = pct >= 80 ? "score-good" : pct >= 50 ? "score-medium" : "score-low";
+              const label = pct >= 80 ? "Preparación alta" : pct >= 50 ? "Necesita repaso" : hecho ? "Revisar" : "Sin empezar";
+              return `
+              <article class="exam-item">
+                <div class="exam-item__left">
+                  <div class="exam-icon">${ICONOS_MODULO[mod.id] || "📘"}</div>
+                  <div>
+                    <strong>${mod.titulo}</strong>
+                    <span>${label}</span>
+                  </div>
+                </div>
+                <div class="exam-score ${hecho ? scoreClass : "score-low"}">${hecho ? pct + "%" : "0%"}</div>
+              </article>`;
+            }).join("")}
+          </div>
+        </div>
+      </section>
+
       <div class="modules-grid">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
