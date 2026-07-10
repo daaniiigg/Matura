@@ -483,7 +483,7 @@ function pintarCursos() {
 
 /* ---------- PANTALLA: ENTRADA (login / registro) ---------- */
 
-let modoRegistro = false;
+let modoRegistro = true;
 let EMAIL_PENDIENTE = null;
 let NOMBRE_PENDIENTE = null;
 
