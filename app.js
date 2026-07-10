@@ -1021,6 +1021,62 @@ function pintarInicio() {
         </div>
       </div>
 
+      <!-- LEARNING JOURNEY -->
+      <section class="learning-journey">
+        <div class="learning-journey__header">
+          <div>
+            <span class="section-badge">Tu progreso</span>
+            <h2>Continúa tu camino hacia la Matura</h2>
+            <p>Cada asignatura forma parte de una ruta de aprendizaje conectada. Avanza, desbloquea nuevos contenidos y mantén una visión global de tu progreso.</p>
+          </div>
+          <button class="btn secundario">Ver roadmap completo</button>
+        </div>
+
+        <div class="journey">
+          <div class="journey-step journey-step--${completados > 0 ? 'completed' : 'active'}">
+            <div class="journey-step__circle">${completados > 0 ? '✓' : '1'}</div>
+            <div class="journey-step__content">
+              <span>FASE 1</span>
+              <h3>Fundamentos</h3>
+              <p>Conceptos básicos dominados.</p>
+            </div>
+          </div>
+
+          <div class="journey-line"></div>
+
+          <div class="journey-step${completados > 0 && porcentaje < 100 ? ' journey-step--active' : completados === 0 ? '' : ' journey-step--completed'}">
+            <div class="journey-step__circle">${completados > 0 && porcentaje < 100 ? '2' : completados === 0 ? '2' : '✓'}</div>
+            <div class="journey-step__content">
+              <span>FASE 2</span>
+              <h3>Consolidación</h3>
+              <p>Resolviendo ejercicios y problemas.</p>
+            </div>
+          </div>
+
+          <div class="journey-line"></div>
+
+          <div class="journey-step${porcentaje >= 75 ? ' journey-step--active' : ''}">
+            <div class="journey-step__circle">3</div>
+            <div class="journey-step__content">
+              <span>FASE 3</span>
+              <h3>Simulacros</h3>
+              <p>Preparación intensiva para el examen.</p>
+            </div>
+          </div>
+
+          <div class="journey-line"></div>
+
+          <div class="journey-step${porcentaje >= 100 ? ' journey-step--completed' : ''}">
+            <div class="journey-step__circle">${porcentaje >= 100 ? '✓' : '🏆'}</div>
+            <div class="journey-step__content">
+              <span>META</span>
+              <h3>Matura</h3>
+              <p>Objetivo final desbloqueado.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- MATURA AI -->
       <section class="matura-ai">
         <div class="matura-ai__background"></div>
