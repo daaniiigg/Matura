@@ -1916,6 +1916,180 @@ textarea.buscador { height: auto; }
   }
 }
 
+/* ==========================================================
+   WEEKLY GOALS
+========================================================== */
+
+.weekly-goals-section {
+  margin-top: 60px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.section-header h2 {
+  margin: 10px 0 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+.section-progress {
+  color: rgba(255,255,255,.55);
+  font-size: .9rem;
+  white-space: nowrap;
+  padding-top: 6px;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.goal-card {
+  padding: 24px;
+  border-radius: 20px;
+  background: #181d28;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: .25s;
+}
+
+.goal-card:hover {
+  transform: translateY(-6px);
+}
+
+.goal-card__icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  background: rgba(255,255,255,.05);
+  font-size: 1.3rem;
+}
+
+.goal-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.goal-card p {
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-size: .9rem;
+}
+
+.goal-card.completed {
+  border-color: rgba(34,197,94,.33);
+}
+
+.goal-card.completed .goal-card__icon {
+  background: rgba(34,197,94,.15);
+  color: #65e69a;
+}
+
+.goal-card.active {
+  border-color: rgba(91,140,255,.33);
+}
+
+.goal-card.active .goal-card__icon {
+  background: rgba(91,140,255,.15);
+}
+
+/* ==========================================================
+   STUDY HEATMAP
+========================================================== */
+
+.study-heatmap {
+  margin-top: 60px;
+}
+
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 7px;
+}
+
+.heat {
+  aspect-ratio: 1;
+  border-radius: 5px;
+}
+
+.level0 { background: #222; }
+.level1 { background: #27496d; }
+.level2 { background: #3569b6; }
+.level3 { background: #5b8cff; }
+.level4 { background: #9dbdff; }
+
+@media (max-width: 600px) {
+  .heatmap {
+    grid-template-columns: repeat(13, 1fr);
+  }
+}
+
+/* ==========================================================
+   ACHIEVEMENTS
+========================================================== */
+
+.achievements {
+  margin-top: 60px;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.achievement {
+  padding: 26px;
+  text-align: center;
+  border-radius: 22px;
+  background: #181d28;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: .25s;
+}
+
+.achievement:hover {
+  transform: translateY(-8px);
+  border-color: rgba(91,140,255,.4);
+}
+
+.achievement--locked {
+  opacity: .5;
+}
+
+.achievement--locked:hover {
+  transform: none;
+  border-color: rgba(255,255,255,.08);
+}
+
+.achievement__emoji {
+  font-size: 2.4rem;
+  margin-bottom: 18px;
+  line-height: 1;
+}
+
+.achievement h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.achievement p {
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-size: .88rem;
+}
+
 /* ==========================================
    QUICK ACTIONS
 ========================================== */

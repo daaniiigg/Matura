@@ -1387,6 +1387,88 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- WEEKLY GOALS -->
+      <section class="weekly-goals-section">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Objetivos</span>
+            <h2>Objetivos de esta semana</h2>
+          </div>
+          <span class="section-progress">${completados} / ${modulos.length} completados</span>
+        </div>
+        <div class="goals-grid">
+          <article class="goal-card${completados >= 1 ? " completed" : completados === 0 ? "" : " active"}">
+            <div class="goal-card__icon">${completados >= 1 ? "✓" : "📖"}</div>
+            <h3>Completar 1 lección</h3>
+            <p>${completados} / 1</p>
+          </article>
+          <article class="goal-card${completados >= 3 ? " completed" : completados > 0 ? " active" : ""}">
+            <div class="goal-card__icon">${completados >= 3 ? "✓" : "📚"}</div>
+            <h3>Completar 3 módulos</h3>
+            <p>${completados} / 3</p>
+          </article>
+          <article class="goal-card${porcentaje >= 50 ? " completed" : porcentaje > 0 ? " active" : ""}">
+            <div class="goal-card__icon">${porcentaje >= 50 ? "✓" : "🎯"}</div>
+            <h3>Llegar al 50%</h3>
+            <p>${porcentaje}% / 50%</p>
+          </article>
+          <article class="goal-card${porcentaje >= 100 ? " completed" : ""}">
+            <div class="goal-card__icon">${porcentaje >= 100 ? "✓" : "⭐"}</div>
+            <h3>Completar el curso</h3>
+            <p>${completados} / ${modulos.length} módulos</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- STUDY HEATMAP -->
+      <section class="study-heatmap">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Constancia</span>
+            <h2>Actividad de estudio</h2>
+          </div>
+          <span style="color:rgba(255,255,255,.45);font-size:.9rem">Últimos 90 días</span>
+        </div>
+        <div class="heatmap">
+          ${Array.from({length: 90}, (_, i) => {
+            const level = i < completados * 3 ? Math.min(4, Math.ceil((i % 4) + 1)) : (i % 7 === 0 ? 1 : 0);
+            return `<div class="heat level${level}"></div>`;
+          }).join("")}
+        </div>
+      </section>
+
+      <!-- ACHIEVEMENTS -->
+      <section class="achievements">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Logros</span>
+            <h2>Últimos desbloqueos</h2>
+          </div>
+        </div>
+        <div class="achievements-grid">
+          <article class="achievement${completados >= 1 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${completados >= 1 ? "🔥" : "🔒"}</div>
+            <h3>Primera lección</h3>
+            <p>${completados >= 1 ? "Desbloqueado" : "Completa 1 módulo"}</p>
+          </article>
+          <article class="achievement${completados >= 3 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${completados >= 3 ? "🧠" : "🔒"}</div>
+            <h3>3 módulos</h3>
+            <p>${completados >= 3 ? "Desbloqueado" : "Completa 3 módulos"}</p>
+          </article>
+          <article class="achievement${porcentaje >= 50 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${porcentaje >= 50 ? "🏆" : "🔒"}</div>
+            <h3>Mitad del camino</h3>
+            <p>${porcentaje >= 50 ? "Desbloqueado" : "Llega al 50%"}</p>
+          </article>
+          <article class="achievement${porcentaje >= 100 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${porcentaje >= 100 ? "⚡" : "🔒"}</div>
+            <h3>Curso completo</h3>
+            <p>${porcentaje >= 100 ? "¡Enhorabuena!" : "Completa el curso"}</p>
+          </article>
+        </div>
+      </section>
+
     </div>
   `;
 
