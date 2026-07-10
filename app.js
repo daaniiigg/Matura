@@ -515,6 +515,8 @@ function validarEmail(e) {
 const GOOGLE_CLIENT_ID = "681227298388-s9b2l8khn07bivbfvvqukasfu91cc6rl.apps.googleusercontent.com";
 
 function pintarLogin() {
+  document.body.classList.add('login-screen');
+
   const camposRegistro = modoRegistro ? `
     <input class="buscador" id="campo-email" type="email" placeholder="${T("emailPlaceholder")}">
     <input class="buscador" id="campo-contrasena" type="password" placeholder="${T("contraPlaceholder")}">
@@ -524,39 +526,82 @@ function pintarLogin() {
       onkeydown="if(event.key==='Enter') enviarFormulario()">`;
 
   app.innerHTML = `
-    <div class="hero">
-      <h1>${modoRegistro ? T("loginTituloNuevo") : T("loginTituloEntrar")}</h1>
-      <p>${modoRegistro ? T("loginSubNuevo") : T("loginSubEntrar")}</p>
-    </div>
-    <div style="max-width:420px;margin:0 auto;text-align:center">
-      <div id="google-signin-btn" style="display:flex;justify-content:center;margin-bottom:16px"></div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--texto-muted)">
-        <div style="flex:1;height:1px;background:var(--borde)"></div>
-        <span style="font-size:.8rem">${T("oSeparador")}</span>
-        <div style="flex:1;height:1px;background:var(--borde)"></div>
+    <div class="login-page">
+
+      <div class="login-hero-panel">
+        <div class="login-hero-brand">
+          <div class="login-logo">🟣</div>
+          <span class="login-brand-name">Matura</span>
+        </div>
+        <h1 class="login-hero-title">Aprende lo que<br>importa, a tu ritmo.</h1>
+        <p class="login-hero-sub">Plataforma de formación con módulos estructurados, quizzes interactivos y seguimiento de progreso en tiempo real.</p>
+        <ul class="login-features">
+          <li class="login-feature">
+            <span class="login-feature-icon">📚</span>
+            <div>
+              <strong>Módulos con contenido real</strong>
+              <span>Basados en investigación académica e industrial</span>
+            </div>
+          </li>
+          <li class="login-feature">
+            <span class="login-feature-icon">🎯</span>
+            <div>
+              <strong>Quizzes y nota media</strong>
+              <span>Evalúa tu comprensión al final de cada módulo</span>
+            </div>
+          </li>
+          <li class="login-feature">
+            <span class="login-feature-icon">🌍</span>
+            <div>
+              <strong>Tres idiomas</strong>
+              <span>Estudia en español, inglés o alemán</span>
+            </div>
+          </li>
+          <li class="login-feature">
+            <span class="login-feature-icon">📈</span>
+            <div>
+              <strong>Progreso y ranking</strong>
+              <span>Compara tu avance con el resto del equipo</span>
+            </div>
+          </li>
+        </ul>
       </div>
-      <input class="buscador" id="campo-nombre" type="text" placeholder="${T("loginPlaceholder")}" autofocus>
-      ${camposRegistro}
-      <p id="error-login" style="color:#e74c3c;min-height:1.4em;margin:8px 0"></p>
-      <button class="btn" onclick="enviarFormulario()">
-        ${modoRegistro ? T("enviarCodigo") : T("entrar")}
-      </button>
-      <p style="margin-top:1rem">
-        <a href="javascript:void(0)" onclick="toggleModo()" style="font-size:.9rem">
-          ${modoRegistro ? T("yaIengoCuenta") : T("soyCuentaNueva")}
-        </a>
-      </p>
-      ${!modoRegistro ? `
-      <p style="margin-top:.5rem">
-        <a href="javascript:void(0)" onclick="toggleCampoProfe()" style="font-size:.8rem;color:var(--texto-muted)">
-          🔑 ¿Eres profesor?
-        </a>
-      </p>
-      <div id="campo-profe-wrap" style="display:none;margin-top:6px">
-        <input class="buscador" id="campo-codigo-profe" type="password"
-          placeholder="Código de acceso de profesor..."
-          onkeydown="if(event.key==='Enter') enviarFormulario()">
-      </div>` : ""}
+
+      <div class="login-form-panel">
+        <div class="login-form-inner">
+          <h2 class="login-form-title">${modoRegistro ? T("loginTituloNuevo") : T("loginTituloEntrar")}</h2>
+          <p class="login-form-sub">${modoRegistro ? T("loginSubNuevo") : T("loginSubEntrar")}</p>
+          <div id="google-signin-btn" style="display:flex;justify-content:center;margin-bottom:16px"></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--texto-muted)">
+            <div style="flex:1;height:1px;background:var(--borde)"></div>
+            <span style="font-size:.8rem">${T("oSeparador")}</span>
+            <div style="flex:1;height:1px;background:var(--borde)"></div>
+          </div>
+          <input class="buscador" id="campo-nombre" type="text" placeholder="${T("loginPlaceholder")}" autofocus>
+          ${camposRegistro}
+          <p id="error-login" style="color:#e74c3c;min-height:1.4em;margin:8px 0"></p>
+          <button class="btn" onclick="enviarFormulario()">
+            ${modoRegistro ? T("enviarCodigo") : T("entrar")}
+          </button>
+          <p style="margin-top:1rem;text-align:center">
+            <a href="javascript:void(0)" onclick="toggleModo()" style="font-size:.9rem">
+              ${modoRegistro ? T("yaIengoCuenta") : T("soyCuentaNueva")}
+            </a>
+          </p>
+          ${!modoRegistro ? `
+          <p style="margin-top:.5rem;text-align:center">
+            <a href="javascript:void(0)" onclick="toggleCampoProfe()" style="font-size:.8rem;color:var(--texto-muted)">
+              🔑 ¿Eres profesor?
+            </a>
+          </p>
+          <div id="campo-profe-wrap" style="display:none;margin-top:6px">
+            <input class="buscador" id="campo-codigo-profe" type="password"
+              placeholder="Código de acceso de profesor..."
+              onkeydown="if(event.key==='Enter') enviarFormulario()">
+          </div>` : ""}
+        </div>
+      </div>
+
     </div>
   `;
 
@@ -714,6 +759,7 @@ async function reenviarCodigo() {
 /* ---------- NAVEGACIÓN ---------- */
 
 function navegar() {
+  document.body.classList.remove('login-screen');
   if (!USUARIO) return pintarLogin();
 
   const ruta = location.hash || "#/";
