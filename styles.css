@@ -69,100 +69,130 @@ a, button, .btn, .tarjeta-curso, .fila-ranking,
 /* ===== BASE ===== */
 /* (reset y base los provee theme.css) */
 
-/* ===== TOPBAR / NAVBAR ===== */
+/* =======================================================
+   MATURA 2.0 - TOPBAR
+   ======================================================= */
+
 .topbar {
-  height: var(--header-height);
-  background: var(--topbar-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--borde);
-  padding: 0 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
   position: sticky;
   top: 0;
-  z-index: 100;
-  box-shadow: var(--sombra-sm);
-}
-
-.logo {
-  font-weight: 700;
-  font-size: .88rem;
-  color: var(--texto);
-  text-decoration: none;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  flex-shrink: 0;
+  z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  height: 82px;
+  padding: 0 42px;
+  background: rgba(16,16,19,.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.logo::before {
-  content: '';
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-  background: var(--acento);
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-.logo .logo-acento { color: var(--acento); }
 
-/* Nav pill */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg,#6C63FF,#8B7CFF);
+  font-size: 20px;
+  box-shadow: 0 10px 30px rgba(108,99,255,.35);
+}
+
+.brand-text h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.brand-text p {
+  font-size: 13px;
+  color: #8D93A8;
+}
+
 .topbar nav {
   display: flex;
-  gap: 2px;
-  background: var(--superficie-alt);
-  padding: 5px;
-  border-radius: 99px;
-  border: 1px solid var(--borde);
-  box-shadow: var(--sombra-sm);
-}
-.topbar nav a {
-  color: var(--texto-suave);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: .82rem;
-  padding: 7px 16px;
-  border-radius: 99px;
-  letter-spacing: .01em;
-  white-space: nowrap;
-}
-.topbar nav a:hover  { color: var(--texto); background: var(--superficie); }
-.topbar nav a.activo {
-  background: var(--acento);
-  color: var(--acento-texto);
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(91,93,246,.3);
+  align-items: center;
+  gap: 28px;
 }
 
-/* Nav visibility via body classes */
+.topbar nav a {
+  color: #9CA3AF;
+  text-decoration: none;
+  font-weight: 500;
+  transition: .25s;
+}
+
+.topbar nav a:hover { color: white; }
+
+.topbar nav a.activo { color: white; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.search {
+  width: 280px;
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: #17171d;
+  color: white;
+  font-family: inherit;
+  font-size: .875rem;
+}
+
+.search::placeholder { color: #71717A; }
+
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #6C63FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: .25s;
+  font-size: .82rem;
+  flex-shrink: 0;
+}
+
+.avatar:hover { transform: scale(1.05); }
+
+/* Nav visibility via body classes (lógica de app.js) */
 #nav-admin   { display: none; }
 #nav-sugerir { display: none; }
 body.es-admin #nav-admin { display: block; }
 body.hay-usuario:not(.es-admin) #nav-sugerir { display: block; }
 
-/* Zona usuario */
-#zona-usuario {
-  font-size: .78rem;
-  color: var(--texto-muted);
-  flex-shrink: 0;
-}
-#zona-usuario a { color: var(--texto-muted); text-decoration: none; }
-#zona-usuario a:hover { color: var(--texto-suave); }
-
+/* Selector idioma integrado en header-right */
 #selector-idioma {
-  background: var(--superficie-alt);
-  color: var(--texto-suave);
-  border: 1px solid var(--borde);
-  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.06);
+  color: #9CA3AF;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
   padding: 6px 10px;
   font-size: .78rem;
   cursor: pointer;
   font-family: inherit;
 }
+
+/* zona-usuario vive dentro de .avatar; estilos de link por si app.js inyecta HTML */
+#zona-usuario a { color: white; text-decoration: none; }
+#zona-usuario a:hover { opacity: .8; }
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 #app {
