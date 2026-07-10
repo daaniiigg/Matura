@@ -1087,7 +1087,7 @@ textarea.buscador { height: auto; }
 
 .modules-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 380px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 380px);
   gap: 42px;
   align-items: center;
   margin-bottom: 48px;
@@ -2185,7 +2185,7 @@ textarea.buscador { height: auto; }
 
 .exam-grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: minmax(0, 420px) 1fr;
   gap: 28px;
 }
 
@@ -2460,7 +2460,7 @@ textarea.buscador { height: auto; }
 
 .daily-focus {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: minmax(0, 420px) 1fr;
   gap: 36px;
   margin-top: 56px;
 }

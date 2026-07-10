@@ -7,6 +7,12 @@ body {
   min-height: 100vh;
 }
 
+/* Reset #app constraints so modules-wrapper can control the full layout width */
+#app:has(.modules-wrapper) {
+  max-width: none;
+  padding: 0;
+}
+
 .modules-wrapper {
   width: min(1380px, 94vw);
   margin: 0 auto;
