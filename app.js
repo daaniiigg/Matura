@@ -866,23 +866,55 @@ function pintarInicio() {
 
   app.innerHTML = `
     <div class="modules-wrapper">
-      <div class="dashboard-hero">
-        <div>
-          <p class="hero-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <section class="modules-hero">
+        <div class="modules-hero__content">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+            <div class="modules-hero__badge">
+              <span class="modules-hero__badge-dot"></span>
+              Curso activo
+            </div>
             <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
-            <span>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</span>
-          </p>
-          <h1 class="dashboard-h1">${T("heroTitulo")}</h1>
+          </div>
+
+          <h1 class="modules-hero__title">${T("heroTitulo")}</h1>
+
+          <p class="modules-hero__description">${T("heroSub")}</p>
+
+          <div class="modules-hero__actions">
+            ${proxMod
+              ? `<a href="#/modulo/${proxMod.id}" class="btn">Continuar aprendiendo</a>`
+              : `<span class="btn" style="opacity:.55;cursor:default">¡Todo completado! 🎉</span>`}
+            <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">
+              Explorar módulos
+            </button>
+          </div>
         </div>
-        <div class="stats-row" style="margin-bottom:0">
-          <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
-          <div class="stat-pill"><strong>${completados}</strong><span>completados</span></div>
-          <div class="stat-pill"><strong>${porcentaje}%</strong><span>progreso</span></div>
-        </div>
-      </div>
-      <div class="barra-progreso-global" style="max-width:100%;margin-bottom:56px">
-        <div class="relleno" style="width:${porcentaje}%"></div>
-      </div>
+
+        <aside class="modules-hero__card">
+          <div class="modules-hero__course">
+            <span class="modules-hero__label">Curso actual</span>
+            <h3>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</h3>
+            <p>Plan completo · Todas las asignaturas</p>
+          </div>
+
+          <div class="modules-hero__divider"></div>
+
+          <div class="modules-hero__stats">
+            <div class="modules-hero__stat">
+              <span class="modules-hero__stat-number">${modulos.length}</span>
+              <span class="modules-hero__stat-label">${T("navModulos")}</span>
+            </div>
+            <div class="modules-hero__stat">
+              <span class="modules-hero__stat-number">${porcentaje}%</span>
+              <span class="modules-hero__stat-label">Progreso</span>
+            </div>
+            <div class="modules-hero__stat">
+              <span class="modules-hero__stat-number">${completados}</span>
+              <span class="modules-hero__stat-label">Completados</span>
+            </div>
+          </div>
+        </aside>
+      </section>
       <div class="modules-grid">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
