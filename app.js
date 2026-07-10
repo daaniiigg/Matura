@@ -1019,6 +1019,105 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- CONTINUE LEARNING -->
+      ${proxMod ? `
+      <section class="continue-learning">
+        <div class="continue-card">
+          <div class="continue-card__left">
+            <span class="section-badge">Continúa donde lo dejaste</span>
+            <h2>${cursoActualObj ? cursoActualObj.titulo : "Curso"} · ${proxMod.titulo}</h2>
+            <p>Completa este módulo para avanzar en tu ruta de aprendizaje.</p>
+            <div class="progress-bar">
+              <div class="progress-bar__value" style="width:${porcentaje}%"></div>
+            </div>
+            <small>${porcentaje}% del curso completado</small>
+          </div>
+          <a class="btn" href="#/modulo/${proxMod.id}">
+            <i data-lucide="play"></i>
+            Continuar
+          </a>
+        </div>
+      </section>` : ""}
+
+      <!-- AI RECOMMENDATIONS -->
+      <section class="ai-recommendations">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Matura AI</span>
+            <h2>Recomendaciones inteligentes</h2>
+          </div>
+        </div>
+        <div class="recommendation-list">
+          ${completados > 0 ? `
+          <article class="recommendation-card">
+            <i data-lucide="brain"></i>
+            <div>
+              <strong>Sigue con el ritmo</strong>
+              <p>Llevas ${completados} módulo${completados !== 1 ? "s" : ""} completado${completados !== 1 ? "s" : ""}. ¡Sigue así!</p>
+            </div>
+          </article>` : `
+          <article class="recommendation-card">
+            <i data-lucide="brain"></i>
+            <div>
+              <strong>Empieza hoy</strong>
+              <p>Aún no has completado ningún módulo. El primer paso es el más importante.</p>
+            </div>
+          </article>`}
+          ${proxMod ? `
+          <article class="recommendation-card">
+            <i data-lucide="triangle-alert"></i>
+            <div>
+              <strong>Próximo módulo pendiente</strong>
+              <p>${proxMod.titulo} — ${proxMod.minutos} min estimados.</p>
+            </div>
+          </article>` : ""}
+          <article class="recommendation-card">
+            <i data-lucide="sparkles"></i>
+            <div>
+              <strong>Buen momento para practicar</strong>
+              <p>Repasa el glosario para afianzar los conceptos que ya has estudiado.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- UPCOMING EXAMS -->
+      <section class="upcoming-exams">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Calendario</span>
+            <h2>Próximos exámenes</h2>
+          </div>
+        </div>
+        <div class="exam-timeline">
+          <article class="timeline-exam">
+            <div class="timeline-date">12<span>JUL</span></div>
+            <div>
+              <strong>${cursoActualObj ? cursoActualObj.titulo : "Examen"}</strong>
+              <p>${modulos.slice(0, 3).map(m => m.titulo).join(" • ")}</p>
+            </div>
+          </article>
+          <article class="timeline-exam">
+            <div class="timeline-date">16<span>JUL</span></div>
+            <div>
+              <strong>Repaso general</strong>
+              <p>Todos los módulos del curso</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- STUDY STREAK -->
+      <section class="study-streak">
+        <div class="streak-widget">
+          <i data-lucide="flame"></i>
+          <div>
+            <strong>${completados} módulo${completados !== 1 ? "s" : ""} completado${completados !== 1 ? "s" : ""}</strong>
+            <p>${completados > 0 ? `Llevas un ${porcentaje}% del curso. ¡Sigue así!` : "Completa tu primer módulo para comenzar tu racha."}</p>
+          </div>
+        </div>
+      </section>
+
       <!-- DAILY FOCUS -->
       <section class="daily-focus">
         <div class="daily-focus__left">
