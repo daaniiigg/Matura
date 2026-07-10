@@ -940,6 +940,65 @@ function pintarInicio() {
           </div>
         </aside>
       </section>
+
+      <!-- DAILY FOCUS -->
+      <section class="daily-focus">
+        <div class="daily-focus__left">
+          <span class="section-badge">Hoy</span>
+          <h2>Tu plan de estudio para hoy</h2>
+          <p>Hemos organizado automáticamente las tareas con mayor impacto para ayudarte a avanzar de la forma más eficiente posible.</p>
+
+          <div class="focus-score">
+            <div class="focus-score__ring" style="background:conic-gradient(#5b8cff 0 ${porcentaje}%, rgba(255,255,255,.08) ${porcentaje}%)">
+              <span>${porcentaje}%</span>
+            </div>
+            <div class="focus-score__content">
+              <strong>Progreso del curso</strong>
+              <p>${porcentaje < 30 ? "Estás empezando. ¡Cada módulo cuenta!" : porcentaje < 70 ? "Vas por buen camino. Sigue así." : "Excelente ritmo. ¡Casi lo tienes!"}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="daily-focus__tasks">
+          ${proxMod ? `
+          <article class="task-card task-card--priority">
+            <div class="task-card__priority">Alta prioridad</div>
+            <h3>${proxMod.titulo}</h3>
+            <p>Continúa con este módulo para avanzar en tu ruta de aprendizaje.</p>
+            <div class="task-card__footer">
+              <span>⏱ ${proxMod.minutos} min</span>
+              <a href="#/modulo/${proxMod.id}" class="btn">Empezar</a>
+            </div>
+          </article>
+          ` : `
+          <article class="task-card task-card--priority">
+            <div class="task-card__priority">¡Completado!</div>
+            <h3>Has terminado todos los módulos</h3>
+            <p>Enhorabuena. Puedes repasar cualquier módulo cuando quieras.</p>
+            <div class="task-card__footer">
+              <span>🎉 Curso completo</span>
+            </div>
+          </article>
+          `}
+          <article class="task-card">
+            <h3>Repasar módulos completados</h3>
+            <p>Vuelve a los módulos que ya completaste para reforzar lo aprendido.</p>
+            <div class="task-card__footer">
+              <span>⏱ A tu ritmo</span>
+              <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">Ver módulos</button>
+            </div>
+          </article>
+          <article class="task-card">
+            <h3>Consulta tu progreso</h3>
+            <p>Revisa tus estadísticas y objetivos de la semana en el panel lateral.</p>
+            <div class="task-card__footer">
+              <span>⏱ 5 min</span>
+              <a href="#/progreso" class="btn secundario">Ver progreso</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <div class="modules-grid">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
