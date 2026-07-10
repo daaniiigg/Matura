@@ -3,71 +3,68 @@
    Tokens bridge → theme.css
    ============================================ */
 
-/* ===== BRIDGE: nombres heredados → tokens de theme.css ===== */
+/* ===== VARIABLES — Dark mode directo (sin bridge) ===== */
 :root {
-  /* Superficies */
-  --fondo:          var(--bg);
-  --superficie:     var(--surface);
-  --superficie-alt: var(--surface-2);
-  --topbar-bg:      rgba(246,248,252,.9);
+  /* Fondos */
+  --fondo:          #0F1117;
+  --superficie:     #171923;
+  --superficie-alt: #1E2230;
   /* Bordes */
-  --borde:          var(--border);
-  --borde-hover:    #CDD2E6;
+  --borde:          #2A3042;
+  --borde-hover:    #3A4055;
   /* Texto */
-  --texto:          var(--text);
-  --texto-suave:    var(--text-light);
-  --texto-muted:    #9CA3AF;
-  /* Primario */
-  --acento:         var(--primary);
+  --texto:          #F0F2F8;
+  --texto-suave:    #A8B0C3;
+  --texto-muted:    #6B7280;
+  /* Acento (unificado con brand del topbar) */
+  --acento:         #8B7CFF;
   --acento-texto:   #FFFFFF;
   /* Semántico */
-  --verde:          var(--success);
-  --verde-suave:    rgba(34,197,94,.09);
-  --rojo:           var(--danger);
-  --rojo-suave:     rgba(239,68,68,.08);
-  --ambar:          var(--warning);
-  --ambar-suave:    rgba(245,158,11,.08);
-  /* Radios (mapean a tokens de theme.css) */
-  --radio:          var(--radius-sm);
-  --radio-sm:       var(--radius-sm);
-  --radio-md:       var(--radius-md);
-  --radio-lg:       var(--radius-lg);
-  --radio-xl:       var(--radius-lg);
+  --verde:          #4ade80;
+  --verde-suave:    rgba(74,222,128,.1);
+  --rojo:           #f87171;
+  --rojo-suave:     rgba(248,113,113,.1);
+  --ambar:          #fbbf24;
+  --ambar-suave:    rgba(251,191,36,.1);
+  /* Radios */
+  --radio:          10px;
+  --radio-sm:       10px;
+  --radio-md:       16px;
+  --radio-lg:       22px;
+  --radio-xl:       22px;
   /* Sombras */
-  --sombra-sm:      var(--shadow-sm);
-  --sombra:         var(--shadow);
-  --sombra-lg:      var(--shadow-lg);
-}
-
-/* Overrides bridge para dark */
-body.dark {
-  --topbar-bg:   rgba(15,17,23,.88);
-  --borde-hover: #363C50;
-  --texto-muted: #525967;
+  --sombra-sm:      0 2px 8px rgba(0,0,0,.4);
+  --sombra:         0 12px 35px rgba(0,0,0,.5);
+  --sombra-lg:      0 25px 60px rgba(0,0,0,.6);
 }
 
 /* Transiciones globales */
 body, body * {
   transition:
-    background-color var(--transition),
-    color            var(--transition),
-    border-color     var(--transition),
-    box-shadow       var(--transition);
+    background-color .25s ease,
+    color            .25s ease,
+    border-color     .25s ease,
+    box-shadow       .25s ease;
 }
 a, button, .btn, .tarjeta-curso, .fila-ranking,
 .rank-tab, .toggle-inscripcion, .tarjeta-modulo {
   transition:
-    background-color var(--transition),
-    color            var(--transition),
-    border-color     var(--transition),
-    box-shadow       var(--transition),
-    transform        var(--transition),
-    padding          200ms ease,
-    opacity          var(--transition);
+    background-color .25s ease,
+    color            .25s ease,
+    border-color     .25s ease,
+    box-shadow       .25s ease,
+    transform        .25s ease,
+    padding          .2s ease,
+    opacity          .25s ease;
 }
 
 /* ===== BASE ===== */
-/* (reset y base los provee theme.css) */
+/* Reset y tipografía los provee theme.css */
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+}
 
 /* =======================================================
    MATURA 2.0 - TOPBAR
