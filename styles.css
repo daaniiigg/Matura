@@ -1917,6 +1917,69 @@ textarea.buscador { height: auto; }
 }
 
 /* ==========================================
+   QUICK ACTIONS
+========================================== */
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 38px 0 52px;
+}
+
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: left;
+  background: #181d28;
+  border: 1px solid rgba(255,255,255,.07);
+  transition: .25s;
+  text-decoration: none;
+  color: var(--texto, #F7F8FB);
+  font-family: inherit;
+}
+
+.quick-action:hover {
+  transform: translateY(-4px);
+  border-color: rgba(91,140,255,.3);
+  background: #1b2232;
+}
+
+.quick-action__icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  font-size: 1.45rem;
+  background: linear-gradient(135deg, rgba(91,140,255,.18), rgba(124,92,255,.18));
+  flex-shrink: 0;
+}
+
+.quick-action strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.quick-action span {
+  color: rgba(255,255,255,.58);
+  font-size: .88rem;
+}
+
+@media (max-width: 600px) {
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 24px 0 36px;
+  }
+}
+
+/* ==========================================
    EXAM CENTER
 ========================================== */
 

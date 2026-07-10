@@ -941,6 +941,35 @@ function pintarInicio() {
         </aside>
       </section>
 
+      <!-- QUICK ACTIONS -->
+      <section class="quick-actions">
+        <button class="quick-action" onclick="document.querySelector('.matura-ai')?.scrollIntoView({behavior:'smooth'})">
+          <div class="quick-action__icon">🧠</div>
+          <div><strong>Matura AI</strong><span>Haz una pregunta</span></div>
+        </button>
+        ${proxMod
+          ? `<a class="quick-action" href="#/modulo/${proxMod.id}">
+              <div class="quick-action__icon">📖</div>
+              <div><strong>Continuar</strong><span>${proxMod.titulo}</span></div>
+            </a>`
+          : `<button class="quick-action" disabled style="opacity:.5;cursor:default">
+              <div class="quick-action__icon">📖</div>
+              <div><strong>Continuar</strong><span>Todo completado ✓</span></div>
+            </button>`}
+        <a class="quick-action" href="#/progreso">
+          <div class="quick-action__icon">📝</div>
+          <div><strong>Mi progreso</strong><span>Ver estadísticas</span></div>
+        </a>
+        <a class="quick-action" href="#/glosario">
+          <div class="quick-action__icon">🗂️</div>
+          <div><strong>Glosario</strong><span>Repasar conceptos</span></div>
+        </a>
+        <a class="quick-action" href="#/ranking">
+          <div class="quick-action__icon">⭐</div>
+          <div><strong>Ranking</strong><span>Ver clasificación</span></div>
+        </a>
+      </section>
+
       <!-- DAILY FOCUS -->
       <section class="daily-focus">
         <div class="daily-focus__left">
