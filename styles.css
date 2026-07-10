@@ -1495,3 +1495,155 @@ textarea.buscador { height: auto; }
   color: rgba(255,255,255,.6);
   font-size: .9rem;
 }
+
+/* ==========================================
+   MATURA AI
+========================================== */
+
+.matura-ai {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 60px;
+  align-items: center;
+  margin-top: 56px;
+  padding: 56px;
+  border-radius: 30px;
+  background: #161b26;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.matura-ai__background {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(91,140,255,.22), transparent 30%),
+    radial-gradient(circle at 20% 80%, rgba(124,58,237,.16), transparent 35%);
+  pointer-events: none;
+}
+
+.matura-ai__content {
+  position: relative;
+  z-index: 2;
+}
+
+.matura-ai__badge {
+  display: inline-flex;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(91,140,255,.15);
+  color: #9fb8ff;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.matura-ai h2 {
+  font-size: 2.6rem;
+  line-height: 1.15;
+  margin: 0 0 18px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+.matura-ai > .matura-ai__content > p {
+  color: rgba(255,255,255,.72);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.matura-ai__features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin: 36px 0;
+}
+
+.ai-feature {
+  display: flex;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.04);
+}
+
+.ai-feature span {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ai-feature strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: .95rem;
+}
+
+.ai-feature p {
+  margin: 0;
+  font-size: .9rem;
+  color: rgba(255,255,255,.6);
+}
+
+.matura-ai__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.matura-ai__visual {
+  position: relative;
+  height: 420px;
+}
+
+.ai-orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6d8fff, #5b5dff);
+  filter: blur(2px);
+  box-shadow: 0 0 80px rgba(91,140,255,.5);
+}
+
+.floating-card {
+  position: absolute;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(24,29,40,.95);
+  border: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(12px);
+  font-weight: 600;
+  font-size: .95rem;
+  white-space: nowrap;
+}
+
+.floating-card--1 { top: 35px;  left: 10px; }
+.floating-card--2 { right: 0;   top: 160px; }
+.floating-card--3 { left: 55px; bottom: 25px; }
+
+@media (max-width: 1100px) {
+  .matura-ai {
+    grid-template-columns: 1fr;
+    padding: 36px;
+  }
+  .matura-ai__visual {
+    display: none;
+  }
+  .matura-ai__features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .matura-ai {
+    padding: 24px;
+    margin-top: 32px;
+  }
+  .matura-ai h2 {
+    font-size: 1.8rem;
+  }
+}

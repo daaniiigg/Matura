@@ -1020,6 +1020,63 @@ function pintarInicio() {
           </aside>
         </div>
       </div>
+
+      <!-- MATURA AI -->
+      <section class="matura-ai">
+        <div class="matura-ai__background"></div>
+
+        <div class="matura-ai__content">
+          <div class="matura-ai__badge">✨ Matura AI</div>
+
+          <h2>Tu profesor personal, disponible las 24 horas.</h2>
+
+          <p>Haz preguntas sobre cualquier asignatura, genera resúmenes, crea ejercicios personalizados, resuelve dudas paso a paso y prepara tus exámenes con ayuda de inteligencia artificial.</p>
+
+          <div class="matura-ai__features">
+            <div class="ai-feature">
+              <span>🧠</span>
+              <div>
+                <strong>Explicaciones inteligentes</strong>
+                <p>Adaptadas a tu nivel.</p>
+              </div>
+            </div>
+            <div class="ai-feature">
+              <span>📝</span>
+              <div>
+                <strong>Ejercicios automáticos</strong>
+                <p>Generados al instante.</p>
+              </div>
+            </div>
+            <div class="ai-feature">
+              <span>📚</span>
+              <div>
+                <strong>Resúmenes</strong>
+                <p>De cualquier tema.</p>
+              </div>
+            </div>
+            <div class="ai-feature">
+              <span>🎯</span>
+              <div>
+                <strong>Preparación Matura</strong>
+                <p>Orientada al examen.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="matura-ai__actions">
+            <button class="btn" disabled style="opacity:.55;cursor:not-allowed">Abrir Matura AI</button>
+            <button class="btn secundario" disabled style="opacity:.55;cursor:not-allowed">Ver ejemplos</button>
+          </div>
+        </div>
+
+        <div class="matura-ai__visual">
+          <div class="ai-orb"></div>
+          <div class="floating-card floating-card--1">💡 Explicación generada</div>
+          <div class="floating-card floating-card--2">✅ Ejercicio corregido</div>
+          <div class="floating-card floating-card--3">📄 Resumen listo</div>
+        </div>
+      </section>
+
     </div>
   `;
 
