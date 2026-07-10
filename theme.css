@@ -1,0 +1,157 @@
+/* ==========================================
+   MATURA 2.0 - DESIGN SYSTEM
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+
+  /* BRAND */
+  --primary:        #5B5DF6;
+  --primary-hover:  #4B4DE8;
+
+  --success:        #22C55E;
+  --warning:        #F59E0B;
+  --danger:         #EF4444;
+
+  /* BACKGROUND */
+  --bg:             #F6F8FC;
+  --surface:        #FFFFFF;
+  --surface-2:      #F8FAFD;
+
+  /* TEXT */
+  --text:           #16181D;
+  --text-light:     #6B7280;
+
+  /* BORDERS */
+  --border:         #E8EBF3;
+
+  /* RADIUS */
+  --radius-sm:      10px;
+  --radius-md:      16px;
+  --radius-lg:      22px;
+
+  /* SHADOWS */
+  --shadow-sm:      0 2px 8px rgba(15,23,42,.04);
+  --shadow:         0 12px 35px rgba(15,23,42,.06);
+  --shadow-lg:      0 25px 60px rgba(15,23,42,.08);
+
+  /* TRANSITIONS */
+  --transition:     .25s ease;
+
+  /* SIDEBAR */
+  --sidebar-width:  270px;
+
+  /* HEADER */
+  --header-height:  74px;
+
+}
+
+/* ===========================
+   DARK MODE
+=========================== */
+
+body.dark {
+
+  --bg:        #0F1117;
+  --surface:   #171923;
+  --surface-2: #1E2230;
+  --text:      #F7F9FC;
+  --text-light:#A8B0C3;
+  --border:    #2A3042;
+  --shadow:    0 15px 40px rgba(0,0,0,.45);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.35);
+  --shadow-lg: 0 25px 60px rgba(0,0,0,.55);
+
+}
+
+/* ===========================
+   RESET
+=========================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background .3s, color .3s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===========================
+   LINKS
+=========================== */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all var(--transition);
+}
+
+button:hover  { transform: translateY(-2px); }
+button:active { transform: scale(.98); }
+
+/* ===========================
+   INPUTS
+=========================== */
+
+input,
+textarea {
+  font-family: inherit;
+  outline: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  transition: .25s;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(91,93,246,.12);
+}
+
+/* ===========================
+   CARDS
+=========================== */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: .25s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+::-webkit-scrollbar        { width: 10px; }
+::-webkit-scrollbar-thumb  { background: #C8CEDD; border-radius: 20px; }

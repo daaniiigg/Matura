@@ -6,6 +6,16 @@
 
 const app = document.getElementById("app");
 
+/* ---------- DARK MODE ---------- */
+(function () {
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (dark) document.body.classList.add('dark');
+  document.documentElement.classList.remove('dark-pending');
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    document.body.classList.toggle('dark', e.matches);
+  });
+})();
+
 /* ---------- IDIOMAS (i18n) ----------
    Todos los textos de la interfaz viven en este "libro de
    frases". El código pide una frase por su clave, y el libro
