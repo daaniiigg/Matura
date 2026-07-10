@@ -20,7 +20,7 @@ const TEXTOS = {
     navGlosario: "Glosario",
     navProgreso: "Mi progreso",
     salir: "salir",
-    footer: "Plataforma creada por Daniel · Tailor Hub · Basada en investigación con 29 fuentes académicas",
+    footer: "Academia CSM · Tailor Hub",
     heroTitulo: "Aprende sobre Gemelos Digitales",
     heroSub: "8 módulos basados en una investigación con 29 fuentes académicas e industriales. Lee cada lección, estudia su vocabulario y demuestra lo aprendido en el quiz.",
     progresoGlobal: "{n} de {t} módulos completados ({p}%)",
@@ -766,19 +766,14 @@ function pintarInicio() {
       const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
       modulosHtml += `
         <a class="tarjeta-modulo" href="#/modulo/${mod.id}">
-          <div class="icono-modulo">${ICONOS_MODULO[mod.id] || mod.id}</div>
+          <span class="mod-num">${String(mod.id).padStart(2, '0')}</span>
           <div class="info">
-            <h3>${T("modulo")} ${mod.id} · ${mod.titulo}</h3>
+            <h3>${mod.titulo}</h3>
             <p>${mod.minutos} ${T("minLectura")} · ${mod.quiz.length} ${T("preguntasQuiz")}</p>
           </div>
-          <div class="tarjeta-barra">
-            <span class="estado ${hecho ? "completado" : "pendiente"}">
-              ${hecho ? `${hecho.nota}/${hecho.total}` : T("pendiente")}
-            </span>
-            <div class="tarjeta-barra-track">
-              <div class="tarjeta-barra-fill ${hecho ? "" : "vacia"}" style="width:${pct}%"></div>
-            </div>
-          </div>
+          <span class="mod-estado estado ${hecho ? "completado" : "pendiente"}">
+            ${hecho ? `${hecho.nota}/${hecho.total}` : "·"}
+          </span>
         </a>`;
     }
   }
@@ -790,9 +785,7 @@ function pintarInicio() {
           <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
           <span>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</span>
         </p>
-        <h1 style="font-size:1.7rem;font-weight:700;letter-spacing:-.03em;color:var(--acento);margin-top:4px">
-          ${T("heroTitulo")}
-        </h1>
+        <h1 class="dashboard-h1">${T("heroTitulo")}</h1>
       </div>
       <div class="stats-row" style="margin-bottom:0">
         <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
