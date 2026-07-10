@@ -20,6 +20,8 @@ const PUERTO = process.env.PORT || 4173;
 const ARCHIVADOR = path.join(__dirname, "progreso.json");
 const FICHERO_USUARIOS = path.join(__dirname, "usuarios.json");
 const FICHERO_SUGERENCIAS = path.join(__dirname, "sugerencias.json");
+const FICHERO_EVENTOS = path.join(__dirname, "eventos.json");
+const FICHERO_COMENTARIOS = path.join(__dirname, "comentarios.json");
 
 /* Códigos de verificación en memoria — desaparecen al reiniciar,
    que es lo correcto: un código caducado no debería sobrevivir */
@@ -78,6 +80,21 @@ function leerSugerencias() {
 
 function guardarSugerencias(lista) {
   fs.writeFileSync(FICHERO_SUGERENCIAS, JSON.stringify(lista, null, 2));
+}
+
+function leerEventos() {
+  try { return JSON.parse(fs.readFileSync(FICHERO_EVENTOS, "utf8")); }
+  catch { return []; }
+}
+function guardarEventos(lista) {
+  fs.writeFileSync(FICHERO_EVENTOS, JSON.stringify(lista, null, 2));
+}
+function leerComentarios() {
+  try { return JSON.parse(fs.readFileSync(FICHERO_COMENTARIOS, "utf8")); }
+  catch { return []; }
+}
+function guardarComentarios(lista) {
+  fs.writeFileSync(FICHERO_COMENTARIOS, JSON.stringify(lista, null, 2));
 }
 
 function hashContrasena(contrasena, sal) {
@@ -506,6 +523,124 @@ const servidor = http.createServer((peticion, respuesta) => {
       });
       return;
     }
+  }
+
+  /* --- EVENTOS: leer (público) ---
+     GET /api/eventos */
+  if (url === "/api/eventos" && peticion.method === "GET") {
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ eventos: leerEventos() }));
+  }
+
+  /* --- EVENTOS: crear (admin) ---
+     POST /api/eventos  Header: x-admin  body: { titulo, fecha, descripcion, tipo, curso } */
+  if (url === "/api/eventos" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", () => {
+      try {
+        const adminNombre = (peticion.headers["x-admin"] || "").trim().toLowerCase();
+        const usuarios = leerUsuarios();
+        if (!usuarios[adminNombre] || usuarios[adminNombre].rol !== "admin") {
+          respuesta.writeHead(403, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+        }
+        const { titulo, fecha, descripcion, tipo, curso } = JSON.parse(cuerpo);
+        if (!titulo || !fecha) {
+          respuesta.writeHead(400, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "Faltan título o fecha" }));
+        }
+        const lista = leerEventos();
+        const nuevo = { id: Date.now(), titulo: titulo.trim().slice(0,100), fecha, descripcion: (descripcion||"").trim().slice(0,300), tipo: tipo||"evento", curso: curso||null };
+        lista.push(nuevo);
+        lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
+        guardarEventos(lista);
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true, evento: nuevo }));
+      } catch(e) {
+        console.error(e);
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error interno" }));
+      }
+    });
+    return;
+  }
+
+  /* --- EVENTOS: borrar (admin) ---
+     DELETE /api/eventos/:id  Header: x-admin */
+  if (url.startsWith("/api/eventos/") && peticion.method === "DELETE") {
+    const idEvento = Number(url.split("/")[3]);
+    const adminNombre = (peticion.headers["x-admin"] || "").trim().toLowerCase();
+    const usuarios = leerUsuarios();
+    if (!usuarios[adminNombre] || usuarios[adminNombre].rol !== "admin") {
+      respuesta.writeHead(403, { "Content-Type": "application/json" });
+      return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+    }
+    const lista = leerEventos().filter(e => e.id !== idEvento);
+    guardarEventos(lista);
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ ok: true }));
+  }
+
+  /* --- COMENTARIOS: leer ---
+     GET /api/comentarios?curso=X&modulo=Y */
+  if (url.startsWith("/api/comentarios") && peticion.method === "GET") {
+    const params = new URL("http://x" + peticion.url).searchParams;
+    const curso = params.get("curso") || "";
+    const modulo = params.get("modulo") || "";
+    let todos = leerComentarios();
+    if (curso) todos = todos.filter(c => c.curso === curso);
+    if (modulo) todos = todos.filter(c => String(c.modulo) === String(modulo));
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ comentarios: todos }));
+  }
+
+  /* --- COMENTARIOS: crear ---
+     POST /api/comentarios  Header: x-usuario  body: { curso, modulo, texto } */
+  if (url === "/api/comentarios" && peticion.method === "POST") {
+    let cuerpo = "";
+    peticion.on("data", (t) => (cuerpo += t));
+    peticion.on("end", () => {
+      try {
+        const autor = (peticion.headers["x-usuario"] || "").trim().toLowerCase();
+        if (!autor) {
+          respuesta.writeHead(401, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "No autenticado" }));
+        }
+        const { curso, modulo, texto } = JSON.parse(cuerpo);
+        if (!texto || texto.trim().length < 3) {
+          respuesta.writeHead(400, { "Content-Type": "application/json" });
+          return respuesta.end(JSON.stringify({ error: "El comentario es demasiado corto" }));
+        }
+        const lista = leerComentarios();
+        const nuevo = { id: Date.now(), curso, modulo: Number(modulo), autor, texto: texto.trim().slice(0,600), fecha: new Date().toISOString() };
+        lista.push(nuevo);
+        guardarComentarios(lista);
+        respuesta.writeHead(200, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ ok: true, comentario: nuevo }));
+      } catch(e) {
+        console.error(e);
+        respuesta.writeHead(500, { "Content-Type": "application/json" });
+        respuesta.end(JSON.stringify({ error: "Error interno" }));
+      }
+    });
+    return;
+  }
+
+  /* --- COMENTARIOS: borrar (admin) ---
+     DELETE /api/comentarios/:id  Header: x-admin */
+  if (url.startsWith("/api/comentarios/") && peticion.method === "DELETE") {
+    const idCom = Number(url.split("/")[3]);
+    const adminNombre = (peticion.headers["x-admin"] || "").trim().toLowerCase();
+    const usuarios = leerUsuarios();
+    if (!usuarios[adminNombre] || usuarios[adminNombre].rol !== "admin") {
+      respuesta.writeHead(403, { "Content-Type": "application/json" });
+      return respuesta.end(JSON.stringify({ error: "No autorizado" }));
+    }
+    const lista = leerComentarios().filter(c => c.id !== idCom);
+    guardarComentarios(lista);
+    respuesta.writeHead(200, { "Content-Type": "application/json" });
+    return respuesta.end(JSON.stringify({ ok: true }));
   }
 
   /* --- EL CAMARERO (archivos estáticos) ---

@@ -308,12 +308,13 @@ function pintarTextosFijos() {
 
 function actualizarNavActivo(ruta) {
   const mapa = {
-    "#/":        "nav-modulos",
-    "#/glosario":"nav-glosario",
-    "#/progreso":"nav-progreso",
-    "#/ranking": "nav-ranking",
-    "#/sugerir": "nav-sugerir",
-    "#/admin":   "nav-admin",
+    "#/":           "nav-modulos",
+    "#/glosario":   "nav-glosario",
+    "#/progreso":   "nav-progreso",
+    "#/ranking":    "nav-ranking",
+    "#/calendario": "nav-calendario",
+    "#/sugerir":    "nav-sugerir",
+    "#/admin":      "nav-admin",
   };
   document.querySelectorAll(".topbar nav a").forEach((a) => a.classList.remove("activo"));
   const id = mapa[ruta];
@@ -710,6 +711,7 @@ function navegar() {
 
   // Estas rutas funcionan sin curso seleccionado
   if (ruta === "#/ranking")                          { actualizarNavActivo(ruta); return pintarRanking(); }
+  if (ruta === "#/calendario")                       { actualizarNavActivo(ruta); return pintarCalendario(); }
   if (ruta === "#/sugerir" && ROL !== "admin")       { actualizarNavActivo(ruta); return pintarSugerir(); }
   if (ruta === "#/admin"   && ROL === "admin")       { return pintarAdmin(); }
 
@@ -873,8 +875,22 @@ function pintarModulo(id) {
         <a class="btn" href="#/quiz/${mod.id}">${T("hacerQuiz")}</a>
         <a class="btn secundario" href="#/">${T("volverModulos")}</a>
       </div>
+
+      <div id="comentarios-seccion" class="comentarios-seccion">
+        <h2 class="seccion-titulo" style="margin-top:40px">Comentarios</h2>
+        <div id="comentarios-lista" style="color:var(--texto-muted);font-size:.82rem;padding:8px 0">Cargando…</div>
+        ${USUARIO ? `
+        <div class="comentario-form">
+          <div class="comentario-avatar" style="flex-shrink:0;margin-top:4px">${USUARIO.slice(0,2).toUpperCase()}</div>
+          <div style="flex:1">
+            <textarea id="comentario-input" class="buscador" placeholder="Escribe un comentario…" rows="3" style="resize:vertical;margin:0;font-family:inherit"></textarea>
+            <button id="comentario-btn" class="btn" onclick="enviarComentario('${CURSO_ACTIVO}', ${mod.id})" style="margin-top:8px">Publicar →</button>
+          </div>
+        </div>` : ""}
+      </div>
     </article>
   `;
+  cargarComentarios(CURSO_ACTIVO, mod.id);
 }
 
 /* ---------- PANTALLA: QUIZ (con baraja aleatoria) ----------
@@ -1376,4 +1392,212 @@ async function toggleInscripcion(alumno, curso, estaInscrito, btn) {
     console.error(e);
   }
   btn.disabled = false;
+}
+
+/* ==================== CALENDARIO ==================== */
+
+let _calMes = new Date().getMonth();
+let _calAnio = new Date().getFullYear();
+let _calEventos = [];
+
+function pintarCalendario() {
+  actualizarNavActivo("#/calendario");
+  const esAdmin = ROL === "admin";
+  app.innerHTML = `
+    <div class="hero">
+      <p class="hero-meta">Academia CSM · Calendario</p>
+      <h1 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;letter-spacing:-.04em;color:var(--texto);margin-top:6px">Calendario</h1>
+    </div>
+    <div class="calendario-layout">
+      <div class="calendario-main">
+        <div class="cal-nav">
+          <button onclick="calNavMes(-1)" class="btn secundario" style="padding:6px 14px;font-size:.85rem">←</button>
+          <span id="cal-titulo" style="font-weight:700;font-size:.95rem;letter-spacing:-.01em"></span>
+          <button onclick="calNavMes(1)" class="btn secundario" style="padding:6px 14px;font-size:.85rem">→</button>
+        </div>
+        <div class="cal-dias-semana">
+          ${["Lu","Ma","Mi","Ju","Vi","Sa","Do"].map(d => `<span>${d}</span>`).join("")}
+        </div>
+        <div id="cal-grid" class="cal-grid">···</div>
+      </div>
+      <div class="calendario-aside">
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">Próximos eventos</h2>
+          <div id="cal-proximos" style="color:var(--texto-muted);font-size:.85rem">···</div>
+        </div>
+        ${esAdmin ? `
+        <div class="panel-widget">
+          <h2 class="seccion-titulo" style="margin-top:0">Añadir evento</h2>
+          <form onsubmit="crearEvento(event)" style="display:flex;flex-direction:column;gap:8px">
+            <input class="buscador" id="ev-titulo" placeholder="Título del evento…" required style="margin:0">
+            <input class="buscador" id="ev-fecha" type="date" required style="margin:0">
+            <input class="buscador" id="ev-desc" placeholder="Descripción (opcional)…" style="margin:0">
+            <select class="buscador" id="ev-tipo" style="margin:0">
+              <option value="evento">📅 Evento general</option>
+              <option value="entrega">📝 Entrega</option>
+              <option value="examen">🔬 Examen / evaluación</option>
+            </select>
+            <button class="btn" type="submit" style="width:100%;margin-top:4px">Añadir evento →</button>
+          </form>
+        </div>` : ""}
+      </div>
+    </div>`;
+  cargarCalendario();
+}
+
+async function cargarCalendario() {
+  try {
+    const resp = await fetch("/api/eventos");
+    const { eventos } = await resp.json();
+    _calEventos = eventos || [];
+  } catch { _calEventos = []; }
+  dibujarCalendario();
+  dibujarProximos();
+}
+
+function calNavMes(delta) {
+  _calMes += delta;
+  if (_calMes > 11) { _calMes = 0; _calAnio++; }
+  if (_calMes < 0)  { _calMes = 11; _calAnio--; }
+  dibujarCalendario();
+  dibujarProximos();
+}
+
+function dibujarCalendario() {
+  const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const titulo = document.getElementById("cal-titulo");
+  if (titulo) titulo.textContent = `${meses[_calMes]} ${_calAnio}`;
+
+  const grid = document.getElementById("cal-grid");
+  if (!grid) return;
+
+  const primerDia = new Date(_calAnio, _calMes, 1);
+  const diasEnMes = new Date(_calAnio, _calMes + 1, 0).getDate();
+  // Monday-based: 0=Mon … 6=Sun
+  let inicioCelda = (primerDia.getDay() + 6) % 7;
+  const hoy = new Date();
+
+  const eventosDelMes = _calEventos.filter(e => {
+    const f = new Date(e.fecha + "T00:00:00");
+    return f.getMonth() === _calMes && f.getFullYear() === _calAnio;
+  });
+
+  let html = "";
+  for (let i = 0; i < inicioCelda; i++) html += `<div class="cal-dia vacio"></div>`;
+  for (let d = 1; d <= diasEnMes; d++) {
+    const esHoy = hoy.getDate() === d && hoy.getMonth() === _calMes && hoy.getFullYear() === _calAnio;
+    const fechaStr = `${_calAnio}-${String(_calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evsHoy = eventosDelMes.filter(e => e.fecha === fechaStr);
+    const tipoColor = { evento:"var(--acento)", entrega:"var(--ambar)", examen:"var(--rojo)" };
+    const dots = evsHoy.map(e => `<span class="cal-dot" style="background:${tipoColor[e.tipo]||'var(--acento)'}"></span>`).join("");
+    html += `<div class="cal-dia${esHoy ? " hoy" : ""}${evsHoy.length ? " con-evento" : ""}">
+      <span class="cal-num">${d}</span>
+      ${dots ? `<div class="cal-dots">${dots}</div>` : ""}
+      ${ROL === "admin" && evsHoy.length ? evsHoy.map(e => `<button class="cal-ev-tag" onclick="eliminarEvento(${e.id})" title="${e.titulo} — click para eliminar">${e.titulo.slice(0,12)}${e.titulo.length>12?"…":""}</button>`).join("") : evsHoy.map(e => `<span class="cal-ev-tag">${e.titulo.slice(0,12)}${e.titulo.length>12?"…":""}</span>`).join("")}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function dibujarProximos() {
+  const el = document.getElementById("cal-proximos");
+  if (!el) return;
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  const proximos = _calEventos.filter(e => new Date(e.fecha + "T00:00:00") >= hoy).slice(0, 6);
+  if (!proximos.length) { el.textContent = "No hay eventos próximos."; return; }
+  const tipoIco = { evento:"📅", entrega:"📝", examen:"🔬" };
+  el.innerHTML = proximos.map(e => {
+    const fecha = new Date(e.fecha + "T00:00:00");
+    const label = fecha.toLocaleDateString("es-ES", { day:"numeric", month:"short" });
+    return `<div class="evento-proximo">
+      <span class="evento-ico">${tipoIco[e.tipo]||"📅"}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.83rem;color:var(--texto);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.titulo}</div>
+        ${e.descripcion ? `<div style="font-size:.75rem;color:var(--texto-muted);margin-top:1px">${e.descripcion}</div>` : ""}
+      </div>
+      <span style="font-size:.72rem;color:var(--texto-muted);flex-shrink:0">${label}</span>
+    </div>`;
+  }).join("");
+}
+
+async function crearEvento(e) {
+  e.preventDefault();
+  const titulo = document.getElementById("ev-titulo").value.trim();
+  const fecha  = document.getElementById("ev-fecha").value;
+  const desc   = document.getElementById("ev-desc").value.trim();
+  const tipo   = document.getElementById("ev-tipo").value;
+  if (!titulo || !fecha) return;
+  try {
+    await fetch("/api/eventos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin": USUARIO },
+      body: JSON.stringify({ titulo, fecha, descripcion: desc, tipo }),
+    });
+    e.target.reset();
+    await cargarCalendario();
+  } catch(err) { console.error(err); }
+}
+
+async function eliminarEvento(id) {
+  if (!confirm("¿Eliminar este evento?")) return;
+  await fetch(`/api/eventos/${id}`, { method: "DELETE", headers: { "x-admin": USUARIO } });
+  await cargarCalendario();
+}
+
+/* ==================== COMENTARIOS ==================== */
+
+async function cargarComentarios(curso, modulo) {
+  const seccion = document.getElementById("comentarios-seccion");
+  if (!seccion) return;
+  try {
+    const resp = await fetch(`/api/comentarios?curso=${curso}&modulo=${modulo}`);
+    const { comentarios } = await resp.json();
+    const lista = document.getElementById("comentarios-lista");
+    if (!lista) return;
+    if (!comentarios || comentarios.length === 0) {
+      lista.innerHTML = `<p style="color:var(--texto-muted);font-size:.82rem;padding:12px 0">Sé el primero en comentar este módulo.</p>`;
+      return;
+    }
+    lista.innerHTML = comentarios.map(c => {
+      const fecha = new Date(c.fecha).toLocaleDateString("es-ES", { day:"numeric", month:"short", year:"numeric" });
+      const esAdmin = ROL === "admin";
+      return `<div class="comentario">
+        <div class="comentario-avatar">${c.autor.slice(0,2).toUpperCase()}</div>
+        <div class="comentario-cuerpo">
+          <div class="comentario-meta">
+            <strong>${c.autor}</strong>
+            <span>${fecha}</span>
+            ${esAdmin ? `<button onclick="eliminarComentario(${c.id},'${curso}',${modulo})" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.75rem;margin-left:auto">✕</button>` : ""}
+          </div>
+          <p class="comentario-texto">${c.texto}</p>
+        </div>
+      </div>`;
+    }).join("");
+  } catch(err) { console.error(err); }
+}
+
+async function enviarComentario(curso, modulo) {
+  const textarea = document.getElementById("comentario-input");
+  if (!textarea) return;
+  const texto = textarea.value.trim();
+  if (!texto || texto.length < 3) return;
+  const btn = document.getElementById("comentario-btn");
+  if (btn) btn.disabled = true;
+  try {
+    await fetch("/api/comentarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-usuario": USUARIO },
+      body: JSON.stringify({ curso, modulo, texto }),
+    });
+    textarea.value = "";
+    await cargarComentarios(curso, modulo);
+  } catch(err) { console.error(err); }
+  finally { if (btn) btn.disabled = false; }
+}
+
+async function eliminarComentario(id, curso, modulo) {
+  if (!confirm("¿Eliminar este comentario?")) return;
+  await fetch(`/api/comentarios/${id}`, { method: "DELETE", headers: { "x-admin": USUARIO } });
+  await cargarComentarios(curso, modulo);
 }
