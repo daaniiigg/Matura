@@ -1133,6 +1133,63 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- STUDY INSIGHTS -->
+      <section class="study-insights">
+        <div class="study-insights__header">
+          <div>
+            <span class="section-badge">Analytics</span>
+            <h2>Tu rendimiento de un vistazo</h2>
+            <p>Observa cómo evoluciona tu aprendizaje, identifica tus puntos fuertes y descubre qué asignaturas necesitan más atención.</p>
+          </div>
+          <button class="btn secundario">Ver estadísticas completas</button>
+        </div>
+
+        <div class="insights-grid">
+
+          <article class="insight-card insight-card--large">
+            <div class="insight-card__top">
+              <span>Constancia</span>
+              <strong>${porcentaje > 0 ? porcentaje + "%" : "—"}</strong>
+            </div>
+            <div class="streak-chart">
+              <div class="bar" style="height:42%"></div>
+              <div class="bar" style="height:65%"></div>
+              <div class="bar" style="height:58%"></div>
+              <div class="bar" style="height:90%"></div>
+              <div class="bar" style="height:76%"></div>
+              <div class="bar active" style="height:100%"></div>
+              <div class="bar" style="height:82%"></div>
+            </div>
+            <p>Sigue avanzando en tus módulos para mejorar tu constancia de estudio.</p>
+          </article>
+
+          <article class="insight-card">
+            <span class="insight-title">Módulos completados</span>
+            <strong class="insight-value">${completados}</strong>
+            <small>de ${modulos.length} en total</small>
+          </article>
+
+          <article class="insight-card">
+            <span class="insight-title">Nota media</span>
+            <strong class="insight-value">${mediaLocal}</strong>
+            <small>en módulos completados</small>
+          </article>
+
+          <article class="insight-card">
+            <span class="insight-title">Progreso global</span>
+            <strong class="insight-value">${porcentaje}%</strong>
+            <small>${porcentaje < 50 ? "Sigue así, vas bien" : porcentaje < 80 ? "Excelente progreso" : "¡Casi en la meta!"}</small>
+          </article>
+
+          <article class="insight-card">
+            <span class="insight-title">Próximo objetivo</span>
+            <strong class="insight-value">${proxMod ? "Módulo " + String(proxMod.id).padStart(2,"0") : "¡Completado!"}</strong>
+            <small>${proxMod ? proxMod.titulo : "Curso terminado 🎉"}</small>
+          </article>
+
+        </div>
+      </section>
+
     </div>
   `;
 
