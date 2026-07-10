@@ -2,52 +2,95 @@
    MODULE PAGE REDESIGN
 ================================*/
 
+body {
+  background: radial-gradient(circle at top, #23243a 0%, #111218 45%, #0b0c11 100%);
+  min-height: 100vh;
+}
+
 .modules-wrapper {
-  width: min(1180px, 92vw);
-  margin: 70px auto;
+  width: min(1380px, 94vw);
+  margin: 0 auto;
+  padding: 56px 0 100px;
 }
 
-.modules-header {
-  margin-bottom: 40px;
+/* Hero section */
+.modules-wrapper .dashboard-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-bottom: 40px;
 }
 
-.modules-label {
-  color: #7D83A2;
-  font-size: 12px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-.modules-title {
-  margin-top: 12px;
-  font-size: 52px;
-  font-weight: 700;
-  color: white;
-  line-height: 1.1;
-}
-
-.modules-description {
-  margin-top: 14px;
-  color: #8D93A8;
-  max-width: 520px;
-  line-height: 1.7;
-}
-
+/* Two-column grid */
 .modules-grid {
-  margin-top: 60px;
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 32px;
+  gap: 40px;
+  align-items: start;
 }
 
+/* Course list column */
 .course-column {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 14px;
 }
 
+/* Sidebar column — sticky so it stays in view while scrolling */
 .side-column {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
+  position: sticky;
+  top: 100px;
+}
+
+/* Sidebar panels */
+.side-column .panel-widget {
+  padding: 28px 24px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.side-column .seccion-titulo {
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--texto-muted);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Progress bar */
+.modules-wrapper .barra-progreso-global {
+  border-radius: 6px;
+}
+
+/* Module cards spacing */
+.course-column .tarjeta-modulo {
+  margin-bottom: 0;
+}
+
+/* Section headings inside course column */
+.course-column .seccion-titulo {
+  margin-top: 32px;
+  margin-bottom: 10px;
+}
+
+.course-column .seccion-titulo:first-child {
+  margin-top: 0;
+}
+
+/* Responsive: stack at tablet */
+@media (max-width: 900px) {
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-column {
+    position: static;
+  }
 }

@@ -791,42 +791,48 @@ function pintarInicio() {
   }
 
   app.innerHTML = `
-    <div class="dashboard-hero">
-      <div>
-        <p class="hero-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
-          <span>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</span>
-        </p>
-        <h1 class="dashboard-h1">${T("heroTitulo")}</h1>
+    <div class="modules-wrapper">
+      <div class="dashboard-hero">
+        <div>
+          <p class="hero-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
+            <span>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</span>
+          </p>
+          <h1 class="dashboard-h1">${T("heroTitulo")}</h1>
+        </div>
+        <div class="stats-row" style="margin-bottom:0">
+          <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
+          <div class="stat-pill"><strong>${completados}</strong><span>completados</span></div>
+          <div class="stat-pill"><strong>${porcentaje}%</strong><span>progreso</span></div>
+        </div>
       </div>
-      <div class="stats-row" style="margin-bottom:0">
-        <div class="stat-pill"><strong>${modulos.length}</strong><span>${T("navModulos")}</span></div>
-        <div class="stat-pill"><strong>${completados}</strong><span>completados</span></div>
-        <div class="stat-pill"><strong>${porcentaje}%</strong><span>progreso</span></div>
+      <div class="barra-progreso-global" style="max-width:100%;margin-bottom:56px">
+        <div class="relleno" style="width:${porcentaje}%"></div>
       </div>
-    </div>
-    <div class="barra-progreso-global" style="max-width:100%;margin-bottom:28px">
-      <div class="relleno" style="width:${porcentaje}%"></div>
-    </div>
-    <div class="dashboard-grid">
-      <div>${modulosHtml}</div>
-      <div class="dashboard-sidebar">
-        <div class="panel-widget">
-          <h2 class="seccion-titulo" style="margin-top:0">Mi rendimiento</h2>
-          <div class="mini-stat-grid">
-            <div class="mini-stat">
-              <span class="mini-stat-val">${completados}/${modulos.length}</span>
-              <span class="mini-stat-label">Módulos</span>
-            </div>
-            <div class="mini-stat">
-              <span class="mini-stat-val">${mediaLocal}</span>
-              <span class="mini-stat-label">Nota media</span>
+      <div class="modules-grid">
+        <div class="course-column">${modulosHtml}</div>
+        <div class="side-column">
+          <div class="panel-widget">
+            <h2 class="seccion-titulo" style="margin-top:0">Estadísticas</h2>
+            <div class="mini-stat-grid">
+              <div class="mini-stat">
+                <span class="mini-stat-val">${completados}/${modulos.length}</span>
+                <span class="mini-stat-label">Módulos</span>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-val">${mediaLocal}</span>
+                <span class="mini-stat-label">Nota media</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="panel-widget">
-          <h2 class="seccion-titulo" style="margin-top:0">Top del curso</h2>
-          <div id="mini-ranking-contenido" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+          <div class="panel-widget">
+            <h2 class="seccion-titulo" style="margin-top:0">Actividad reciente</h2>
+            <div id="mini-ranking-contenido" style="color:var(--texto-muted);font-size:.82rem;padding:4px 0">···</div>
+          </div>
+          <div class="panel-widget">
+            <h2 class="seccion-titulo" style="margin-top:0">Próxima tarea</h2>
+            <p style="color:var(--texto-muted);font-size:.85rem;line-height:1.6">Sin módulos pendientes programados.</p>
+          </div>
         </div>
       </div>
     </div>
