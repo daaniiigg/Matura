@@ -1617,6 +1617,117 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- STUDY PLANNER -->
+      <section class="study-planner">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Planner</span>
+            <h2>Plan de estudio de hoy</h2>
+          </div>
+          <a class="btn secundario" href="#/calendario">Ver planificación</a>
+        </div>
+        <div class="planner-list">
+          ${modulos.filter(m => !PROGRESO[m.id]).slice(0, 3).map((mod, i) => {
+            const horas = ["09:30", "11:00", "17:00"][i] || "19:00";
+            const iconos = ["circle-check-big", "book-open-check", "pen-tool"];
+            return `
+          <article class="planner-item">
+            <i data-lucide="${iconos[i] || "circle-check-big"}"></i>
+            <div>
+              <strong>${mod.titulo}</strong>
+              <span>${horas} · ${mod.minutos} min</span>
+            </div>
+          </article>`;
+          }).join("") || `
+          <article class="planner-item" style="opacity:.55">
+            <i data-lucide="circle-check-big"></i>
+            <div><strong>Sin tareas pendientes</strong><span>¡Has completado todos los módulos!</span></div>
+          </article>`}
+        </div>
+      </section>
+
+      <!-- RECENT NOTES -->
+      <section class="recent-notes">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Notas</span>
+            <h2>Últimos apuntes</h2>
+          </div>
+        </div>
+        <div class="notes-grid">
+          ${modulos.slice(0, 3).map((mod, i) => {
+            const lucideIcon = ["file-text", "file-pen-line", "notebook-tabs"][i];
+            const tiempo = ["hace 12 minutos", "ayer", "última revisión"][i];
+            return `
+          <article class="note-card">
+            <i data-lucide="${lucideIcon}"></i>
+            <strong>${mod.titulo}</strong>
+            <p>${tiempo}</p>
+          </article>`;
+          }).join("")}
+        </div>
+      </section>
+
+      <!-- PINNED RESOURCES -->
+      <section class="pinned-resources">
+        <div class="section-header">
+          <div>
+            <span class="section-badge">Recursos</span>
+            <h2>Fijados</h2>
+          </div>
+        </div>
+        <div class="resources-grid">
+          <article class="resource-card">
+            <i data-lucide="link"></i>
+            <strong>Formularios del curso</strong>
+          </article>
+          <article class="resource-card">
+            <i data-lucide="folder-open"></i>
+            <strong>${cursoActualObj ? cursoActualObj.titulo : "Material del curso"}</strong>
+          </article>
+          <article class="resource-card">
+            <i data-lucide="bookmark"></i>
+            <strong>Módulos guardados</strong>
+          </article>
+          <article class="resource-card">
+            <i data-lucide="library"></i>
+            <strong>Biblioteca</strong>
+          </article>
+        </div>
+      </section>
+
+      <!-- QUICK STATS -->
+      <section class="quick-stats">
+        <article class="stat-widget">
+          <i data-lucide="clock-3"></i>
+          <div>
+            <strong>${modulos.reduce((t, m) => t + (PROGRESO[m.id] ? m.minutos : 0), 0)} min</strong>
+            <span>Estudiadas</span>
+          </div>
+        </article>
+        <article class="stat-widget">
+          <i data-lucide="target"></i>
+          <div>
+            <strong>${porcentaje}%</strong>
+            <span>Objetivos</span>
+          </div>
+        </article>
+        <article class="stat-widget">
+          <i data-lucide="award"></i>
+          <div>
+            <strong>${completados}</strong>
+            <span>Logros</span>
+          </div>
+        </article>
+        <article class="stat-widget">
+          <i data-lucide="zap"></i>
+          <div>
+            <strong>${completados * 100 + Math.round(mediaLocal * 10)}</strong>
+            <span>XP</span>
+          </div>
+        </article>
+      </section>
+
     </div>
   `;
 
