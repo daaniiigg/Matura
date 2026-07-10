@@ -1192,6 +1192,67 @@ function pintarInicio() {
         </div>
       </section>
 
+      <!-- ACTIVITY FEED -->
+      <section class="activity-feed">
+        <div class="activity-feed__header">
+          <div>
+            <span class="section-badge">Actividad reciente</span>
+            <h2>Todo lo que has conseguido</h2>
+            <p>Un historial inteligente de tu progreso para que siempre sepas qué has hecho y cuál es el siguiente paso.</p>
+          </div>
+          <button class="btn secundario">Ver historial completo</button>
+        </div>
+
+        <div class="timeline">
+          ${completados > 0 ? `
+          <article class="timeline-item">
+            <div class="timeline-item__icon">✓</div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <h3>Módulo completado</h3>
+                <span>Reciente</span>
+              </div>
+              <p>Has terminado <strong>${modulos.filter(m => PROGRESO[m.id]).slice(-1)[0]?.titulo || "un módulo"}</strong> con nota ${(() => { const last = modulos.filter(m => PROGRESO[m.id]).slice(-1)[0]; return last ? PROGRESO[last.id].nota + "/" + PROGRESO[last.id].total : ""; })()}.</p>
+              <div class="timeline-tags"><span>+XP</span><span>${CURSO_ACTIVO}</span></div>
+            </div>
+          </article>
+          ` : ""}
+          <article class="timeline-item">
+            <div class="timeline-item__icon">🧠</div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <h3>Matura AI</h3>
+                <span>Próximamente</span>
+              </div>
+              <p>Tu asistente de estudio personal estará disponible muy pronto para generar resúmenes, ejercicios y explicaciones paso a paso.</p>
+              <div class="timeline-tags"><span>IA</span><span>En desarrollo</span></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="timeline-item__icon">📈</div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <h3>Tu progreso actual</h3>
+                <span>Hoy</span>
+              </div>
+              <p>Llevas <strong>${completados} de ${modulos.length} módulos</strong> completados con una nota media de <strong>${mediaLocal}</strong>.</p>
+              <div class="timeline-tags"><span>Estadísticas</span><span>${porcentaje}% completado</span></div>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="timeline-item__icon">🏆</div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <h3>Objetivo: Matura</h3>
+                <span>En curso</span>
+              </div>
+              <p>${proxMod ? `Próximo paso: <strong>${proxMod.titulo}</strong>. ¡Sigue adelante!` : "¡Has completado todos los módulos del curso! Enhorabuena."}</p>
+              <div class="timeline-tags"><span>Ruta de aprendizaje</span><span>${proxMod ? "Pendiente" : "Completado ✓"}</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- STUDY INSIGHTS -->
       <section class="study-insights">
         <div class="study-insights__header">
