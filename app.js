@@ -846,22 +846,47 @@ function pintarInicio() {
 
   let modulosHtml = "";
   for (const seccion of seccionesIdioma()) {
-    modulosHtml += `<h2 class="seccion-titulo">${seccion.nombre}</h2>`;
+    modulosHtml += `<h2 class="seccion-titulo">${seccion.nombre}</h2><div class="module-cards-grid">`;
     for (const mod of modulos.filter((m) => m.seccion === seccion.id)) {
-      const hecho = PROGRESO[mod.id];
-      const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
+      const hecho    = PROGRESO[mod.id];
+      const pct      = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
+      const isActive    = !hecho && proxMod && mod.id === proxMod.id;
+      const isCompleted = !!hecho;
+
       modulosHtml += `
-        <a class="tarjeta-modulo" href="#/modulo/${mod.id}">
-          <span class="mod-num">${String(mod.id).padStart(2, '0')}</span>
-          <div class="info">
+        <a class="module-card${isActive ? " module-card--active" : ""}" href="#/modulo/${mod.id}">
+          <div class="module-card__header">
+            <div class="module-card__icon">${ICONOS_MODULO[mod.id] || String(mod.id).padStart(2,"0")}</div>
+            <span class="module-card__status${isCompleted ? " module-card__status--completed" : ""}">
+              ${isCompleted ? "Completado" : isActive ? "En progreso" : "Pendiente"}
+            </span>
+          </div>
+          <div class="module-card__body">
             <h3>${mod.titulo}</h3>
             <p>${mod.minutos} ${T("minLectura")} · ${mod.quiz.length} ${T("preguntasQuiz")}</p>
           </div>
-          <span class="mod-estado estado ${hecho ? "completado" : "pendiente"}">
-            ${hecho ? `${hecho.nota}/${hecho.total}` : "·"}
-          </span>
+          <div class="module-card__progress">
+            <div class="module-card__progress-info">
+              <span>Progreso</span>
+              <strong>${isCompleted ? hecho.nota + "/" + hecho.total : "—"}</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar__fill" style="width:${isCompleted ? "100" : "0"}%"></div>
+            </div>
+          </div>
+          <div class="module-card__footer">
+            <div class="module-card__meta">
+              <span>${mod.minutos} min</span>
+              <span>•</span>
+              <span>${mod.quiz.length} ${T("preguntasQuiz")}</span>
+            </div>
+            <span class="btn${isCompleted ? " secundario" : ""}">
+              ${isCompleted ? "Repasar" : isActive ? "Continuar" : "Empezar"}
+            </span>
+          </div>
         </a>`;
     }
+    modulosHtml += `</div>`;
   }
 
   app.innerHTML = `

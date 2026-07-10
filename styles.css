@@ -1222,3 +1222,132 @@ textarea.buscador { height: auto; }
     font-size: 1rem;
   }
 }
+
+/* ===========================================
+   MODULE CARDS
+=========================================== */
+
+.module-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.module-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 28px;
+  border-radius: 24px;
+  background: #181d28;
+  border: 1px solid rgba(255,255,255,.07);
+  text-decoration: none;
+  color: var(--texto, #F7F8FB);
+  transition: .28s;
+}
+
+.module-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(115,155,255,.35);
+  box-shadow: 0 18px 45px rgba(0,0,0,.35);
+}
+
+.module-card--active {
+  background:
+    radial-gradient(circle at top right, rgba(90,130,255,.18), transparent 45%),
+    #181d28;
+}
+
+.module-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.module-card__icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  font-size: 1.5rem;
+  background: rgba(255,255,255,.06);
+}
+
+.module-card__status {
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #3b82f6;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.module-card__status--completed {
+  background: #22c55e;
+}
+
+.module-card__status--locked {
+  background: #5b6474;
+}
+
+.module-card__body h3 {
+  margin: 0 0 14px;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.module-card__body p {
+  margin: 0;
+  color: rgba(255,255,255,.68);
+  line-height: 1.7;
+}
+
+.module-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.module-card__progress-info {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255,255,255,.72);
+  font-size: .9rem;
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,.06);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5b8cff, #7d6bff);
+  transition: width .5s ease;
+}
+
+.module-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.module-card__meta {
+  display: flex;
+  gap: 10px;
+  color: rgba(255,255,255,.55);
+  font-size: .9rem;
+}
+
+@media (max-width: 600px) {
+  .module-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
