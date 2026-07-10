@@ -205,6 +205,25 @@ body.hay-usuario:not(.es-admin) #nav-sugerir { display: block; }
   font-size: .92rem;
 }
 
+/* Botón volver a cursos */
+.btn-volver {
+  background: var(--superficie-alt);
+  border: 1px solid var(--borde);
+  border-radius: 99px;
+  color: var(--texto-suave);
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  font-family: inherit;
+}
+.btn-volver:hover {
+  background: var(--borde-hover);
+  color: var(--texto);
+  border-color: var(--borde-hover);
+}
+
 /* Stats pills */
 .stats-row {
   display: flex;

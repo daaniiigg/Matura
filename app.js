@@ -786,10 +786,9 @@ function pintarInicio() {
   app.innerHTML = `
     <div class="dashboard-hero">
       <div>
-        <p class="hero-meta">
-          <a href="javascript:void(0)" onclick="volverACursos()"
-             style="color:var(--texto-muted);text-decoration:none;font-weight:500">← Mis cursos</a>
-          &nbsp;·&nbsp; ${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}
+        <p class="hero-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
+          <span>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</span>
         </p>
         <h1 style="font-size:1.7rem;font-weight:700;letter-spacing:-.03em;color:var(--acento);margin-top:4px">
           ${T("heroTitulo")}

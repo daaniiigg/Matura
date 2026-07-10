@@ -844,5 +844,5 @@ const GLOSARIO = [
 ];
 
 /* ---- Empaquetamos el temario por idioma y por curso ---- */
-const DATOS = {};
+var DATOS = window.DATOS || {};
 DATOS.gemelos = { es: { SECCIONES, MODULOS, GLOSARIO } };
