@@ -1,0 +1,53 @@
+/* ==============================
+   MODULE PAGE REDESIGN
+================================*/
+
+.modules-wrapper {
+  width: min(1180px, 92vw);
+  margin: 70px auto;
+}
+
+.modules-header {
+  margin-bottom: 40px;
+}
+
+.modules-label {
+  color: #7D83A2;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.modules-title {
+  margin-top: 12px;
+  font-size: 52px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.1;
+}
+
+.modules-description {
+  margin-top: 14px;
+  color: #8D93A8;
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+.modules-grid {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+}
+
+.course-column {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
