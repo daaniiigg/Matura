@@ -3570,3 +3570,190 @@ textarea.buscador { height: auto; }
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ==========================================================
+   DESIGN TOKENS — ESPACIADO
+   (radius/shadow/transition ya definidos en design-system.css)
+========================================================== */
+
+:root {
+  --space-1:  8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+}
+
+/* ==========================================================
+   LAYOUT HELPERS
+========================================================== */
+
+.dashboard-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================
+   MODAL
+========================================================== */
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-overlay--visible {
+  display: flex;
+}
+
+.modal-window {
+  width: min(700px, 92vw);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  margin: 6px 0 0;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: var(--space-4);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.modal-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================
+   ALERT BANNER
+========================================================== */
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin: var(--space-4) 0;
+  border-radius: var(--radius-md);
+}
+
+.banner svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.banner strong {
+  display: block;
+  font-size: .95rem;
+}
+
+.banner p {
+  margin-top: 4px;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.banner-info {
+  border: 1px solid rgba(91,140,255,.2);
+  background: rgba(91,140,255,.08);
+  color: var(--text);
+}
+.banner-info svg { color: #7ba4ff; }
+.banner-info p   { color: var(--text-secondary); }
+
+.banner-success {
+  border: 1px solid rgba(66,211,146,.2);
+  background: rgba(66,211,146,.07);
+  color: var(--text);
+}
+.banner-success svg { color: var(--success); }
+.banner-success p   { color: var(--text-secondary); }
+
+.banner-warning {
+  border: 1px solid rgba(247,185,85,.2);
+  background: rgba(247,185,85,.07);
+  color: var(--text);
+}
+.banner-warning svg { color: var(--warning); }
+.banner-warning p   { color: var(--text-secondary); }
+
+.banner-error {
+  border: 1px solid rgba(255,107,107,.2);
+  background: rgba(255,107,107,.07);
+  color: var(--text);
+}
+.banner-error svg { color: var(--danger); }
+.banner-error p   { color: var(--text-secondary); }
