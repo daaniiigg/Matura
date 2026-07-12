@@ -959,8 +959,9 @@ function pintarInicio() {
         </div>
       </div>
 
-      <!-- ROW 1: Continue Learning + Stats Strip -->
-      <div class="dash-row dash-row--65-35">
+
+      <!-- ROW 1: Continue Learning (2fr) + Quick Stats (1fr) -->
+      <div class="dashboard-grid-main">
         ${proxMod ? `
         <section class="continue-learning">
           <div class="continue-card">
@@ -974,8 +975,7 @@ function pintarInicio() {
               <small>${porcentaje}% del curso completado</small>
             </div>
             <a class="btn" href="#/modulo/${proxMod.id}">
-              <i data-lucide="play"></i>
-              Continuar
+              <i data-lucide="play"></i>Continuar
             </a>
           </div>
         </section>
@@ -986,9 +986,7 @@ function pintarInicio() {
               <span class="section-badge">¡Enhorabuena!</span>
               <h2>Has completado todos los módulos del curso</h2>
               <p>Puedes repasar cualquier módulo cuando quieras.</p>
-              <div class="progress-bar">
-                <div class="progress-bar__value" style="width:100%"></div>
-              </div>
+              <div class="progress-bar"><div class="progress-bar__value" style="width:100%"></div></div>
               <small>100% completado</small>
             </div>
           </div>
@@ -1004,17 +1002,11 @@ function pintarInicio() {
           </article>
           <article class="stat-widget">
             <i data-lucide="target"></i>
-            <div>
-              <strong>${porcentaje}%</strong>
-              <span>Progreso</span>
-            </div>
+            <div><strong>${porcentaje}%</strong><span>Progreso</span></div>
           </article>
           <article class="stat-widget">
             <i data-lucide="award"></i>
-            <div>
-              <strong>${completados}</strong>
-              <span>Completados</span>
-            </div>
+            <div><strong>${completados}</strong><span>Completados</span></div>
           </article>
           <article class="stat-widget">
             <i data-lucide="zap"></i>
@@ -1026,46 +1018,30 @@ function pintarInicio() {
         </div>
       </div>
 
-      <!-- ROW 2: AI Recommendations + Upcoming Exams -->
-      <div class="dash-row">
-        <section class="ai-recommendations">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Matura AI</span>
-              <h2>Recomendaciones inteligentes</h2>
+      <!-- ROW 2: Matura AI (1.4fr) + Próximo Examen (1fr) -->
+      <div class="dashboard-grid-secondary">
+        <section class="matura-ai">
+          <div class="matura-ai__background"></div>
+          <div class="matura-ai__content">
+            <div class="matura-ai__badge">✨ Matura AI</div>
+            <h2>Tu profesor personal, disponible las 24 horas.</h2>
+            <p>Haz preguntas sobre cualquier asignatura, genera resúmenes, crea ejercicios personalizados y prepara tus exámenes con ayuda de inteligencia artificial.</p>
+            <div class="matura-ai__features">
+              <div class="ai-feature"><span>🧠</span><div><strong>Explicaciones inteligentes</strong><p>Adaptadas a tu nivel.</p></div></div>
+              <div class="ai-feature"><span>📝</span><div><strong>Ejercicios automáticos</strong><p>Generados al instante.</p></div></div>
+              <div class="ai-feature"><span>📚</span><div><strong>Resúmenes</strong><p>De cualquier tema.</p></div></div>
+              <div class="ai-feature"><span>🎯</span><div><strong>Preparación Matura</strong><p>Orientada al examen.</p></div></div>
+            </div>
+            <div class="matura-ai__actions">
+              <button class="btn" disabled style="opacity:.55;cursor:not-allowed">Abrir Matura AI</button>
+              <button class="btn secundario" disabled style="opacity:.55;cursor:not-allowed">Ver ejemplos</button>
             </div>
           </div>
-          <div class="recommendation-list">
-            ${completados > 0 ? `
-            <article class="recommendation-card">
-              <i data-lucide="brain"></i>
-              <div>
-                <strong>Sigue con el ritmo</strong>
-                <p>Llevas ${completados} módulo${completados !== 1 ? "s" : ""} completado${completados !== 1 ? "s" : ""}. ¡Sigue así!</p>
-              </div>
-            </article>` : `
-            <article class="recommendation-card">
-              <i data-lucide="brain"></i>
-              <div>
-                <strong>Empieza hoy</strong>
-                <p>Aún no has completado ningún módulo. El primer paso es el más importante.</p>
-              </div>
-            </article>`}
-            ${proxMod ? `
-            <article class="recommendation-card">
-              <i data-lucide="triangle-alert"></i>
-              <div>
-                <strong>Próximo módulo pendiente</strong>
-                <p>${proxMod.titulo} — ${proxMod.minutos} min estimados.</p>
-              </div>
-            </article>` : ""}
-            <article class="recommendation-card">
-              <i data-lucide="sparkles"></i>
-              <div>
-                <strong>Buen momento para practicar</strong>
-                <p>Repasa el glosario para afianzar los conceptos que ya has estudiado.</p>
-              </div>
-            </article>
+          <div class="matura-ai__visual">
+            <div class="ai-orb"></div>
+            <div class="floating-card floating-card--1">💡 Explicación generada</div>
+            <div class="floating-card floating-card--2">✅ Ejercicio corregido</div>
+            <div class="floating-card floating-card--3">📄 Resumen listo</div>
           </div>
         </section>
 
@@ -1095,118 +1071,39 @@ function pintarInicio() {
         </section>
       </div>
 
-      <!-- DAILY FOCUS -->
-      <section class="daily-focus">
-        <div class="daily-focus__left">
-          <span class="section-badge">Hoy</span>
-          <h2>Tu plan de estudio para hoy</h2>
-          <p>Hemos organizado automáticamente las tareas con mayor impacto para ayudarte a avanzar de la forma más eficiente posible.</p>
-
-          <div class="focus-score">
-            <div class="focus-score__ring" style="background:conic-gradient(#5b8cff 0 ${porcentaje}%, rgba(255,255,255,.08) ${porcentaje}%)">
-              <span>${porcentaje}%</span>
-            </div>
-            <div class="focus-score__content">
-              <strong>Progreso del curso</strong>
-              <p>${porcentaje < 30 ? "Estás empezando. ¡Cada módulo cuenta!" : porcentaje < 70 ? "Vas por buen camino. Sigue así." : "Excelente ritmo. ¡Casi lo tienes!"}</p>
-            </div>
+      <!-- ROW 3: Compact Daily Focus bar (~100px) -->
+      <div class="daily-focus-compact">
+        <div class="dfc-left">
+          <div class="dfc-ring" style="background:conic-gradient(#5b8cff 0 ${porcentaje}%, rgba(255,255,255,.1) ${porcentaje}%)">
+            ${porcentaje}%
+          </div>
+          <div class="dfc-left-info">
+            <span class="section-badge">Objetivo diario</span>
+            <strong>${porcentaje < 30 ? "Estás empezando. ¡Cada módulo cuenta!" : porcentaje < 70 ? "Vas por buen camino. Sigue así." : "Excelente ritmo. ¡Casi lo tienes!"}</strong>
           </div>
         </div>
-
-        <div class="daily-focus__tasks">
-          ${proxMod ? `
-          <article class="task-card task-card--priority">
-            <div class="task-card__priority">Alta prioridad</div>
-            <h3>${proxMod.titulo}</h3>
-            <p>Continúa con este módulo para avanzar en tu ruta de aprendizaje.</p>
-            <div class="task-card__footer">
-              <span>⏱ ${proxMod.minutos} min</span>
-              <a href="#/modulo/${proxMod.id}" class="btn">Empezar</a>
-            </div>
-          </article>
-          ` : `
-          <article class="task-card task-card--priority">
-            <div class="task-card__priority">¡Completado!</div>
-            <h3>Has terminado todos los módulos</h3>
-            <p>Enhorabuena. Puedes repasar cualquier módulo cuando quieras.</p>
-            <div class="task-card__footer">
-              <span>🎉 Curso completo</span>
-            </div>
-          </article>
-          `}
-          <article class="task-card">
-            <h3>Repasar módulos completados</h3>
-            <p>Vuelve a los módulos que ya completaste para reforzar lo aprendido.</p>
-            <div class="task-card__footer">
-              <span>⏱ A tu ritmo</span>
-              <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">Ver módulos</button>
-            </div>
-          </article>
-          <article class="task-card">
-            <h3>Consulta tu progreso</h3>
-            <p>Revisa tus estadísticas y objetivos de la semana en el panel lateral.</p>
-            <div class="task-card__footer">
-              <span>⏱ 5 min</span>
-              <a href="#/progreso" class="btn secundario">Ver progreso</a>
-            </div>
-          </article>
+        ${proxMod ? `
+        <div class="dfc-center">
+          <span>Próxima tarea</span>
+          <strong>${proxMod.titulo}</strong>
+          <small>⏱ ${proxMod.minutos} min</small>
         </div>
-      </section>
-
-      <!-- EXAM CENTER -->
-      <section class="exam-center">
-        <div class="exam-center__header">
-          <div>
-            <span class="section-badge">Exámenes</span>
-            <h2>Centro de preparación</h2>
-            <p>Todo lo relacionado con tus próximos exámenes en un único lugar. Consulta el tiempo restante, tu nivel de preparación y comienza un simulacro en un clic.</p>
-          </div>
-          <a href="#/calendario" class="btn secundario">Ver calendario</a>
+        <a href="#/modulo/${proxMod.id}" class="btn"><i data-lucide="play"></i>Empezar</a>
+        ` : `
+        <div class="dfc-center">
+          <span>Estado del curso</span>
+          <strong>¡Curso completado!</strong>
+          <small>🎉 Enhorabuena</small>
         </div>
+        <span class="btn" style="opacity:.55;cursor:default">Completado ✓</span>
+        `}
+      </div>
 
-        <div class="exam-grid">
-          <article class="next-exam">
-            <div class="next-exam__badge">Próximo examen</div>
-            <h3>${cursoActualObj?.titulo || CURSO_ACTIVO}</h3>
-            <p>${modulos.slice(0,3).map(m => m.titulo).join(" • ")}</p>
-            <div class="countdown">
-              <div class="countdown-item"><strong>—</strong><span>Días</span></div>
-              <div class="countdown-item"><strong>—</strong><span>Horas</span></div>
-              <div class="countdown-item"><strong>—</strong><span>Min</span></div>
-            </div>
-            ${proxMod
-              ? `<a href="#/modulo/${proxMod.id}" class="btn">Empezar simulacro</a>`
-              : `<span class="btn" style="opacity:.55;cursor:default">Curso completado ✓</span>`}
-          </article>
-
-          <div class="exam-list">
-            ${modulos.slice(0, 4).map(mod => {
-              const hecho = PROGRESO[mod.id];
-              const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
-              const scoreClass = pct >= 80 ? "score-good" : pct >= 50 ? "score-medium" : "score-low";
-              const label = pct >= 80 ? "Preparación alta" : pct >= 50 ? "Necesita repaso" : hecho ? "Revisar" : "Sin empezar";
-              return `
-              <article class="exam-item">
-                <div class="exam-item__left">
-                  <div class="exam-icon">${ICONOS_MODULO[mod.id] || "📘"}</div>
-                  <div>
-                    <strong>${mod.titulo}</strong>
-                    <span>${label}</span>
-                  </div>
-                </div>
-                <div class="exam-score ${hecho ? scoreClass : "score-low"}">${hecho ? pct + "%" : "0%"}</div>
-              </article>`;
-            }).join("")}
-          </div>
-        </div>
-      </section>
-
-      <div class="modules-grid">
+      <!-- MODULES GRID (course cards + sidebar) -->
+      <div class="modules-grid section-spacing">
         <div class="course-column">${modulosHtml}</div>
         <div class="side-column">
           <aside class="modules-sidebar">
-
-            <!-- Card: Continuar -->
             <section class="sidebar-card sidebar-card--continue">
               <div class="sidebar-card__header">
                 <span class="sidebar-label">CONTINUAR</span>
@@ -1230,7 +1127,6 @@ function pintarInicio() {
               ` : `<p class="widget-muted">¡Todo completado! 🎉</p>`}
             </section>
 
-            <!-- Card: Objetivos -->
             <section class="sidebar-card">
               <div class="sidebar-card__header">
                 <span class="sidebar-label">OBJETIVOS</span>
@@ -1238,25 +1134,20 @@ function pintarInicio() {
               </div>
               <div class="weekly-goals">
                 <div class="goal-item${completados >= 1 ? ' goal-item--done' : ''}">
-                  <span>${completados >= 1 ? '✓' : ''}</span>
-                  <p>Completar 1 módulo</p>
+                  <span>${completados >= 1 ? '✓' : ''}</span><p>Completar 1 módulo</p>
                 </div>
                 <div class="goal-item${completados >= 3 ? ' goal-item--done' : ''}">
-                  <span>${completados >= 3 ? '✓' : ''}</span>
-                  <p>Completar 3 módulos</p>
+                  <span>${completados >= 3 ? '✓' : ''}</span><p>Completar 3 módulos</p>
                 </div>
                 <div class="goal-item${porcentaje >= 50 ? ' goal-item--done' : ''}">
-                  <span>${porcentaje >= 50 ? '✓' : ''}</span>
-                  <p>Llegar al 50% del curso</p>
+                  <span>${porcentaje >= 50 ? '✓' : ''}</span><p>Llegar al 50% del curso</p>
                 </div>
                 <div class="goal-item${porcentaje >= 100 ? ' goal-item--done' : ''}">
-                  <span>${porcentaje >= 100 ? '✓' : ''}</span>
-                  <p>Completar el curso</p>
+                  <span>${porcentaje >= 100 ? '✓' : ''}</span><p>Completar el curso</p>
                 </div>
               </div>
             </section>
 
-            <!-- Card: Estadísticas -->
             <section class="sidebar-card">
               <div class="sidebar-card__header">
                 <span class="sidebar-label">ESTADÍSTICAS</span>
@@ -1268,376 +1159,360 @@ function pintarInicio() {
                   <span>Módulos completados</span>
                 </div>
                 <div class="sidebar-stat">
-                  <strong>${porcentaje}%</strong>
-                  <span>Progreso total</span>
+                  <strong>${porcentaje}%</strong><span>Progreso total</span>
                 </div>
                 <div class="sidebar-stat">
-                  <strong>${mediaLocal}</strong>
-                  <span>Nota media</span>
+                  <strong>${mediaLocal}</strong><span>Nota media</span>
                 </div>
               </div>
             </section>
-
           </aside>
         </div>
       </div>
 
-      <!-- ROW 3: Study Insights + Study Heatmap -->
-      <div class="dash-row">
-        <section class="study-insights">
-          <div class="study-insights__header">
-            <div>
-              <span class="section-badge">Analytics</span>
-              <h2>Tu rendimiento de un vistazo</h2>
-            </div>
-            <button class="btn secundario">Ver estadísticas</button>
-          </div>
+      <!-- ROW 4: "Más información" — visually secondary, always visible -->
+      <div class="dashboard-collapsible">
+        <h2>Más información</h2>
 
-          <div class="insights-grid">
-            <article class="insight-card insight-card--large">
-              <div class="insight-card__top">
-                <span>Constancia</span>
-                <strong>${porcentaje > 0 ? porcentaje + "%" : "—"}</strong>
-              </div>
-              <div class="streak-chart">
-                <div class="bar" style="height:42%"></div>
-                <div class="bar" style="height:65%"></div>
-                <div class="bar" style="height:58%"></div>
-                <div class="bar" style="height:90%"></div>
-                <div class="bar" style="height:76%"></div>
-                <div class="bar active" style="height:100%"></div>
-                <div class="bar" style="height:82%"></div>
-              </div>
-              <p>Sigue avanzando en tus módulos para mejorar tu constancia de estudio.</p>
-            </article>
-
-            <article class="insight-card">
-              <span class="insight-title">Módulos completados</span>
-              <strong class="insight-value">${completados}</strong>
-              <small>de ${modulos.length} en total</small>
-            </article>
-
-            <article class="insight-card">
-              <span class="insight-title">Nota media</span>
-              <strong class="insight-value">${mediaLocal}</strong>
-              <small>en módulos completados</small>
-            </article>
-
-            <article class="insight-card">
-              <span class="insight-title">Progreso global</span>
-              <strong class="insight-value">${porcentaje}%</strong>
-              <small>${porcentaje < 50 ? "Sigue así, vas bien" : porcentaje < 80 ? "Excelente progreso" : "¡Casi en la meta!"}</small>
-            </article>
-
-            <article class="insight-card">
-              <span class="insight-title">Próximo objetivo</span>
-              <strong class="insight-value">${proxMod ? "Módulo " + String(proxMod.id).padStart(2,"0") : "¡Completado!"}</strong>
-              <small>${proxMod ? proxMod.titulo : "Curso terminado 🎉"}</small>
-            </article>
-          </div>
-        </section>
-
-        <section class="study-heatmap">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Constancia</span>
-              <h2>Actividad de estudio</h2>
-            </div>
-            <span style="color:rgba(255,255,255,.45);font-size:.9rem">Últimos 90 días</span>
-          </div>
-          <div class="heatmap">
-            ${Array.from({length: 90}, (_, i) => {
-              const level = i < completados * 3 ? Math.min(4, Math.ceil((i % 4) + 1)) : (i % 7 === 0 ? 1 : 0);
-              return `<div class="heat level${level}"></div>`;
-            }).join("")}
-          </div>
-        </section>
-      </div>
-
-      <!-- ROW 4: Study Planner + Activity Feed -->
-      <div class="dash-row">
-        <section class="study-planner">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Planner</span>
-              <h2>Plan de estudio de hoy</h2>
-            </div>
-            <a class="btn secundario" href="#/calendario">Ver planificación</a>
-          </div>
-          <div class="planner-list">
-            ${modulos.filter(m => !PROGRESO[m.id]).slice(0, 3).map((mod, i) => {
-              const horas = ["09:30", "11:00", "17:00"][i] || "19:00";
-              const iconos = ["circle-check-big", "book-open-check", "pen-tool"];
-              return `
-            <article class="planner-item">
-              <i data-lucide="${iconos[i] || "circle-check-big"}"></i>
+        <div class="dash-row">
+          <section class="study-insights">
+            <div class="study-insights__header">
               <div>
-                <strong>${mod.titulo}</strong>
-                <span>${horas} · ${mod.minutos} min</span>
+                <span class="section-badge">Analytics</span>
+                <h2>Tu rendimiento de un vistazo</h2>
               </div>
-            </article>`;
-            }).join("") || `
-            <article class="planner-item" style="opacity:.55">
-              <i data-lucide="circle-check-big"></i>
-              <div><strong>Sin tareas pendientes</strong><span>¡Has completado todos los módulos!</span></div>
-            </article>`}
-          </div>
-        </section>
-
-        <section class="activity-feed">
-          <div class="activity-feed__header">
-            <div>
-              <span class="section-badge">Actividad reciente</span>
-              <h2>Todo lo que has conseguido</h2>
+              <button class="btn secundario">Ver estadísticas</button>
             </div>
-            <button class="btn secundario">Ver historial</button>
-          </div>
-
-          <div class="timeline">
-            ${completados > 0 ? `
-            <article class="timeline-item">
-              <div class="timeline-item__icon">✓</div>
-              <div class="timeline-item__content">
-                <div class="timeline-item__top">
-                  <h3>Módulo completado</h3>
-                  <span>Reciente</span>
+            <div class="insights-grid">
+              <article class="insight-card insight-card--large">
+                <div class="insight-card__top">
+                  <span>Constancia</span>
+                  <strong>${porcentaje > 0 ? porcentaje + "%" : "—"}</strong>
                 </div>
-                <p>Has terminado <strong>${modulos.filter(m => PROGRESO[m.id]).slice(-1)[0]?.titulo || "un módulo"}</strong>.</p>
-                <div class="timeline-tags"><span>+XP</span><span>${CURSO_ACTIVO}</span></div>
-              </div>
-            </article>
-            ` : ""}
-            <article class="timeline-item">
-              <div class="timeline-item__icon">📈</div>
-              <div class="timeline-item__content">
-                <div class="timeline-item__top">
-                  <h3>Tu progreso actual</h3>
-                  <span>Hoy</span>
+                <div class="streak-chart">
+                  <div class="bar" style="height:42%"></div>
+                  <div class="bar" style="height:65%"></div>
+                  <div class="bar" style="height:58%"></div>
+                  <div class="bar" style="height:90%"></div>
+                  <div class="bar" style="height:76%"></div>
+                  <div class="bar active" style="height:100%"></div>
+                  <div class="bar" style="height:82%"></div>
                 </div>
-                <p>Llevas <strong>${completados} de ${modulos.length} módulos</strong> con nota media <strong>${mediaLocal}</strong>.</p>
-                <div class="timeline-tags"><span>Estadísticas</span><span>${porcentaje}%</span></div>
+                <p>Sigue avanzando en tus módulos para mejorar tu constancia de estudio.</p>
+              </article>
+              <article class="insight-card">
+                <span class="insight-title">Módulos completados</span>
+                <strong class="insight-value">${completados}</strong>
+                <small>de ${modulos.length} en total</small>
+              </article>
+              <article class="insight-card">
+                <span class="insight-title">Nota media</span>
+                <strong class="insight-value">${mediaLocal}</strong>
+                <small>en módulos completados</small>
+              </article>
+              <article class="insight-card">
+                <span class="insight-title">Progreso global</span>
+                <strong class="insight-value">${porcentaje}%</strong>
+                <small>${porcentaje < 50 ? "Sigue así, vas bien" : porcentaje < 80 ? "Excelente progreso" : "¡Casi en la meta!"}</small>
+              </article>
+              <article class="insight-card">
+                <span class="insight-title">Próximo objetivo</span>
+                <strong class="insight-value">${proxMod ? "Módulo " + String(proxMod.id).padStart(2,"0") : "¡Completado!"}</strong>
+                <small>${proxMod ? proxMod.titulo : "Curso terminado 🎉"}</small>
+              </article>
+            </div>
+          </section>
+
+          <section class="study-heatmap">
+            <div class="section-header">
+              <div>
+                <span class="section-badge">Constancia</span>
+                <h2>Actividad de estudio</h2>
               </div>
-            </article>
-            <article class="timeline-item">
-              <div class="timeline-item__icon">🏆</div>
-              <div class="timeline-item__content">
-                <div class="timeline-item__top">
-                  <h3>Objetivo: Matura</h3>
-                  <span>En curso</span>
-                </div>
-                <p>${proxMod ? `Próximo: <strong>${proxMod.titulo}</strong>` : "¡Has completado todos los módulos!"}</p>
-                <div class="timeline-tags"><span>Ruta</span><span>${proxMod ? "Pendiente" : "Completado ✓"}</span></div>
-              </div>
-            </article>
-          </div>
-        </section>
-      </div>
-
-      <!-- ROW 5: Achievements + Weekly Goals -->
-      <div class="dash-row">
-        <section class="achievements">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Logros</span>
-              <h2>Últimos desbloqueos</h2>
+              <span style="color:rgba(255,255,255,.45);font-size:.9rem">Últimos 90 días</span>
             </div>
-          </div>
-          <div class="achievements-grid">
-            <article class="achievement${completados >= 1 ? "" : " achievement--locked"}">
-              <div class="achievement__emoji">${completados >= 1 ? "🔥" : "🔒"}</div>
-              <h3>Primera lección</h3>
-              <p>${completados >= 1 ? "Desbloqueado" : "Completa 1 módulo"}</p>
-            </article>
-            <article class="achievement${completados >= 3 ? "" : " achievement--locked"}">
-              <div class="achievement__emoji">${completados >= 3 ? "🧠" : "🔒"}</div>
-              <h3>3 módulos</h3>
-              <p>${completados >= 3 ? "Desbloqueado" : "Completa 3 módulos"}</p>
-            </article>
-            <article class="achievement${porcentaje >= 50 ? "" : " achievement--locked"}">
-              <div class="achievement__emoji">${porcentaje >= 50 ? "🏆" : "🔒"}</div>
-              <h3>Mitad del camino</h3>
-              <p>${porcentaje >= 50 ? "Desbloqueado" : "Llega al 50%"}</p>
-            </article>
-            <article class="achievement${porcentaje >= 100 ? "" : " achievement--locked"}">
-              <div class="achievement__emoji">${porcentaje >= 100 ? "⚡" : "🔒"}</div>
-              <h3>Curso completo</h3>
-              <p>${porcentaje >= 100 ? "¡Enhorabuena!" : "Completa el curso"}</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="weekly-goals-section">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Objetivos</span>
-              <h2>Objetivos de esta semana</h2>
+            <div class="heatmap">
+              ${Array.from({length: 90}, (_, i) => {
+                const level = i < completados * 3 ? Math.min(4, Math.ceil((i % 4) + 1)) : (i % 7 === 0 ? 1 : 0);
+                return `<div class="heat level${level}"></div>`;
+              }).join("")}
             </div>
-            <span class="section-progress">${completados} / ${modulos.length}</span>
-          </div>
-          <div class="goals-grid">
-            <article class="goal-card${completados >= 1 ? " completed" : completados === 0 ? "" : " active"}">
-              <div class="goal-card__icon">${completados >= 1 ? "✓" : "📖"}</div>
-              <h3>Completar 1 lección</h3>
-              <p>${completados} / 1</p>
-            </article>
-            <article class="goal-card${completados >= 3 ? " completed" : completados > 0 ? " active" : ""}">
-              <div class="goal-card__icon">${completados >= 3 ? "✓" : "📚"}</div>
-              <h3>Completar 3 módulos</h3>
-              <p>${completados} / 3</p>
-            </article>
-            <article class="goal-card${porcentaje >= 50 ? " completed" : porcentaje > 0 ? " active" : ""}">
-              <div class="goal-card__icon">${porcentaje >= 50 ? "✓" : "🎯"}</div>
-              <h3>Llegar al 50%</h3>
-              <p>${porcentaje}% / 50%</p>
-            </article>
-            <article class="goal-card${porcentaje >= 100 ? " completed" : ""}">
-              <div class="goal-card__icon">${porcentaje >= 100 ? "✓" : "⭐"}</div>
-              <h3>Completar el curso</h3>
-              <p>${completados} / ${modulos.length} módulos</p>
-            </article>
-          </div>
-        </section>
-      </div>
-
-      <!-- MATURA AI -->
-      <section class="matura-ai">
-        <div class="matura-ai__background"></div>
-
-        <div class="matura-ai__content">
-          <div class="matura-ai__badge">✨ Matura AI</div>
-          <h2>Tu profesor personal, disponible las 24 horas.</h2>
-          <p>Haz preguntas sobre cualquier asignatura, genera resúmenes, crea ejercicios personalizados, resuelve dudas paso a paso y prepara tus exámenes con ayuda de inteligencia artificial.</p>
-          <div class="matura-ai__features">
-            <div class="ai-feature">
-              <span>🧠</span>
-              <div><strong>Explicaciones inteligentes</strong><p>Adaptadas a tu nivel.</p></div>
-            </div>
-            <div class="ai-feature">
-              <span>📝</span>
-              <div><strong>Ejercicios automáticos</strong><p>Generados al instante.</p></div>
-            </div>
-            <div class="ai-feature">
-              <span>📚</span>
-              <div><strong>Resúmenes</strong><p>De cualquier tema.</p></div>
-            </div>
-            <div class="ai-feature">
-              <span>🎯</span>
-              <div><strong>Preparación Matura</strong><p>Orientada al examen.</p></div>
-            </div>
-          </div>
-          <div class="matura-ai__actions">
-            <button class="btn" disabled style="opacity:.55;cursor:not-allowed">Abrir Matura AI</button>
-            <button class="btn secundario" disabled style="opacity:.55;cursor:not-allowed">Ver ejemplos</button>
-          </div>
+          </section>
         </div>
 
-        <div class="matura-ai__visual">
-          <div class="ai-orb"></div>
-          <div class="floating-card floating-card--1">💡 Explicación generada</div>
-          <div class="floating-card floating-card--2">✅ Ejercicio corregido</div>
-          <div class="floating-card floating-card--3">📄 Resumen listo</div>
-        </div>
-      </section>
+        <div class="dash-row section-spacing">
+          <section class="study-planner">
+            <div class="section-header">
+              <div>
+                <span class="section-badge">Planner</span>
+                <h2>Plan de estudio de hoy</h2>
+              </div>
+              <a class="btn secundario" href="#/calendario">Ver planificación</a>
+            </div>
+            <div class="planner-list">
+              ${modulos.filter(m => !PROGRESO[m.id]).slice(0, 3).map((mod, i) => {
+                const horas = ["09:30", "11:00", "17:00"][i] || "19:00";
+                const iconos = ["circle-check-big", "book-open-check", "pen-tool"];
+                return `
+              <article class="planner-item">
+                <i data-lucide="${iconos[i] || "circle-check-big"}"></i>
+                <div>
+                  <strong>${mod.titulo}</strong>
+                  <span>${horas} · ${mod.minutos} min</span>
+                </div>
+              </article>`;
+              }).join("") || `
+              <article class="planner-item" style="opacity:.55">
+                <i data-lucide="circle-check-big"></i>
+                <div><strong>Sin tareas pendientes</strong><span>¡Has completado todos los módulos!</span></div>
+              </article>`}
+            </div>
+          </section>
 
-      <!-- LEARNING JOURNEY -->
-      <section class="learning-journey">
+          <section class="activity-feed">
+            <div class="activity-feed__header">
+              <div>
+                <span class="section-badge">Actividad reciente</span>
+                <h2>Todo lo que has conseguido</h2>
+              </div>
+              <button class="btn secundario">Ver historial</button>
+            </div>
+            <div class="timeline">
+              ${completados > 0 ? `
+              <article class="timeline-item">
+                <div class="timeline-item__icon">✓</div>
+                <div class="timeline-item__content">
+                  <div class="timeline-item__top"><h3>Módulo completado</h3><span>Reciente</span></div>
+                  <p>Has terminado <strong>${modulos.filter(m => PROGRESO[m.id]).slice(-1)[0]?.titulo || "un módulo"}</strong>.</p>
+                  <div class="timeline-tags"><span>+XP</span><span>${CURSO_ACTIVO}</span></div>
+                </div>
+              </article>
+              ` : ""}
+              <article class="timeline-item">
+                <div class="timeline-item__icon">📈</div>
+                <div class="timeline-item__content">
+                  <div class="timeline-item__top"><h3>Tu progreso actual</h3><span>Hoy</span></div>
+                  <p>Llevas <strong>${completados} de ${modulos.length} módulos</strong> con nota media <strong>${mediaLocal}</strong>.</p>
+                  <div class="timeline-tags"><span>Estadísticas</span><span>${porcentaje}%</span></div>
+                </div>
+              </article>
+              <article class="timeline-item">
+                <div class="timeline-item__icon">🏆</div>
+                <div class="timeline-item__content">
+                  <div class="timeline-item__top"><h3>Objetivo: Matura</h3><span>En curso</span></div>
+                  <p>${proxMod ? `Próximo: <strong>${proxMod.titulo}</strong>` : "¡Has completado todos los módulos!"}</p>
+                  <div class="timeline-tags"><span>Ruta</span><span>${proxMod ? "Pendiente" : "Completado ✓"}</span></div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <section class="exam-center section-spacing">
+          <div class="exam-center__header">
+            <div>
+              <span class="section-badge">Exámenes</span>
+              <h2>Centro de preparación</h2>
+              <p>Todo lo relacionado con tus próximos exámenes en un único lugar.</p>
+            </div>
+            <a href="#/calendario" class="btn secundario">Ver calendario</a>
+          </div>
+          <div class="exam-grid">
+            <article class="next-exam">
+              <div class="next-exam__badge">Próximo examen</div>
+              <h3>${cursoActualObj?.titulo || CURSO_ACTIVO}</h3>
+              <p>${modulos.slice(0,3).map(m => m.titulo).join(" • ")}</p>
+              <div class="countdown">
+                <div class="countdown-item"><strong>—</strong><span>Días</span></div>
+                <div class="countdown-item"><strong>—</strong><span>Horas</span></div>
+                <div class="countdown-item"><strong>—</strong><span>Min</span></div>
+              </div>
+              ${proxMod
+                ? `<a href="#/modulo/${proxMod.id}" class="btn">Empezar simulacro</a>`
+                : `<span class="btn" style="opacity:.55;cursor:default">Curso completado ✓</span>`}
+            </article>
+            <div class="exam-list">
+              ${modulos.slice(0, 4).map(mod => {
+                const hecho = PROGRESO[mod.id];
+                const pct = hecho ? Math.round((hecho.nota / hecho.total) * 100) : 0;
+                const scoreClass = pct >= 80 ? "score-good" : pct >= 50 ? "score-medium" : "score-low";
+                const label = pct >= 80 ? "Preparación alta" : pct >= 50 ? "Necesita repaso" : hecho ? "Revisar" : "Sin empezar";
+                return `
+                <article class="exam-item">
+                  <div class="exam-item__left">
+                    <div class="exam-icon">${ICONOS_MODULO[mod.id] || "📘"}</div>
+                    <div>
+                      <strong>${mod.titulo}</strong>
+                      <span>${label}</span>
+                    </div>
+                  </div>
+                  <div class="exam-score ${hecho ? scoreClass : "score-low"}">${hecho ? pct + "%" : "0%"}</div>
+                </article>`;
+              }).join("")}
+            </div>
+          </div>
+        </section>
+
+        <div class="dash-row section-spacing">
+          <section class="ai-recommendations">
+            <div class="section-header">
+              <div>
+                <span class="section-badge">Matura AI</span>
+                <h2>Recomendaciones inteligentes</h2>
+              </div>
+            </div>
+            <div class="recommendation-list">
+              ${completados > 0 ? `
+              <article class="recommendation-card">
+                <i data-lucide="brain"></i>
+                <div>
+                  <strong>Sigue con el ritmo</strong>
+                  <p>Llevas ${completados} módulo${completados !== 1 ? "s" : ""} completado${completados !== 1 ? "s" : ""}. ¡Sigue así!</p>
+                </div>
+              </article>` : `
+              <article class="recommendation-card">
+                <i data-lucide="brain"></i>
+                <div>
+                  <strong>Empieza hoy</strong>
+                  <p>Aún no has completado ningún módulo. El primer paso es el más importante.</p>
+                </div>
+              </article>`}
+              ${proxMod ? `
+              <article class="recommendation-card">
+                <i data-lucide="triangle-alert"></i>
+                <div>
+                  <strong>Próximo módulo pendiente</strong>
+                  <p>${proxMod.titulo} — ${proxMod.minutos} min estimados.</p>
+                </div>
+              </article>` : ""}
+              <article class="recommendation-card">
+                <i data-lucide="sparkles"></i>
+                <div>
+                  <strong>Buen momento para practicar</strong>
+                  <p>Repasa el glosario para afianzar los conceptos que ya has estudiado.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="weekly-goals-section">
+            <div class="section-header">
+              <div>
+                <span class="section-badge">Objetivos</span>
+                <h2>Objetivos de esta semana</h2>
+              </div>
+              <span class="section-progress">${completados} / ${modulos.length}</span>
+            </div>
+            <div class="goals-grid">
+              <article class="goal-card${completados >= 1 ? " completed" : completados === 0 ? "" : " active"}">
+                <div class="goal-card__icon">${completados >= 1 ? "✓" : "📖"}</div>
+                <h3>Completar 1 lección</h3>
+                <p>${completados} / 1</p>
+              </article>
+              <article class="goal-card${completados >= 3 ? " completed" : completados > 0 ? " active" : ""}">
+                <div class="goal-card__icon">${completados >= 3 ? "✓" : "📚"}</div>
+                <h3>Completar 3 módulos</h3>
+                <p>${completados} / 3</p>
+              </article>
+              <article class="goal-card${porcentaje >= 50 ? " completed" : porcentaje > 0 ? " active" : ""}">
+                <div class="goal-card__icon">${porcentaje >= 50 ? "✓" : "🎯"}</div>
+                <h3>Llegar al 50%</h3>
+                <p>${porcentaje}% / 50%</p>
+              </article>
+              <article class="goal-card${porcentaje >= 100 ? " completed" : ""}">
+                <div class="goal-card__icon">${porcentaje >= 100 ? "✓" : "⭐"}</div>
+                <h3>Completar el curso</h3>
+                <p>${completados} / ${modulos.length} módulos</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ROW 5: Learning Journey (roadmap, reduced) -->
+      <section class="learning-journey section-spacing">
         <div class="learning-journey__header">
           <div>
             <span class="section-badge">Tu progreso</span>
             <h2>Continúa tu camino hacia la Matura</h2>
-            <p>Cada asignatura forma parte de una ruta de aprendizaje conectada. Avanza, desbloquea nuevos contenidos y mantén una visión global de tu progreso.</p>
           </div>
-          <button class="btn secundario">Ver roadmap completo</button>
+          <button class="btn secundario">Ver roadmap</button>
         </div>
-
         <div class="journey">
           <div class="journey-step journey-step--${completados > 0 ? 'completed' : 'active'}">
             <div class="journey-step__circle">${completados > 0 ? '✓' : '1'}</div>
             <div class="journey-step__content">
-              <span>FASE 1</span>
-              <h3>Fundamentos</h3>
-              <p>Conceptos básicos dominados.</p>
+              <span>FASE 1</span><h3>Fundamentos</h3><p>Conceptos básicos dominados.</p>
             </div>
           </div>
           <div class="journey-line"></div>
           <div class="journey-step${completados > 0 && porcentaje < 100 ? ' journey-step--active' : completados === 0 ? '' : ' journey-step--completed'}">
             <div class="journey-step__circle">${completados > 0 && porcentaje < 100 ? '2' : completados === 0 ? '2' : '✓'}</div>
             <div class="journey-step__content">
-              <span>FASE 2</span>
-              <h3>Consolidación</h3>
-              <p>Resolviendo ejercicios y problemas.</p>
+              <span>FASE 2</span><h3>Consolidación</h3><p>Resolviendo ejercicios y problemas.</p>
             </div>
           </div>
           <div class="journey-line"></div>
           <div class="journey-step${porcentaje >= 75 ? ' journey-step--active' : ''}">
             <div class="journey-step__circle">3</div>
             <div class="journey-step__content">
-              <span>FASE 3</span>
-              <h3>Simulacros</h3>
-              <p>Preparación intensiva para el examen.</p>
+              <span>FASE 3</span><h3>Simulacros</h3><p>Preparación intensiva.</p>
             </div>
           </div>
           <div class="journey-line"></div>
           <div class="journey-step${porcentaje >= 100 ? ' journey-step--completed' : ''}">
             <div class="journey-step__circle">${porcentaje >= 100 ? '✓' : '🏆'}</div>
             <div class="journey-step__content">
-              <span>META</span>
-              <h3>Matura</h3>
-              <p>Objetivo final desbloqueado.</p>
+              <span>META</span><h3>Matura</h3><p>Objetivo final desbloqueado.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ROW 6: Recent Notes + Pinned Resources -->
-      <div class="dash-row">
-        <section class="recent-notes">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Notas</span>
-              <h2>Últimos apuntes</h2>
-            </div>
+      <!-- ROW 6: Biblioteca — Notas + Recursos + Logros (4-col compact grid) -->
+      <div class="dashboard-section">
+        <div class="biblioteca-header">
+          <div>
+            <span class="section-badge">Biblioteca</span>
+            <h2>Notas, recursos y logros</h2>
           </div>
-          <div class="notes-grid">
-            ${modulos.slice(0, 3).map((mod, i) => {
-              const lucideIcon = ["file-text", "file-pen-line", "notebook-tabs"][i];
-              const tiempo = ["hace 12 minutos", "ayer", "última revisión"][i];
-              return `
-            <article class="note-card">
-              <i data-lucide="${lucideIcon}"></i>
-              <strong>${mod.titulo}</strong>
-              <p>${tiempo}</p>
-            </article>`;
-            }).join("")}
-          </div>
-        </section>
-
-        <section class="pinned-resources">
-          <div class="section-header">
-            <div>
-              <span class="section-badge">Recursos</span>
-              <h2>Fijados</h2>
-            </div>
-          </div>
-          <div class="resources-grid">
-            <article class="resource-card">
-              <i data-lucide="link"></i>
-              <strong>Formularios del curso</strong>
-            </article>
-            <article class="resource-card">
-              <i data-lucide="folder-open"></i>
-              <strong>${cursoActualObj ? cursoActualObj.titulo : "Material del curso"}</strong>
-            </article>
-            <article class="resource-card">
-              <i data-lucide="bookmark"></i>
-              <strong>Módulos guardados</strong>
-            </article>
-            <article class="resource-card">
-              <i data-lucide="library"></i>
-              <strong>Biblioteca</strong>
-            </article>
-          </div>
-        </section>
+        </div>
+        <div class="dashboard-library">
+          ${modulos.slice(0, 3).map((mod, i) => {
+            const lucideIcon = ["file-text", "file-pen-line", "notebook-tabs"][i];
+            const tiempo = ["hace 12 minutos", "ayer", "última revisión"][i];
+            return `
+          <article class="note-card">
+            <i data-lucide="${lucideIcon}"></i>
+            <strong>${mod.titulo}</strong>
+            <p>${tiempo}</p>
+          </article>`;
+          }).join("")}
+          <article class="resource-card"><i data-lucide="link"></i><strong>Formularios del curso</strong></article>
+          <article class="resource-card"><i data-lucide="folder-open"></i><strong>${cursoActualObj ? cursoActualObj.titulo : "Material del curso"}</strong></article>
+          <article class="resource-card"><i data-lucide="bookmark"></i><strong>Módulos guardados</strong></article>
+          <article class="resource-card"><i data-lucide="library"></i><strong>Biblioteca</strong></article>
+          <article class="achievement${completados >= 1 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${completados >= 1 ? "🔥" : "🔒"}</div>
+            <h3>Primera lección</h3>
+            <p>${completados >= 1 ? "Desbloqueado" : "Completa 1 módulo"}</p>
+          </article>
+          <article class="achievement${completados >= 3 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${completados >= 3 ? "🧠" : "🔒"}</div>
+            <h3>3 módulos</h3>
+            <p>${completados >= 3 ? "Desbloqueado" : "Completa 3 módulos"}</p>
+          </article>
+          <article class="achievement${porcentaje >= 50 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${porcentaje >= 50 ? "🏆" : "🔒"}</div>
+            <h3>Mitad del camino</h3>
+            <p>${porcentaje >= 50 ? "Desbloqueado" : "Llega al 50%"}</p>
+          </article>
+          <article class="achievement${porcentaje >= 100 ? "" : " achievement--locked"}">
+            <div class="achievement__emoji">${porcentaje >= 100 ? "⚡" : "🔒"}</div>
+            <h3>Curso completo</h3>
+            <p>${porcentaje >= 100 ? "¡Enhorabuena!" : "Completa el curso"}</p>
+          </article>
+        </div>
       </div>
 
     </div>
