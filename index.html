@@ -69,6 +69,30 @@
   <!-- Aquí el "profesor" (app.js) pinta la pantalla que toque -->
   <main id="app"></main>
 
+  <!-- ======================================================
+       FOCUS MODE — overlay global, siempre en el DOM
+  ====================================================== -->
+  <div class="focus-mode" id="focusMode" aria-modal="true" role="dialog" aria-hidden="true">
+    <div class="focus-overlay" id="focusOverlay"></div>
+    <div class="focus-container">
+      <div class="focus-header">
+        <div>
+          <span class="section-badge">Focus Mode</span>
+          <h1 id="focusModeTitle">Sesión de estudio</h1>
+        </div>
+        <div class="focus-actions">
+          <button class="btn secundario" id="focusModeClose">Salir del focus</button>
+        </div>
+      </div>
+      <div class="focus-content" id="focusModeContent">
+        <div class="focus-card">
+          <h2>Continúa exactamente donde lo dejaste.</h2>
+          <p>Cuando este modo esté conectado con la lógica, aquí aparecerá automáticamente la lección, el vídeo o el ejercicio correspondiente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <span id="texto-footer">Plataforma creada por Daniel · Tailor Hub · Basada en investigación con 29 fuentes académicas</span>
   </footer>
@@ -102,5 +126,6 @@
   <script src="command-palette.js"></script>
   <script src="ux-components.js"></script>
   <script src="animations.js"></script>
+  <script src="focus-mode.js"></script>
 </body>
 </html>

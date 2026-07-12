@@ -4309,3 +4309,101 @@ input:focus {
 html {
   scroll-behavior: smooth;
 }
+
+/* ==========================================================
+   FOCUS MODE
+========================================================== */
+
+.focus-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s ease, visibility .35s ease;
+}
+
+.focus-mode--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.focus-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.focus-container {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px;
+  transform: translateY(28px) scale(.97);
+  transition: transform .4s cubic-bezier(.22,1,.36,1);
+}
+
+.focus-mode--open .focus-container {
+  transform: translateY(0) scale(1);
+}
+
+.focus-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.focus-header h1 {
+  margin: 10px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.focus-actions {
+  flex-shrink: 0;
+  padding-top: 6px;
+}
+
+.focus-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.focus-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 16px);
+  padding: 36px 40px;
+}
+
+.focus-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.focus-card p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .focus-header { flex-direction: column; }
+  .focus-card   { padding: 24px; }
+}
