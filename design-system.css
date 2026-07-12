@@ -74,7 +74,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: all var(--transition);
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
 }
 
 .m-card:hover {
@@ -113,7 +113,7 @@
   font-weight: 600;
   white-space: nowrap;
   text-decoration: none;
-  transition: all var(--transition);
+  transition: background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
 .m-button {
@@ -229,7 +229,7 @@
   font-family: inherit;
   font-size: 14px;
   outline: none;
-  transition: all var(--transition);
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
   -webkit-appearance: none;
 }
 
