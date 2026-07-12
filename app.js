@@ -960,6 +960,40 @@ function pintarInicio() {
       </div>
 
 
+      <!-- QUICK ACTIONS -->
+      <section class="quick-actions">
+        <div class="quick-actions-header">
+          <div>
+            <span class="section-badge">Accesos rápidos</span>
+            <h2>Empieza en segundos</h2>
+          </div>
+        </div>
+        <div class="quick-actions-grid">
+          ${proxMod
+            ? `<button class="quick-action-card" onclick="location.hash='#/modulo/${proxMod.id}'">
+              <i data-lucide="play-circle"></i>
+              <div><h3>Continuar</h3><p>Retoma tu último módulo.</p></div>
+            </button>`
+            : `<button class="quick-action-card" style="opacity:.5;cursor:default">
+              <i data-lucide="play-circle"></i>
+              <div><h3>Continuar</h3><p>Curso completado ✓</p></div>
+            </button>`}
+          <button class="quick-action-card" disabled style="opacity:.5;cursor:not-allowed">
+            <i data-lucide="brain"></i>
+            <div><h3>Matura AI</h3><p>Pregunta cualquier duda.</p></div>
+          </button>
+          <button class="quick-action-card" onclick="location.hash='#/calendario'">
+            <i data-lucide="calendar-days"></i>
+            <div><h3>Exámenes</h3><p>Consulta el calendario.</p></div>
+          </button>
+          <button class="quick-action-card" onclick="document.querySelector('.command-bar__search')?.focus()">
+            <i data-lucide="search"></i>
+            <div><h3>Buscar</h3><p>Encuentra cualquier tema.</p></div>
+          </button>
+        </div>
+      </section>
+
+
       <!-- ROW 1: Continue Learning (2fr) + Quick Stats (1fr) -->
       <div class="dashboard-grid-main">
         ${proxMod ? `
