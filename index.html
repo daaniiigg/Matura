@@ -70,6 +70,46 @@
   <main id="app"></main>
 
   <!-- ======================================================
+       COMMAND CENTER — Ctrl/Cmd+K
+  ====================================================== -->
+  <div class="command-center" id="commandCenter" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="command-backdrop"></div>
+    <div class="command-window">
+      <div class="command-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Buscar módulos, apuntes, IA, exámenes..." autocomplete="off" spellcheck="false">
+        <span class="command-shortcut">ESC</span>
+      </div>
+      <div class="command-results">
+        <div class="command-group">
+          <span class="command-title">Acciones rápidas</span>
+          <button class="command-item" data-action="ai">
+            <i data-lucide="brain"></i><div><strong>Abrir Matura AI</strong><small>Iniciar una conversación</small></div>
+          </button>
+          <button class="command-item" data-action="continue">
+            <i data-lucide="play-circle"></i><div><strong>Continuar estudiando</strong><small>Retoma tu último módulo</small></div>
+          </button>
+          <button class="command-item" data-action="exams">
+            <i data-lucide="calendar-days"></i><div><strong>Ver exámenes</strong><small>Consulta el calendario</small></div>
+          </button>
+          <button class="command-item" data-action="ranking">
+            <i data-lucide="star"></i><div><strong>Ranking</strong><small>Compara tu progreso</small></div>
+          </button>
+        </div>
+        <div class="command-group">
+          <span class="command-title">Navegar</span>
+          <button class="command-item" data-action="progress">
+            <i data-lucide="graduation-cap"></i><div><strong>Mi progreso</strong><small>Estadísticas y notas</small></div>
+          </button>
+          <button class="command-item" data-action="glossary">
+            <i data-lucide="layers"></i><div><strong>Biblioteca</strong><small>Glosario y recursos</small></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
        FOCUS MODE — overlay global, siempre en el DOM
   ====================================================== -->
   <div class="focus-mode" id="focusMode" aria-modal="true" role="dialog" aria-hidden="true">
