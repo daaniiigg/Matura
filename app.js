@@ -1201,6 +1201,70 @@ function pintarInicio() {
               </div>
             </section>
           </aside>
+
+            <!-- CONTEXTUAL AI PANEL -->
+            <aside class="ai-context-panel" id="aiContextPanel">
+              <div class="ai-context-header">
+                <div>
+                  <span class="section-badge">Matura AI</span>
+                  <h2>Asistente contextual</h2>
+                </div>
+                <span class="ai-status">
+                  <span class="status-dot"></span>
+                  Contexto activo
+                </span>
+              </div>
+
+              <div class="ai-context-body">
+                <article class="ai-context-card">
+                  <i data-lucide="book-open"></i>
+                  <div>
+                    <strong>Módulo actual</strong>
+                    <p>${proxMod ? `${cursoActualObj ? cursoActualObj.titulo : CURSO_ACTIVO} · ${proxMod.titulo}` : "Curso completado ✓"}</p>
+                  </div>
+                </article>
+                <article class="ai-context-card">
+                  <i data-lucide="target"></i>
+                  <div>
+                    <strong>Progreso</strong>
+                    <p>${completados} de ${modulos.length} módulos · ${porcentaje}%</p>
+                  </div>
+                </article>
+                <article class="ai-context-card">
+                  <i data-lucide="calendar-clock"></i>
+                  <div>
+                    <strong>Próximo examen</strong>
+                    <p>Sin fecha configurada</p>
+                  </div>
+                </article>
+                <article class="ai-context-card">
+                  <i data-lucide="triangle-alert"></i>
+                  <div>
+                    <strong>Recomendación</strong>
+                    <p>${porcentaje < 30 ? "Empieza con el primer módulo pendiente." : porcentaje < 70 ? "Mantén el ritmo diario de estudio." : "Repasa antes del examen final."}</p>
+                  </div>
+                </article>
+              </div>
+
+              <div class="ai-suggestions">
+                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
+                  <i data-lucide="sparkles"></i>
+                  Generar plan de hoy
+                </button>
+                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
+                  <i data-lucide="brain"></i>
+                  Explicar este tema
+                </button>
+                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
+                  <i data-lucide="file-text"></i>
+                  Crear resumen
+                </button>
+                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
+                  <i data-lucide="graduation-cap"></i>
+                  Generar examen
+                </button>
+              </div>
+            </aside>
         </div>
       </div>
 
