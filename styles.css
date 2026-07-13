@@ -4755,12 +4755,126 @@ body.study-mode #app {
   white-space: nowrap;
 }
 
+/* --- Study Header: Badge + Focus --- */
+
+.study-header__badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: background .2s, color .2s;
+}
+.study-header__badge--aprender {
+  background: rgba(124, 111, 247, 0.14);
+  color: rgba(160, 148, 255, 0.9);
+  border: 1px solid rgba(124, 111, 247, 0.25);
+}
+.study-header__badge--reforzar {
+  background: rgba(251, 189, 35, 0.1);
+  color: rgba(251, 189, 35, 0.8);
+  border: 1px solid rgba(251, 189, 35, 0.2);
+}
+
+.study-header__focus {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.study-header__focus:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.study-header__focus--active {
+  background: rgba(124, 111, 247, 0.14);
+  color: rgba(160, 148, 255, 0.9);
+  border-color: rgba(124, 111, 247, 0.3);
+}
+.study-header__focus svg { width: 14px; height: 14px; }
+
+/* --- Session Stages Bar --- */
+
+.study-stages {
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 36px;
+  padding: 0 28px;
+  background: rgba(15, 17, 23, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.sh-stage {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sh-stage__line {
+  width: 48px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0 0 7px;
+  transition: background .3s;
+}
+
+.sh-stage__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  transition: background .3s, box-shadow .3s;
+}
+
+.sh-stage__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: rgba(255, 255, 255, 0.22);
+  white-space: nowrap;
+  transition: color .3s;
+}
+
+.sh-stage--active .sh-stage__dot {
+  background: #8b7cf8;
+  box-shadow: 0 0 0 3px rgba(139, 124, 248, 0.2);
+}
+.sh-stage--active .sh-stage__label { color: rgba(255, 255, 255, 0.85); }
+.sh-stage--active .sh-stage__line  { background: rgba(139, 124, 248, 0.35); }
+
+.sh-stage--done .sh-stage__dot   { background: rgba(139, 124, 248, 0.5); }
+.sh-stage--done .sh-stage__label { color: rgba(139, 124, 248, 0.6); }
+.sh-stage--done .sh-stage__line  { background: rgba(139, 124, 248, 0.3); }
+
+/* Focus mode: stages bar fades (layout behaviour comes in later block) */
+body.focus-mode .study-stages { opacity: 0.3; transition: opacity .3s; }
+
 /* --- Session Progress Bar --- */
 
 .study-progress-bar {
   position: sticky;
-  top: 56px;
-  z-index: 99;
+  top: 92px;
+  z-index: 98;
   height: 3px;
   background: rgba(255, 255, 255, 0.05);
 }
@@ -5217,12 +5331,14 @@ body.study-mode #app {
 /* --- Responsive --- */
 
 @media (max-width: 700px) {
-  .study-header {
-    padding: 0 16px;
-    gap: 10px;
-  }
+  .study-header { padding: 0 16px; gap: 10px; }
   .study-header__section { display: none; }
-  .study-header__phase { display: none; }
+  .study-header__badge { display: none; }
+  .study-stages { height: 28px; padding: 0 16px; top: 56px; }
+  .sh-stage__label { font-size: 10px; letter-spacing: .04em; }
+  .sh-stage__line { width: 28px; }
+  .sh-stage__dot { width: 5px; height: 5px; }
+  .study-progress-bar { top: 84px; }
   .study-content { padding: 40px 20px 64px; }
   .study-content__title { margin-bottom: 28px; }
   .study-quiz { padding: 36px 20px 64px; }

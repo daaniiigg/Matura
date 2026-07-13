@@ -1551,8 +1551,11 @@ function pintarModulo(id) {
           <span class="study-header__section">${seccion ? seccion.nombre : ''}</span>
           <span class="study-header__title">${mod.titulo}</span>
         </div>
-        <span class="study-header__phase" id="study-phase">Lectura · ${mod.minutos} min</span>
+        <span class="study-header__badge" id="study-mode-badge"></span>
+        <button class="study-header__focus" id="study-focus-btn" aria-label="Activar Focus" aria-pressed="false"><i data-lucide="minimize-2"></i></button>
       </header>
+
+      <nav class="study-stages" id="study-stages" aria-label="Progreso de sesión"></nav>
 
       <div class="study-progress-bar">
         <div class="study-progress-bar__fill" id="study-progress-fill" style="width:0%"></div>
@@ -1598,14 +1601,57 @@ function pintarModulo(id) {
 
   const session = { phase: 'reading', currentQuestion: 0, answered: false, score: 0, startTime: Date.now() };
 
+  // Focus toggle — wired once, cleanup removes focus-mode
+  (function() {
+    var btn = document.getElementById('study-focus-btn');
+    if (btn) btn.addEventListener('click', function() {
+      var active = document.body.classList.toggle('focus-mode');
+      this.setAttribute('aria-pressed', String(active));
+      this.classList.toggle('study-header__focus--active', active);
+    });
+  })();
+  if (window.lucide) lucide.createIcons();
+
   function setProgress(pct) {
     const el = document.getElementById('study-progress-fill');
     if (el) el.style.width = Math.min(100, Math.max(0, pct)) + '%';
   }
 
-  function setPhase(label) {
-    const el = document.getElementById('study-phase');
-    if (el) el.textContent = label;
+  function setStage(phase) {
+    var order = ['reading', 'practicar', 'quiz', 'complete'];
+    var activeIdx = order.indexOf(phase);
+    document.querySelectorAll('.sh-stage').forEach(function(el) {
+      var stageIdx = order.indexOf(el.dataset.phase);
+      el.classList.remove('sh-stage--active', 'sh-stage--done');
+      if (stageIdx < activeIdx) el.classList.add('sh-stage--done');
+      else if (stageIdx === activeIdx) el.classList.add('sh-stage--active');
+    });
+  }
+
+  function initStages(session) {
+    var ALL = [
+      { key: 'reading',   label: 'Leer',     modes: ['aprender'] },
+      { key: 'practicar', label: 'Practicar', modes: ['aprender', 'reforzar'], needsPracticar: true },
+      { key: 'quiz',      label: 'Quiz',      modes: ['aprender', 'reforzar'] },
+      { key: 'complete',  label: 'Finalizar', modes: ['aprender', 'reforzar'] }
+    ];
+    var stages = ALL.filter(function(s) {
+      return s.modes.indexOf(session.mode) !== -1 && (!s.needsPracticar || session.hasPracticar);
+    });
+    var badge = document.getElementById('study-mode-badge');
+    if (badge) {
+      badge.textContent = session.mode === 'reforzar' ? 'Reforzar' : 'Aprender';
+      badge.className = 'study-header__badge study-header__badge--' + session.mode;
+    }
+    var nav = document.getElementById('study-stages');
+    if (nav) nav.innerHTML = stages.map(function(s, i) {
+      return '<div class="sh-stage" data-phase="' + s.key + '">' +
+        (i > 0 ? '<div class="sh-stage__line"></div>' : '') +
+        '<div class="sh-stage__dot"></div>' +
+        '<span class="sh-stage__label">' + s.label + '</span>' +
+        '</div>';
+    }).join('');
+    if (window.lucide) lucide.createIcons();
   }
 
   function onScroll() {
@@ -1634,6 +1680,7 @@ function pintarModulo(id) {
     window.removeEventListener('scroll', onScroll);
     document.removeEventListener('keydown', onKey);
     document.body.classList.remove('study-mode');
+    document.body.classList.remove('focus-mode');
     delete window.MaturaStudy;
     delete window._studyCleanup;
   };
@@ -1659,9 +1706,11 @@ function pintarModulo(id) {
   }
 
   window.MaturaStudy = {
+    initStages: initStages,
+    setStage: setStage,
     startQuiz() {
       session.phase = 'quiz';
-      setPhase('Quiz · ' + questions.length + ' preguntas');
+      setStage('quiz');
       document.getElementById('study-content').style.display = 'none';
       document.getElementById('study-quiz').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1700,7 +1749,7 @@ function pintarModulo(id) {
     },
     finish() {
       session.phase = 'complete';
-      setPhase('Completado');
+      setStage('complete');
       setProgress(100);
       const anterior = PROGRESO[id];
       const locale = IDIOMA === 'de' ? 'de-DE' : IDIOMA === 'en' ? 'en-GB' : 'es-ES';
@@ -1813,10 +1862,13 @@ function launchSessionIntro(mod, seccion, session) {
     el.classList.add('session-intro--exit');
     setTimeout(function() {
       el.remove();
-      // Bloque 2 (Session Stages) sobreescribirá el routing de Reforzar.
-      // Por ahora Reforzar arranca en quiz directamente.
-      if (selectedMode === 'reforzar' && window.MaturaStudy) {
-        window.MaturaStudy.startQuiz();
+      if (window.MaturaStudy) {
+        window.MaturaStudy.initStages(session);
+        if (selectedMode === 'aprender') {
+          window.MaturaStudy.setStage('reading');
+        } else {
+          window.MaturaStudy.startQuiz();
+        }
       }
     }, 320);
   }
