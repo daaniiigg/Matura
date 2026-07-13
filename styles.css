@@ -5230,3 +5230,108 @@ body.study-mode #app {
   .study-option { padding: 14px 16px; font-size: 14px; }
   .study-question__text { font-size: 1.1rem; }
 }
+
+/* ============================================
+   SESSION INTRO OVERLAY — Bloque 1
+   ============================================ */
+
+.session-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--fondo, #0f1117);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: siIn .22s ease both;
+}
+.session-intro--brief { animation-duration: .14s; }
+.session-intro--exit  { animation: siOut .3s ease forwards; }
+
+@keyframes siIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes siOut { from { opacity: 1; } to { opacity: 0; } }
+
+.session-intro__card {
+  max-width: 520px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+.si-context {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.28);
+  animation: siItemIn .28s .18s ease both;
+}
+
+.session-intro .si-title {
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -.045em;
+  color: #fff;
+  line-height: 1.1;
+  animation: siItemIn .32s .28s ease both;
+}
+.session-intro--brief .si-title {
+  font-size: clamp(1.3rem, 3vw, 1.75rem);
+  animation: siItemIn .2s .1s ease both;
+}
+
+.si-objectives {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: siItemIn .28s .5s ease both;
+}
+.si-obj {
+  font-size: 14px;
+  color: rgba(255,255,255,.5);
+  text-align: left;
+}
+
+.si-modes {
+  display: flex;
+  gap: 10px;
+  animation: siItemIn .26s .68s ease both;
+}
+.si-mode {
+  padding: 12px 30px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.42);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.si-mode:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+.si-mode--active {
+  background: rgba(139,124,255,.14);
+  border-color: rgba(139,124,255,.42);
+  color: #fff;
+}
+
+.si-auto {
+  font-size: 12px;
+  color: rgba(255,255,255,.22);
+  animation: siItemIn .2s .85s ease both;
+  min-height: 1em;
+}
+
+@keyframes siItemIn {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .si-objectives { display: none; }
+  .si-mode { padding: 10px 20px; font-size: 14px; }
+}

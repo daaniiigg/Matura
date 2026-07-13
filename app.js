@@ -1734,8 +1734,128 @@ function pintarModulo(id) {
       if (window.lucide) lucide.createIcons();
     }
   };
+  launchSessionIntro(mod, seccion, session);
 }
 
+function launchSessionIntro(mod, seccion, session) {
+  const isRepeat = !!PROGRESO[mod.id];
+  const defaultMode = isRepeat ? 'reforzar' : 'aprender';
+  const hasPracticar = !!(mod.vocabulario && mod.vocabulario.length > 0);
+  const countdownSecs = isRepeat ? 2 : 3;
+  const objectives = (mod.objetivos || []).slice(0, 3);
+
+  const el = document.createElement('div');
+  el.id = 'session-intro';
+  el.className = 'session-intro' + (isRepeat ? ' session-intro--brief' : '');
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', 'Inicio de sesión de estudio');
+
+  if (isRepeat) {
+    el.innerHTML =
+      '<div class="session-intro__card">' +
+      '<h2 class="si-title">' + mod.titulo + '</h2>' +
+      '<div class="si-modes" id="si-modes">' +
+      '<button class="si-mode' + (defaultMode === 'aprender' ? ' si-mode--active' : '') + '" data-mode="aprender">Aprender</button>' +
+      '<button class="si-mode' + (defaultMode === 'reforzar' ? ' si-mode--active' : '') + '" data-mode="reforzar">Reforzar</button>' +
+      '</div>' +
+      '<p class="si-auto" id="si-auto" aria-live="polite"></p>' +
+      '</div>';
+  } else {
+    el.innerHTML =
+      '<div class="session-intro__card">' +
+      '<p class="si-context">' + (seccion ? seccion.nombre.toUpperCase() + ' · ' : '') + mod.minutos + ' MIN</p>' +
+      '<h1 class="si-title">' + mod.titulo + '</h1>' +
+      (objectives.length
+        ? '<div class="si-objectives">' +
+          objectives.map(function(o) { return '<p class="si-obj">→ ' + o + '</p>'; }).join('') +
+          '</div>'
+        : '') +
+      '<div class="si-modes" id="si-modes">' +
+      '<button class="si-mode si-mode--active" data-mode="aprender">Aprender</button>' +
+      '<button class="si-mode" data-mode="reforzar">Reforzar</button>' +
+      '</div>' +
+      '<p class="si-auto" id="si-auto" aria-live="polite"></p>' +
+      '</div>';
+  }
+
+  document.body.appendChild(el);
+
+  // Focus trap: move focus into the intro for accessibility
+  var firstBtn = el.querySelector('.si-mode');
+  if (firstBtn) setTimeout(function() { firstBtn.focus(); }, 250);
+
+  var selectedMode = defaultMode;
+  var cdInterval = null;
+
+  function startCd(secs) {
+    clearInterval(cdInterval);
+    var rem = secs;
+    var autoEl = document.getElementById('si-auto');
+    if (autoEl) autoEl.textContent = 'Comenzando en ' + rem + 's…';
+    cdInterval = setInterval(function() {
+      rem--;
+      var autoEl2 = document.getElementById('si-auto');
+      if (autoEl2) autoEl2.textContent = rem > 0 ? 'Comenzando en ' + rem + 's…' : '';
+      if (rem <= 0) { clearInterval(cdInterval); dismiss(); }
+    }, 1000);
+  }
+
+  function dismiss() {
+    clearInterval(cdInterval);
+    session.mode = selectedMode;
+    session.hasPracticar = hasPracticar;
+    // Pre-hide content for Reforzar before intro fades — avoids flash
+    if (selectedMode === 'reforzar') {
+      var content = document.getElementById('study-content');
+      if (content) content.style.display = 'none';
+    }
+    el.classList.add('session-intro--exit');
+    setTimeout(function() {
+      el.remove();
+      // Bloque 2 (Session Stages) sobreescribirá el routing de Reforzar.
+      // Por ahora Reforzar arranca en quiz directamente.
+      if (selectedMode === 'reforzar' && window.MaturaStudy) {
+        window.MaturaStudy.startQuiz();
+      }
+    }, 320);
+  }
+
+  el.querySelectorAll('.si-mode').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var wasActive = btn.classList.contains('si-mode--active');
+      el.querySelectorAll('.si-mode').forEach(function(b) { b.classList.remove('si-mode--active'); });
+      btn.classList.add('si-mode--active');
+      selectedMode = btn.dataset.mode;
+      if (wasActive) {
+        dismiss(); // segundo clic en el activo = arrancar ahora
+      } else {
+        startCd(countdownSecs);
+      }
+    });
+    // Keyboard: Enter/Space on non-active selects; on active dismisses
+    btn.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  });
+
+  // Escape key exits to dashboard
+  function onEsc(e) {
+    if (e.key === 'Escape') {
+      clearInterval(cdInterval);
+      el.remove();
+      document.removeEventListener('keydown', onEsc);
+      location.hash = '#/';
+    }
+  }
+  document.addEventListener('keydown', onEsc);
+
+  // Start countdown after entry animation settles
+  setTimeout(function() { startCd(countdownSecs); }, isRepeat ? 380 : 780);
+}
 /* ---------- PANTALLA: QUIZ (con baraja aleatoria) ----------
    En cada intento barajamos el orden de las preguntas Y el
    orden de las respuestas de cada una. Así memorizar
