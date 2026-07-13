@@ -892,191 +892,96 @@ function pintarInicio() {
   app.innerHTML = `
     <div class="modules-wrapper">
 
-      <!-- HERO (compact) -->
-      <section class="modules-hero">
-        <div class="modules-hero__content">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-            <div class="modules-hero__badge">
-              <span class="modules-hero__badge-dot"></span>
-              Curso activo
-            </div>
-            <button onclick="volverACursos()" class="btn-volver">← Mis cursos</button>
-          </div>
 
-          <h1 class="modules-hero__title">${T("heroTitulo")}</h1>
-          <p class="modules-hero__description">${T("heroSub")}</p>
+      <!-- TODAY WORKSPACE -->
+      <section class="today-workspace">
+        <div class="today-workspace__main">
+          <nav class="today-nav">
+            <button class="today-nav__pill" onclick="volverACursos()"><i data-lucide="arrow-left"></i>Mis cursos</button>
+            <a class="today-nav__pill" href="#/progreso"><i data-lucide="bar-chart-2"></i>Progreso</a>
+            <a class="today-nav__pill" href="#/glosario"><i data-lucide="layers"></i>Glosario</a>
+            <a class="today-nav__pill" href="#/calendario"><i data-lucide="calendar"></i>Exámenes</a>
+            <a class="today-nav__pill" href="#/ranking"><i data-lucide="trophy"></i>Ranking</a>
+            <button class="today-nav__pill" onclick="window.Matura.commandCenter.open()"><i data-lucide="search"></i>Buscar</button>
+          </nav>
 
-          <div class="modules-hero__actions">
-            ${proxMod
-              ? `<a href="#/modulo/${proxMod.id}" class="btn">Continuar aprendiendo</a>`
-              : `<span class="btn" style="opacity:.55;cursor:default">¡Todo completado! 🎉</span>`}
-            <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">
-              Explorar módulos
-            </button>
-          </div>
-        </div>
-
-        <aside class="modules-hero__card">
-          <div class="modules-hero__course">
-            <span class="modules-hero__label">Curso actual</span>
-            <h3>${cursoActualObj?.icono || ""} ${cursoActualObj?.titulo || CURSO_ACTIVO}</h3>
-            <p>Plan completo · Todas las asignaturas</p>
-          </div>
-          <div class="modules-hero__divider"></div>
-          <div class="modules-hero__stats">
-            <div class="modules-hero__stat">
-              <span class="modules-hero__stat-number">${modulos.length}</span>
-              <span class="modules-hero__stat-label">${T("navModulos")}</span>
-            </div>
-            <div class="modules-hero__stat">
-              <span class="modules-hero__stat-number">${porcentaje}%</span>
-              <span class="modules-hero__stat-label">Progreso</span>
-            </div>
-            <div class="modules-hero__stat">
-              <span class="modules-hero__stat-number">${completados}</span>
-              <span class="modules-hero__stat-label">Completados</span>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <!-- COMMAND BAR: search + quick actions unified -->
-      <div class="command-bar">
-        <div class="command-bar__search">
-          <i data-lucide="search"></i>
-          <input type="text" placeholder="Buscar módulos, apuntes, ejercicios o preguntar a Matura AI...">
-        </div>
-        <div class="command-bar__actions">
-          <button class="cbar-action" onclick="document.querySelector('.matura-ai')?.scrollIntoView({behavior:'smooth'})">
-            <i data-lucide="brain"></i>Matura AI
-          </button>
-          ${proxMod
-            ? `<a class="cbar-action" href="#/modulo/${proxMod.id}"><i data-lucide="play-circle"></i>Continuar</a>`
-            : `<span class="cbar-action" style="opacity:.45;cursor:default"><i data-lucide="play-circle"></i>Continuar</span>`}
-          <a class="cbar-action" href="#/progreso"><i data-lucide="graduation-cap"></i>Progreso</a>
-          <a class="cbar-action" href="#/glosario"><i data-lucide="layers"></i>Glosario</a>
-          <a class="cbar-action" href="#/ranking"><i data-lucide="star"></i>Ranking</a>
-        </div>
-      </div>
-
-
-      <!-- QUICK ACTIONS -->
-      <section class="quick-actions">
-        <div class="quick-actions-header">
-          <div>
-            <span class="section-badge">Accesos rápidos</span>
-            <h2>Empieza en segundos</h2>
-          </div>
-        </div>
-        <div class="quick-actions-grid">
-          ${proxMod
-            ? `<button class="quick-action-card" onclick="location.hash='#/modulo/${proxMod.id}'">
-              <i data-lucide="play-circle"></i>
-              <div><h3>Continuar</h3><p>Retoma tu último módulo.</p></div>
-            </button>`
-            : `<button class="quick-action-card" style="opacity:.5;cursor:default">
-              <i data-lucide="play-circle"></i>
-              <div><h3>Continuar</h3><p>Curso completado ✓</p></div>
-            </button>`}
-          <button class="quick-action-card" disabled style="opacity:.5;cursor:not-allowed">
-            <i data-lucide="brain"></i>
-            <div><h3>Matura AI</h3><p>Pregunta cualquier duda.</p></div>
-          </button>
-          <button class="quick-action-card" onclick="location.hash='#/calendario'">
-            <i data-lucide="calendar-days"></i>
-            <div><h3>Exámenes</h3><p>Consulta el calendario.</p></div>
-          </button>
-          <button class="quick-action-card" onclick="document.querySelector('.command-bar__search')?.focus()">
-            <i data-lucide="search"></i>
-            <div><h3>Buscar</h3><p>Encuentra cualquier tema.</p></div>
-          </button>
-        </div>
-      </section>
-
-
-      <!-- ROW 1: Continue Learning (2fr) + Quick Stats (1fr) -->
-      <div class="dashboard-grid-main">
-        ${proxMod ? `
-        <section class="continue-learning">
-          <div class="continue-card">
-            <div class="continue-card__left">
-              <span class="section-badge">Continúa donde lo dejaste</span>
-              <h2>${cursoActualObj ? cursoActualObj.titulo : "Curso"} · ${proxMod.titulo}</h2>
-              <p>Completa este módulo para avanzar en tu ruta de aprendizaje.</p>
-              <div class="progress-bar">
-                <div class="progress-bar__value" style="width:${porcentaje}%"></div>
+          ${proxMod ? `
+          <div class="today-continue">
+            <span class="section-badge">Continúa donde lo dejaste</span>
+            <h1 class="today-continue__module">${proxMod.titulo}</h1>
+            <p class="today-continue__course">${cursoActualObj ? cursoActualObj.titulo : CURSO_ACTIVO}</p>
+            <div class="today-progress">
+              <div class="progress-bar"><div class="progress-bar__fill" style="width:${porcentaje}%"></div></div>
+              <div class="today-progress__meta">
+                <span>${porcentaje}% del curso completado</span>
+                <span>${modulos.length - completados} módulos pendientes · ${proxMod.minutos} min</span>
               </div>
-              <small>${porcentaje}% del curso completado</small>
             </div>
-            <a class="btn" href="#/modulo/${proxMod.id}">
-              <i data-lucide="play"></i>Continuar
-            </a>
-          </div>
-        </section>
-        ` : `
-        <section class="continue-learning">
-          <div class="continue-card" style="opacity:.75">
-            <div class="continue-card__left">
-              <span class="section-badge">¡Enhorabuena!</span>
-              <h2>Has completado todos los módulos del curso</h2>
-              <p>Puedes repasar cualquier módulo cuando quieras.</p>
-              <div class="progress-bar"><div class="progress-bar__value" style="width:100%"></div></div>
-              <small>100% completado</small>
+            <div class="today-continue__actions">
+              <a href="#/modulo/${proxMod.id}" class="btn today-continue__btn"><i data-lucide="play"></i>Continuar aprendiendo</a>
+              <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">Ver módulos</button>
             </div>
           </div>
-        </section>
-        `}
-        <div class="stats-strip">
-          <article class="stat-widget">
-            <i data-lucide="clock-3"></i>
-            <div>
-              <strong>${modulos.reduce((t, m) => t + (PROGRESO[m.id] ? m.minutos : 0), 0)} min</strong>
-              <span>Estudiadas</span>
+          ` : `
+          <div class="today-continue today-continue--complete">
+            <span class="section-badge">Completado</span>
+            <h1 class="today-continue__module">¡Has completado el curso!</h1>
+            <p class="today-continue__course">${cursoActualObj ? cursoActualObj.titulo : CURSO_ACTIVO}</p>
+            <div class="today-progress">
+              <div class="progress-bar"><div class="progress-bar__fill" style="width:100%"></div></div>
+              <div class="today-progress__meta"><span>100% completado</span><span>${modulos.length} módulos · ¡Enhorabuena!</span></div>
             </div>
-          </article>
-          <article class="stat-widget">
-            <i data-lucide="target"></i>
-            <div><strong>${porcentaje}%</strong><span>Progreso</span></div>
-          </article>
-          <article class="stat-widget">
-            <i data-lucide="award"></i>
-            <div><strong>${completados}</strong><span>Completados</span></div>
-          </article>
-          <article class="stat-widget">
-            <i data-lucide="zap"></i>
-            <div>
-              <strong>${completados * 100 + (notasArr.length > 0 ? Math.round(notasArr.reduce((a,b)=>a+b,0)/notasArr.length) : 0)}</strong>
-              <span>XP</span>
+            <div class="today-continue__actions">
+              <a href="#/progreso" class="btn today-continue__btn"><i data-lucide="bar-chart-2"></i>Ver mi progreso</a>
+              <button class="btn secundario" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">Repasar módulos</button>
             </div>
-          </article>
+          </div>
+          `}
         </div>
-      </div>
 
-      <!-- ROW 2: Matura AI (1.4fr) + Próximo Examen (1fr) -->
+        <div class="today-workspace__side">
+          <div class="today-stats">
+            <div class="today-stat"><strong>${porcentaje}%</strong><span>Progreso</span></div>
+            <div class="today-stat"><strong>${completados}/${modulos.length}</strong><span>Módulos</span></div>
+            <div class="today-stat"><strong>${mediaLocal}</strong><span>Nota media</span></div>
+          </div>
+          <div class="today-recommendation">
+            <div class="today-rec__label"><i data-lucide="sparkles"></i><span>Recomendación</span></div>
+            <p class="today-rec__text">${porcentaje === 0
+              ? "Empieza por el primer módulo. Solo " + (modulos[0] ? modulos[0].minutos : 15) + " min de lectura."
+              : porcentaje < 30
+              ? "Estás construyendo el hábito. Un módulo al día marca la diferencia."
+              : porcentaje < 70
+              ? "Vas por buen camino. Con " + (proxMod ? proxMod.minutos : 15) + " min diarios llegarás al objetivo."
+              : porcentaje < 100
+              ? "¡Casi lo tienes! Solo " + (modulos.length - completados) + " módulos para completar el curso."
+              : "Curso terminado. Repasa los módulos con menor puntuación antes del examen."
+            }</p>
+            ${proxMod ? `<a class="today-rec__action" href="#/modulo/${proxMod.id}">Empezar ahora →</a>` : ''}
+          </div>
+        </div>
+      </section>
+
+      <!-- PLAN DE ESTUDIO + PRÓXIMOS EXÁMENES -->
       <div class="dashboard-grid-secondary">
-        <section class="matura-ai">
-          <div class="matura-ai__background"></div>
-          <div class="matura-ai__content">
-            <div class="matura-ai__badge">✨ Matura AI</div>
-            <h2>Tu profesor personal, disponible las 24 horas.</h2>
-            <p>Haz preguntas sobre cualquier asignatura, genera resúmenes, crea ejercicios personalizados y prepara tus exámenes con ayuda de inteligencia artificial.</p>
-            <div class="matura-ai__features">
-              <div class="ai-feature"><span>🧠</span><div><strong>Explicaciones inteligentes</strong><p>Adaptadas a tu nivel.</p></div></div>
-              <div class="ai-feature"><span>📝</span><div><strong>Ejercicios automáticos</strong><p>Generados al instante.</p></div></div>
-              <div class="ai-feature"><span>📚</span><div><strong>Resúmenes</strong><p>De cualquier tema.</p></div></div>
-              <div class="ai-feature"><span>🎯</span><div><strong>Preparación Matura</strong><p>Orientada al examen.</p></div></div>
-            </div>
-            <div class="matura-ai__actions">
-              <button class="btn" disabled style="opacity:.55;cursor:not-allowed">Abrir Matura AI</button>
-              <button class="btn secundario" disabled style="opacity:.55;cursor:not-allowed">Ver ejemplos</button>
+        <section class="study-plan">
+          <div class="section-header">
+            <div>
+              <span class="section-badge">Plan de estudio</span>
+              <h2>Próximos módulos</h2>
             </div>
           </div>
-          <div class="matura-ai__visual">
-            <div class="ai-orb"></div>
-            <div class="floating-card floating-card--1">💡 Explicación generada</div>
-            <div class="floating-card floating-card--2">✅ Ejercicio corregido</div>
-            <div class="floating-card floating-card--3">📄 Resumen listo</div>
+          <div class="study-plan__list">
+            ${modulos.filter(m => !PROGRESO[m.id]).slice(0, 3).map((m, i) => `
+            <a class="study-plan__item${i === 0 ? ' study-plan__item--next' : ''}" href="#/modulo/${m.id}">
+              <div class="study-plan__icon">${ICONOS_MODULO[m.id] || String(m.id).padStart(2,"0")}</div>
+              <div class="study-plan__info"><strong>${m.titulo}</strong><span>${m.minutos} min · ${m.quiz.length} preguntas</span></div>
+              ${i === 0 ? `<span class="study-plan__badge">Siguiente</span>` : `<i data-lucide="chevron-right"></i>`}
+            </a>`).join("") || `<p class="widget-muted">¡Todos los módulos completados! 🎉</p>`}
           </div>
+          ${modulos.filter(m => !PROGRESO[m.id]).length > 3
+            ? `<button class="btn secundario" style="width:100%;margin-top:16px" onclick="document.querySelector('.course-column')?.scrollIntoView({behavior:'smooth'})">Ver todos los módulos</button>`
+            : ''}
         </section>
 
         <section class="upcoming-exams">
@@ -1103,34 +1008,6 @@ function pintarInicio() {
             </article>
           </div>
         </section>
-      </div>
-
-      <!-- ROW 3: Compact Daily Focus bar (~100px) -->
-      <div class="daily-focus-compact">
-        <div class="dfc-left">
-          <div class="dfc-ring" style="background:conic-gradient(#5b8cff 0 ${porcentaje}%, rgba(255,255,255,.1) ${porcentaje}%)">
-            ${porcentaje}%
-          </div>
-          <div class="dfc-left-info">
-            <span class="section-badge">Objetivo diario</span>
-            <strong>${porcentaje < 30 ? "Estás empezando. ¡Cada módulo cuenta!" : porcentaje < 70 ? "Vas por buen camino. Sigue así." : "Excelente ritmo. ¡Casi lo tienes!"}</strong>
-          </div>
-        </div>
-        ${proxMod ? `
-        <div class="dfc-center">
-          <span>Próxima tarea</span>
-          <strong>${proxMod.titulo}</strong>
-          <small>⏱ ${proxMod.minutos} min</small>
-        </div>
-        <a href="#/modulo/${proxMod.id}" class="btn"><i data-lucide="play"></i>Empezar</a>
-        ` : `
-        <div class="dfc-center">
-          <span>Estado del curso</span>
-          <strong>¡Curso completado!</strong>
-          <small>🎉 Enhorabuena</small>
-        </div>
-        <span class="btn" style="opacity:.55;cursor:default">Completado ✓</span>
-        `}
       </div>
 
       <!-- MODULES GRID (course cards + sidebar) -->
@@ -1247,22 +1124,21 @@ function pintarInicio() {
               </div>
 
               <div class="ai-suggestions">
-                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
+                <button class="ai-suggestion" data-plan="${proxMod ? proxMod.titulo + '|' + proxMod.minutos + '|' + proxMod.quiz.length : '||'}" onclick="(function(b){var p=b.dataset.plan.split('|');window.Matura.modal({title:'Tu plan para hoy',badge:'Matura AI',hideFooter:true,body:p[0]?'<p style=\'color:rgba(255,255,255,.5);margin-bottom:8px\'>Módulo recomendado</p><h3 style=\'margin:0 0 6px;font-size:1.1rem\'>'+p[0]+'</h3><small style=\'color:rgba(255,255,255,.45)\'>'+p[1]+' min de lectura · '+p[2]+' preguntas</small>':'<p>¡Curso completado! Repasa los módulos con menor puntuación antes del examen.</p>'});})(this)">
                   <i data-lucide="sparkles"></i>
-                  Generar plan de hoy
+                  Ver plan de hoy
                 </button>
-                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
-                  <i data-lucide="brain"></i>
-                  Explicar este tema
-                </button>
-                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
-                  <i data-lucide="file-text"></i>
-                  Crear resumen
-                </button>
-                <button class="ai-suggestion" disabled style="opacity:.55;cursor:not-allowed">
-                  <i data-lucide="graduation-cap"></i>
-                  Generar examen
-                </button>
+                ${proxMod
+                  ? `<a class="ai-suggestion" href="#/modulo/${proxMod.id}"><i data-lucide="play-circle"></i>Ir al módulo actual</a>`
+                  : `<button class="ai-suggestion" disabled style="opacity:.4;cursor:default"><i data-lucide="check-circle-2"></i>Curso completado</button>`}
+                <a class="ai-suggestion" href="#/progreso">
+                  <i data-lucide="bar-chart-2"></i>
+                  Ver mi progreso
+                </a>
+                <a class="ai-suggestion" href="#/calendario">
+                  <i data-lucide="calendar"></i>
+                  Ver exámenes
+                </a>
               </div>
             </aside>
         </div>
