@@ -792,6 +792,7 @@ window.addEventListener("hashchange", () => {
   // Close mobile nav on route change
   document.querySelector('.topbar nav')?.classList.remove('nav-abierta');
   document.getElementById('hamburger-btn')?.classList.remove('abierto');
+  if (window._studyCleanup) window._studyCleanup();
   navegar();
 });
 
@@ -1528,52 +1529,211 @@ async function cargarMiniRanking() {
 /* ---------- PANTALLA: LECCIÓN ---------- */
 
 function pintarModulo(id) {
-  const mod = modulosIdioma().find((m) => m.id === id);
+  const mod = modulosIdioma().find(m => m.id === id);
   if (!mod) return pintarInicio();
-  const seccion = seccionesIdioma().find((s) => s.id === mod.seccion);
+  const seccion = seccionesIdioma().find(s => s.id === mod.seccion);
 
-  // Ficha de vocabulario del módulo (idea de Daniel)
-  const vocabHtml = mod.vocabulario
-    .map((v) => `<dt>${v.termino}</dt><dd>${v.explicacion}</dd>`)
-    .join("");
+  if (window._studyCleanup) window._studyCleanup();
+
+  const questions = barajar(mod.quiz).map(q => {
+    const orden = barajar(q.opciones.map((_, i) => i));
+    return { pregunta: q.pregunta, opciones: orden.map(i => q.opciones[i]), correcta: orden.indexOf(q.correcta), explicacion: q.explicacion };
+  });
+
+  document.body.classList.add('study-mode');
 
   app.innerHTML = `
-    <article class="leccion">
-      <p class="miga">${seccion.nombre} · ${T("modulo")} ${mod.id} · ⏱ ${mod.minutos} ${T("minLectura")}</p>
-      <h1>${mod.titulo}</h1>
+    <div class="study-workspace">
 
-      <div class="objetivos">
-        <h2>${T("objetivos")}</h2>
-        <ul>${mod.objetivos.map((o) => `<li>${o}</li>`).join("")}</ul>
+      <header class="study-header">
+        <button class="study-header__back" onclick="history.back()"><i data-lucide="arrow-left"></i>Salir</button>
+        <div class="study-header__info">
+          <span class="study-header__section">${seccion ? seccion.nombre : ''}</span>
+          <span class="study-header__title">${mod.titulo}</span>
+        </div>
+        <span class="study-header__phase" id="study-phase">Lectura · ${mod.minutos} min</span>
+      </header>
+
+      <div class="study-progress-bar">
+        <div class="study-progress-bar__fill" id="study-progress-fill" style="width:0%"></div>
       </div>
 
-      <div class="vocabulario">
-        <h2>${T("vocabTitulo")}</h2>
-        <dl>${vocabHtml}</dl>
-      </div>
-
-      ${mod.contenido}
-
-      <div class="acciones">
-        <a class="btn" href="#/quiz/${mod.id}">${T("hacerQuiz")}</a>
-        <a class="btn secundario" href="#/">${T("volverModulos")}</a>
-      </div>
-
-      <div id="comentarios-seccion" class="comentarios-seccion">
-        <h2 class="seccion-titulo" style="margin-top:40px">Comentarios</h2>
-        <div id="comentarios-lista" style="color:var(--texto-muted);font-size:.82rem;padding:8px 0">Cargando…</div>
-        ${USUARIO ? `
-        <div class="comentario-form">
-          <div class="comentario-avatar" style="flex-shrink:0;margin-top:4px">${USUARIO.slice(0,2).toUpperCase()}</div>
-          <div style="flex:1">
-            <textarea id="comentario-input" class="buscador" placeholder="Escribe un comentario…" rows="3" style="resize:vertical;margin:0;font-family:inherit"></textarea>
-            <button id="comentario-btn" class="btn" onclick="enviarComentario('${CURSO_ACTIVO}', ${mod.id})" style="margin-top:8px">Publicar →</button>
+      <div class="study-content" id="study-content">
+        <div class="study-content__inner">
+          <h1 class="study-content__title">${mod.titulo}</h1>
+          ${mod.objetivos && mod.objetivos.length ? `
+          <div class="study-objectives">
+            <p class="study-objectives__label">En este módulo aprenderás</p>
+            <ul>${mod.objetivos.map(o => `<li>${o}</li>`).join('')}</ul>
+          </div>` : ''}
+          <div class="study-content__body">${mod.contenido}</div>
+          ${mod.vocabulario && mod.vocabulario.length ? `
+          <div class="study-vocab">
+            <p class="study-vocab__label">Vocabulario clave</p>
+            <dl>${mod.vocabulario.map(v => `<dt>${v.termino}</dt><dd>${v.explicacion}</dd>`).join('')}</dl>
+          </div>` : ''}
+          <div class="study-content__cta">
+            <p class="study-cta-hint">Fin del contenido — ¿listo para el quiz?</p>
+            <button class="btn study-cta-btn" onclick="window.MaturaStudy.startQuiz()">
+              <i data-lucide="check-circle"></i>Empezar el quiz
+            </button>
           </div>
-        </div>` : ""}
+        </div>
       </div>
-    </article>
+
+      <div class="study-quiz" id="study-quiz" style="display:none">
+        <div class="study-quiz__inner">
+          <div class="study-quiz__header">
+            <span class="section-badge">Quiz · ${questions.length} preguntas</span>
+            <h2>Comprueba lo que has aprendido</h2>
+          </div>
+          <div id="study-quiz-stage"></div>
+        </div>
+      </div>
+
+      <div class="study-complete" id="study-complete" style="display:none"></div>
+
+    </div>
   `;
-  cargarComentarios(CURSO_ACTIVO, mod.id);
+
+  const session = { phase: 'reading', currentQuestion: 0, answered: false, score: 0, startTime: Date.now() };
+
+  function setProgress(pct) {
+    const el = document.getElementById('study-progress-fill');
+    if (el) el.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  }
+
+  function setPhase(label) {
+    const el = document.getElementById('study-phase');
+    if (el) el.textContent = label;
+  }
+
+  function onScroll() {
+    if (session.phase !== 'reading') return;
+    const content = document.getElementById('study-content');
+    if (!content) return;
+    const ratio = Math.max(0, Math.min(1, (window.scrollY + window.innerHeight - content.offsetTop) / content.offsetHeight));
+    setProgress(ratio * 55);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  function onKey(e) {
+    if (session.phase !== 'quiz') return;
+    const q = questions[session.currentQuestion];
+    if (!q) return;
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= q.opciones.length && !session.answered) {
+      window.MaturaStudy.selectOption(num - 1);
+      return;
+    }
+    if (e.key === 'Enter' && session.answered) window.MaturaStudy.nextQuestion();
+  }
+  document.addEventListener('keydown', onKey);
+
+  window._studyCleanup = function() {
+    window.removeEventListener('scroll', onScroll);
+    document.removeEventListener('keydown', onKey);
+    document.body.classList.remove('study-mode');
+    delete window.MaturaStudy;
+    delete window._studyCleanup;
+  };
+
+  function renderQuestion(idx) {
+    const q = questions[idx];
+    session.answered = false;
+    const optHtml = q.opciones.map((op, j) =>
+      '<button class="study-option" onclick="window.MaturaStudy.selectOption(' + j + ')">' +
+      '<kbd class="study-option__key">' + (j + 1) + '</kbd><span>' + op + '</span></button>'
+    ).join('');
+    document.getElementById('study-quiz-stage').innerHTML =
+      '<div class="study-question">' +
+      '<div class="study-question__counter">' + (idx + 1) + '<span> / ' + questions.length + '</span></div>' +
+      '<h3 class="study-question__text">' + q.pregunta + '</h3>' +
+      '<div class="study-question__options">' + optHtml + '</div>' +
+      '<div id="study-feedback" style="display:none"></div>' +
+      '<div class="study-question__nav" id="study-nav" style="display:none">' +
+      '<button class="btn" onclick="window.MaturaStudy.nextQuestion()">' +
+      (idx < questions.length - 1 ? 'Siguiente &rarr;' : 'Ver resultado &rarr;') +
+      '</button></div></div>';
+    setProgress(60 + (idx / questions.length) * 35);
+  }
+
+  window.MaturaStudy = {
+    startQuiz() {
+      session.phase = 'quiz';
+      setPhase('Quiz · ' + questions.length + ' preguntas');
+      document.getElementById('study-content').style.display = 'none';
+      document.getElementById('study-quiz').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setProgress(60);
+      renderQuestion(0);
+    },
+    selectOption(optIdx) {
+      if (session.answered) return;
+      session.answered = true;
+      const q = questions[session.currentQuestion];
+      const correct = optIdx === q.correcta;
+      if (correct) session.score++;
+      document.querySelectorAll('.study-option').forEach((btn, j) => {
+        btn.disabled = true;
+        if (j === q.correcta) btn.classList.add('study-option--correct');
+        if (j === optIdx && !correct) btn.classList.add('study-option--wrong');
+      });
+      const fb = document.getElementById('study-feedback');
+      if (fb) {
+        fb.style.display = 'block';
+        fb.innerHTML = '<div class="study-feedback study-feedback--' + (correct ? 'ok' : 'err') + '">' +
+          '<strong>' + (correct ? '✓ Correcto' : '✗ Incorrecto') + '</strong>' +
+          '<p>' + q.explicacion + '</p></div>';
+      }
+      const nav = document.getElementById('study-nav');
+      if (nav) nav.style.display = 'flex';
+    },
+    nextQuestion() {
+      session.currentQuestion++;
+      if (session.currentQuestion < questions.length) {
+        renderQuestion(session.currentQuestion);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        this.finish();
+      }
+    },
+    finish() {
+      session.phase = 'complete';
+      setPhase('Completado');
+      setProgress(100);
+      const anterior = PROGRESO[id];
+      const locale = IDIOMA === 'de' ? 'de-DE' : IDIOMA === 'en' ? 'en-GB' : 'es-ES';
+      if (!anterior || session.score > anterior.nota) {
+        PROGRESO[id] = { nota: session.score, total: questions.length, fecha: new Date().toLocaleDateString(locale) };
+        guardarProgreso();
+      }
+      const elapsed = Math.max(1, Math.round((Date.now() - session.startTime) / 60000));
+      const aprobado = session.score >= Math.ceil(questions.length * 0.5);
+      const perfect = session.score === questions.length;
+      const modulos = modulosIdioma();
+      const nextMod = modulos[modulos.findIndex(m => m.id === id) + 1];
+      document.getElementById('study-quiz').style.display = 'none';
+      const el = document.getElementById('study-complete');
+      el.style.display = 'block';
+      el.innerHTML =
+        '<div class="study-complete__inner">' +
+        '<div class="study-complete__badge ' + (perfect ? 'perfect' : aprobado ? 'pass' : 'retry') + '">' +
+        session.score + ' / ' + questions.length +
+        '</div>' +
+        '<h2 class="study-complete__heading">' + (perfect ? '¡Nota perfecta!' : aprobado ? 'Módulo completado' : 'Sigue practicando') + '</h2>' +
+        '<p class="study-complete__sub">' + elapsed + ' min de estudio · ' + session.score + (session.score === 1 ? ' respuesta correcta' : ' respuestas correctas') + '</p>' +
+        '<div class="study-complete__actions">' +
+        (nextMod
+          ? '<a href="#/modulo/' + nextMod.id + '" class="btn study-complete__primary"><i data-lucide="arrow-right"></i>Siguiente: ' + nextMod.titulo + '</a>'
+          : '<a href="#/" class="btn study-complete__primary"><i data-lucide="home"></i>Volver al Dashboard</a>') +
+        '<a href="#/progreso" class="btn secundario">Ver mi progreso</a>' +
+        (!aprobado ? '<button class="study-complete__retry" onclick="pintarModulo(' + id + ')">Reintentar este módulo</button>' : '') +
+        '</div></div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.lucide) lucide.createIcons();
+    }
+  };
 }
 
 /* ---------- PANTALLA: QUIZ (con baraja aleatoria) ----------
