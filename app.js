@@ -1526,6 +1526,22 @@ async function cargarMiniRanking() {
   } catch { el.textContent = ""; }
 }
 
+/* ---------- FLIP CARDS: registro de renderizadores ----------
+   Cada tipo de tarjeta solo declara front()/back(). La cola,
+   el flip y el teclado son agnosticos al contenido: anadir un
+   tipo nuevo (imagen->concepto, audio->termino, IA...) no toca
+   la logica de navegacion. */
+const CARD_RENDERERS = {
+  'term-definition': {
+    front(card) {
+      return '<p class="flip-card__eyebrow">Termino</p><h3 class="flip-card__term">' + card.data.termino + '</h3>';
+    },
+    back(card) {
+      return '<p class="flip-card__eyebrow">Definicion</p><p class="flip-card__definition">' + card.data.explicacion + '</p>';
+    }
+  }
+};
+
 /* ---------- PANTALLA: LECCIÓN ---------- */
 
 function pintarModulo(id) {
@@ -1539,6 +1555,9 @@ function pintarModulo(id) {
     const orden = barajar(q.opciones.map((_, i) => i));
     return { pregunta: q.pregunta, opciones: orden.map(i => q.opciones[i]), correcta: orden.indexOf(q.correcta), explicacion: q.explicacion };
   });
+
+  const hasPracticar = !!(mod.vocabulario && mod.vocabulario.length > 0);
+  const practicarCards = barajar((mod.vocabulario || []).map((v, i) => ({ id: 'v' + i, type: 'term-definition', data: v })));
 
   document.body.classList.add('study-mode');
 
@@ -1576,11 +1595,21 @@ function pintarModulo(id) {
             <dl>${mod.vocabulario.map(v => `<dt>${v.termino}</dt><dd>${v.explicacion}</dd>`).join('')}</dl>
           </div>` : ''}
           <div class="study-content__cta">
-            <p class="study-cta-hint">Fin del contenido — ¿listo para el quiz?</p>
-            <button class="btn study-cta-btn" onclick="window.MaturaStudy.startQuiz()">
-              <i data-lucide="check-circle"></i>Empezar el quiz
+            <p class="study-cta-hint">${hasPracticar ? 'Fin del contenido — practica el vocabulario' : 'Fin del contenido — ¿listo para el quiz?'}</p>
+            <button class="btn study-cta-btn" onclick="window.MaturaStudy.afterContent()">
+              <i data-lucide="${hasPracticar ? 'layers' : 'check-circle'}"></i>${hasPracticar ? 'Practicar vocabulario' : 'Empezar el quiz'}
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="study-practicar" id="study-practicar" style="display:none">
+        <div class="study-practicar__inner">
+          <div class="study-practicar__header">
+            <span class="section-badge">Practicar · <span id="practicar-progress">0 / ${practicarCards.length}</span></span>
+            <h2>Repasa el vocabulario antes de continuar</h2>
+          </div>
+          <div class="practicar-stage" id="practicar-stage"></div>
         </div>
       </div>
 
@@ -1617,6 +1646,17 @@ function pintarModulo(id) {
     if (el) el.style.width = Math.min(100, Math.max(0, pct)) + '%';
   }
 
+  function computeBands(stageKeys) {
+    var work = stageKeys.filter(function(k) { return k !== 'complete'; });
+    var bands = {};
+    var step = 95 / work.length;
+    work.forEach(function(k, i) {
+      bands[k] = { start: Math.round(i * step), end: Math.round((i + 1) * step) };
+    });
+    bands.complete = { start: 100, end: 100 };
+    return bands;
+  }
+
   function setStage(phase) {
     var order = ['reading', 'practicar', 'quiz', 'complete'];
     var activeIdx = order.indexOf(phase);
@@ -1638,6 +1678,7 @@ function pintarModulo(id) {
     var stages = ALL.filter(function(s) {
       return s.modes.indexOf(session.mode) !== -1 && (!s.needsPracticar || session.hasPracticar);
     });
+    session.bands = computeBands(stages.map(function(s) { return s.key; }));
     var badge = document.getElementById('study-mode-badge');
     if (badge) {
       badge.textContent = session.mode === 'reforzar' ? 'Reforzar' : 'Aprender';
@@ -1659,11 +1700,75 @@ function pintarModulo(id) {
     const content = document.getElementById('study-content');
     if (!content) return;
     const ratio = Math.max(0, Math.min(1, (window.scrollY + window.innerHeight - content.offsetTop) / content.offsetHeight));
-    setProgress(ratio * 55);
+    const b = (session.bands && session.bands.reading) || { start: 0, end: 55 };
+    setProgress(b.start + ratio * (b.end - b.start));
   }
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  // ---------- Practicar (flip cards) ----------
+  let practicarQueue = [];
+  let practicarTotal = 0;
+  let practicarDone = 0;
+  let practicarFlipped = false;
+
+  function updatePracticarProgress() {
+    const el = document.getElementById('practicar-progress');
+    if (el) el.textContent = practicarDone + ' / ' + practicarTotal;
+    const b = session.bands && session.bands.practicar;
+    if (b) setProgress(b.start + (practicarTotal ? practicarDone / practicarTotal : 1) * (b.end - b.start));
+  }
+
+  function renderPracticarCard() {
+    if (!practicarQueue.length) return finishPracticar();
+    const stage = document.getElementById('practicar-stage');
+    const card = practicarQueue[0];
+    const renderer = CARD_RENDERERS[card.type];
+    practicarFlipped = false;
+    stage.innerHTML =
+      '<div class="flip-card" id="flip-card" tabindex="0" role="button" aria-pressed="false" ' +
+      'aria-label="Tarjeta de repaso. Pulsa espacio o haz clic para girar." onclick="window.MaturaStudy.flipCard()">' +
+        '<div class="flip-card__inner">' +
+          '<div class="flip-card__face flip-card__face--front">' + renderer.front(card) +
+            '<span class="flip-card__hint">Espacio para girar</span>' +
+          '</div>' +
+          '<div class="flip-card__face flip-card__face--back" aria-hidden="true">' + renderer.back(card) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="practicar-actions" id="practicar-actions" style="display:none">' +
+        '<button class="practicar-btn practicar-btn--review" onclick="window.MaturaStudy.reviewCard()"><kbd>2</kbd>Repasar</button>' +
+        '<button class="practicar-btn practicar-btn--know" onclick="window.MaturaStudy.knowCard()"><kbd>1</kbd>Lo sé</button>' +
+      '</div>';
+    const fc = document.getElementById('flip-card');
+    if (fc) setTimeout(function() { fc.focus(); }, 50);
+  }
+
+  function advancePracticarCard(kind) {
+    const fc = document.getElementById('flip-card');
+    if (fc) fc.classList.add(kind === 'know' ? 'flip-card--exit-know' : 'flip-card--exit-review');
+    setTimeout(renderPracticarCard, 260);
+  }
+
+  function finishPracticar() {
+    const stage = document.getElementById('practicar-stage');
+    if (stage) stage.innerHTML =
+      '<div class="practicar-done"><i data-lucide="check-circle-2"></i><p>Vocabulario dominado</p></div>';
+    if (window.lucide) lucide.createIcons();
+    setTimeout(function() { window.MaturaStudy.startQuiz(); }, 650);
+  }
+
   function onKey(e) {
+    if (session.phase === 'practicar') {
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        window.MaturaStudy.flipCard();
+        return;
+      }
+      if (practicarFlipped) {
+        if (e.key === '1') { window.MaturaStudy.knowCard(); return; }
+        if (e.key === '2') { window.MaturaStudy.reviewCard(); return; }
+      }
+      return;
+    }
     if (session.phase !== 'quiz') return;
     const q = questions[session.currentQuestion];
     if (!q) return;
@@ -1702,19 +1807,66 @@ function pintarModulo(id) {
       '<button class="btn" onclick="window.MaturaStudy.nextQuestion()">' +
       (idx < questions.length - 1 ? 'Siguiente &rarr;' : 'Ver resultado &rarr;') +
       '</button></div></div>';
-    setProgress(60 + (idx / questions.length) * 35);
+    const b = (session.bands && session.bands.quiz) || { start: 60, end: 95 };
+    setProgress(b.start + (idx / questions.length) * (b.end - b.start));
   }
 
   window.MaturaStudy = {
     initStages: initStages,
     setStage: setStage,
+    afterContent() {
+      if (hasPracticar) this.startPracticar();
+      else this.startQuiz();
+    },
+    startPracticar() {
+      session.phase = 'practicar';
+      setStage('practicar');
+      document.getElementById('study-content').style.display = 'none';
+      document.getElementById('study-practicar').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      practicarQueue = practicarCards.slice();
+      practicarTotal = practicarQueue.length;
+      practicarDone = 0;
+      updatePracticarProgress();
+      renderPracticarCard();
+    },
+    flipCard() {
+      if (session.phase !== 'practicar' || !practicarQueue.length) return;
+      practicarFlipped = !practicarFlipped;
+      const fc = document.getElementById('flip-card');
+      const actions = document.getElementById('practicar-actions');
+      if (fc) {
+        fc.classList.toggle('flip-card--flipped', practicarFlipped);
+        fc.setAttribute('aria-pressed', String(practicarFlipped));
+        const front = fc.querySelector('.flip-card__face--front');
+        const back = fc.querySelector('.flip-card__face--back');
+        if (front) front.setAttribute('aria-hidden', String(practicarFlipped));
+        if (back) back.setAttribute('aria-hidden', String(!practicarFlipped));
+      }
+      if (actions) actions.style.display = practicarFlipped ? 'flex' : 'none';
+    },
+    knowCard() {
+      if (!practicarFlipped || !practicarQueue.length) return;
+      practicarQueue.shift();
+      practicarDone++;
+      updatePracticarProgress();
+      advancePracticarCard('know');
+    },
+    reviewCard() {
+      if (!practicarFlipped || !practicarQueue.length) return;
+      const card = practicarQueue.shift();
+      practicarQueue.push(card);
+      advancePracticarCard('review');
+    },
     startQuiz() {
       session.phase = 'quiz';
       setStage('quiz');
       document.getElementById('study-content').style.display = 'none';
+      document.getElementById('study-practicar').style.display = 'none';
       document.getElementById('study-quiz').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setProgress(60);
+      const b = (session.bands && session.bands.quiz) || { start: 60, end: 95 };
+      setProgress(b.start);
       renderQuestion(0);
     },
     selectOption(optIdx) {
@@ -1866,6 +2018,8 @@ function launchSessionIntro(mod, seccion, session) {
         window.MaturaStudy.initStages(session);
         if (selectedMode === 'aprender') {
           window.MaturaStudy.setStage('reading');
+        } else if (session.hasPracticar) {
+          window.MaturaStudy.startPracticar();
         } else {
           window.MaturaStudy.startQuiz();
         }
